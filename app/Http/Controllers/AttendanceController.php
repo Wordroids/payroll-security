@@ -53,7 +53,7 @@ class AttendanceController extends Controller
         $selectedSite = $request->site_id ?? null;
         $selectedMonth = $request->month ?? now()->format('Y-m'); // e.g., 2024-04
 
-        $guards = [];
+        $guards = [];$filledAttendances = [];
         if ($selectedSite) {
             $guards = Site::find($selectedSite)?->employees ?? [];
             $startDate = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
@@ -64,7 +64,7 @@ class AttendanceController extends Controller
                 ->where('site_id', $selectedSite)
                 ->get();
 
-            $filledAttendances = [];
+            
 
             foreach ($records as $record) {
                 $day = Carbon::parse($record->date)->day;
