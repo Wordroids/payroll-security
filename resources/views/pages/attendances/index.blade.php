@@ -138,19 +138,19 @@
                                   </td>
 
                                   {{-- Tot. OT Hrs --}}
-                                  <td class="border px-2 py-1 text-center font-semibold">{{ $totalOTDayHours + $totalOTNightHours }}
+                                  <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">{{ $totalOTDayHours + $totalOTNightHours }}
                                   </td>
 
                                   {{-- Tot. Hrs --}}
-                                  <td class="border px-2 py-1 text-center font-semibold">{{ ($totalOTDayHours + $totalOTNightHours) + ($totalNormalDayHours + $totalNormalNightHours) }}
+                                  <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">{{ ($totalOTDayHours + $totalOTNightHours) + ($totalNormalDayHours + $totalNormalNightHours) }}
                                   </td>
 
                                   {{-- Days --}}
-                                  <td class="border px-2 py-1 text-center font-semibold">{{ (($totalOTDayHours + $totalOTNightHours) + ($totalNormalDayHours + $totalNormalNightHours)) /24 }}
+                                  <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">{{ (($totalOTDayHours + $totalOTNightHours) + ($totalNormalDayHours + $totalNormalNightHours)) /24 }}
                                   </td>
 
                                   {{-- Shifts --}}
-                                  <td class="border px-2 py-1 text-center font-semibold">{{ (($totalNormalDayHours + $totalNormalNightHours) + ($totalOTDayHours + $totalOTNightHours)) / 12 }}
+                                  <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">{{ (($totalNormalDayHours + $totalNormalNightHours) + ($totalOTDayHours + $totalOTNightHours)) / 12 }}
                                   </td>
                               </tr>
                           @endforeach
