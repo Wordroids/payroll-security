@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiteController;
@@ -39,6 +40,13 @@ Route::middleware('auth')->group(function () {
     Route::put('sites/{site}', [SiteController::class, 'update'])->name('sites.update');
     Route::delete('sites/{site}', [SiteController::class, 'destroy'])->name('sites.destroy');
     
+    // Attendance Management Routes
+    Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+
+    Route::get('/attendances/site-entry', [AttendanceController::class, 'siteEntryForm'])->name('attendances.site-entry');
+    Route::post('/attendances/site-entry', [AttendanceController::class, 'storeSiteEntry'])->name('attendances.site-entry.store');
+    
+
 
 });
 
