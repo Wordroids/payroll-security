@@ -36,6 +36,27 @@ class AttendanceController extends Controller
             $attendances[$attendance->employee_id][$day][$attendance->shift] = $attendance->worked_hours;
         }
 
+        //get the Normal Hours of worked hours.Normal hours are 9 hours from the total worked hours from the day for nigh and day.
+        foreach ($attendances as $employeeId => $days) {
+            foreach ($days as $day => $shifts) {
+
+                if (isset($shifts['day'])) {
+                    $attendances[$employeeId][$day]['normal_day_hours'] = min($shifts['day'], 9);
+                    $attendances[$employeeId][$day]['ot_day_hours'] = min($shifts['day'], 3);
+
+
+                }
+                if (isset($shifts['night'])) {
+                    $attendances[$employeeId][$day]['normal_night_hours'] = min($shifts['night'], 9);
+                    $attendances[$employeeId][$day]['ot_night_hours'] = min($shifts['night'], 3);
+
+                }
+            }
+        }
+
+
+       
+
         return view('pages.attendances.index', compact('month', 'employeeId', 'attendances', 'employees'));
     }
 
