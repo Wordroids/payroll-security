@@ -3,17 +3,10 @@
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="sm:flex sm:items-center">
                 <div class="sm:flex-auto">
-                    <h1 class="text-base font-semibold text-gray-900">Guards</h1>
-                    <p class="mt-2 text-sm text-gray-700">
-                        A list of all the Guards in your system including their name, phone, address, NIC and dates.
-                    </p>
+                    <h1 class="text-base font-semibold text-gray-900">Salaries</h1>
+                   
                 </div>
-                <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                    <a href="{{ route('employees.create') }}"
-                       class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                        Add Guard
-                    </a>
-                </div>
+                
             </div>
 
             <div class="mt-8 flow-root">
@@ -26,7 +19,6 @@
                                         <th class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Emp No</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Rank</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Phone</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Address</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">NIC</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date of Birth</th>
@@ -45,12 +37,8 @@
                                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 {{ $employee->name }}
                                             </td>
-
                                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 {{ $employee->rank }}
-                                            </td>
-                                            <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                {{ $employee->phone }}
                                             </td>
                                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 {{ $employee->address }}
@@ -65,15 +53,10 @@
                                                 {{ \Carbon\Carbon::parse($employee->date_of_hire)->format('Y-m-d') }}
                                             </td>
                                             <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
-                                                <a href="{{ route('employees.edit', $employee->id) }}"
-                                                   class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
+                                                <a href="{{ route('salaries.show', $employee->id) }}"
+                                                   class="text-indigo-600 hover:text-indigo-900 mr-4">View Salary Log</a>
                                             
-                                                <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" class="inline-block"
-                                                      onsubmit="return confirm('Are you sure you want to delete this employee?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
-                                                </form>
+                                                
                                             </td>
                                             
                                         </tr>

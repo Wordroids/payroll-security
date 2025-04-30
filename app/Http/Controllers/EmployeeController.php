@@ -39,6 +39,7 @@ class EmployeeController extends Controller
             'nic' => 'required|string|max:12',
             'date_of_birth' => 'required|date',
             'date_of_hire' => 'required|date',
+            'rank' => 'required|string|max:255',
         ]);
 
         Employee::create($validated);
@@ -75,6 +76,7 @@ class EmployeeController extends Controller
             'nic' => 'required|string|max:12',
             'date_of_birth' => 'required|date',
             'date_of_hire' => 'required|date',
+            'rank' => 'required|string|max:255',
         ]);
 
         $employee->update($validated);

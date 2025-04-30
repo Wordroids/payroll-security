@@ -16,7 +16,8 @@ class Employee extends Model
         'address',
         'nic',
         'date_of_birth',
-        'date_of_hire'
+        'date_of_hire',
+        'rank',
     ];
 
     public function sites()
@@ -28,4 +29,11 @@ class Employee extends Model
     {
         return $this->hasMany(SalaryAdvance::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+
 }

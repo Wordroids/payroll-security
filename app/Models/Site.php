@@ -30,4 +30,9 @@ class Site extends Model
     {
         return $this->belongsToMany(Employee::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }

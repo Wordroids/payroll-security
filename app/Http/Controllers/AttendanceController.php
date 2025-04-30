@@ -19,47 +19,61 @@ class AttendanceController extends Controller
     {
         $month = $request->input('month', now()->format('Y-m')); // default: current month
         $employeeId = $request->input('employee_id');
-
+    
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+   
+    
+        // Get all employees (for dropdown)
+        $allEmployees = Employee::orderBy('name')->get();
+    
+        // Load Sites with filtered employees
+        $sites = Site::with(['employees' => function ($q) use ($employeeId) {
+            if ($employeeId) {
+                $q->where('id', $employeeId);
+            }
+        }])->get();
 
-        $employees = Employee::orderBy('name')->get();
-
-        $records = Attendance::whereBetween('date', [$startDate, $endDate])
-            ->when($employeeId, fn($q) => $q->where('employee_id', $employeeId))
-            ->get();
+    
+        // Fetch attendances
+        $records = Attendance::whereBetween('date', [$startDate, $endDate])->when($employeeId, fn($q) => $q->where('employee_id', $employeeId))->get();
+ 
 
         $attendances = [];
-
+    
         foreach ($records as $attendance) {
             $day = Carbon::parse($attendance->date)->day;
-            $attendances[$attendance->employee_id][$day][$attendance->shift] = $attendance->worked_hours;
+            $attendances[$attendance->employee_id][$attendance->site_id][$day][$attendance->shift] = $attendance->worked_hours;
         }
 
-        //get the Normal Hours of worked hours.Normal hours are 9 hours from the total worked hours from the day for nigh and day.
-        foreach ($attendances as $employeeId => $days) {
-            foreach ($days as $day => $shifts) {
+        foreach ($attendances as $empId => $sitess) {
 
-                if (isset($shifts['day'])) {
-                    $attendances[$employeeId][$day]['normal_day_hours'] = min($shifts['day'], 9);
-                    $attendances[$employeeId][$day]['ot_day_hours'] = min($shifts['day'], 3);
-
-
-                }
-                if (isset($shifts['night'])) {
-                    $attendances[$employeeId][$day]['normal_night_hours'] = min($shifts['night'], 9);
-                    $attendances[$employeeId][$day]['ot_night_hours'] = min($shifts['night'], 3);
-
+            foreach($sitess as $siteId => $days) {
+                
+                foreach ($days as $day => $shifts) {
+                    if (isset($shifts['day'])) {
+                        $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
+                        $attendances[$empId][$siteId][$day]['ot_day_hours'] = max($shifts['day'] - 9, 0);
+                    }
+                    if (isset($shifts['night'])) {
+                        $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
+                        $attendances[$empId][$siteId][$day]['ot_night_hours'] = max($shifts['night'] - 9, 0);
+                    }
                 }
             }
+            
         }
 
 
-       
-
-        return view('pages.attendances.index', compact('month', 'employeeId', 'attendances', 'employees'));
+        return view('pages.attendances.index', [
+            'month' => $month,
+            'employeeId' => $employeeId,
+            'attendances' => $attendances,
+            'allEmployees' => $allEmployees,
+            'sites' => $sites,
+        ]);
     }
-
+    
     /**
      * Show the form for creating a new resource.
      */

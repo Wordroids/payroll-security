@@ -56,6 +56,19 @@
                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                 </div>
 
+                {{-- Rank --}}
+                <div>
+                    <label for="rank" class="block text-sm font-medium text-gray-700">Rank</label>
+                    <select name="rank" id="rank"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        <option value="">Select Rank</option>
+                        <option value="SSO" {{ $employee->rank == 'SSO' ? 'selected' : '' }}>SSO</option>
+                        <option value="OIC" {{ $employee->rank == 'OIC' ? 'selected' : '' }}>OIC</option>
+                        <option value="LSO" {{ $employee->rank == 'LSO' ? 'selected' : '' }}>LSO</option>
+                        <option value="JSO" {{ $employee->rank == 'JSO' ? 'selected' : '' }}>JSO</option>
+                    </select>
+                </div>
+
                 <div class="pt-4">
                     <button type="submit"
                         class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">

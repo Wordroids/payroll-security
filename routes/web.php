@@ -4,6 +4,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalaryAdvanceController;
+use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/salary-advance/{salaryAdvance}/edit', [SalaryAdvanceController::class, 'edit'])->name('salary.advance.edit');
     Route::put('/salary-advance/{salaryAdvance}', [SalaryAdvanceController::class, 'update'])->name('salary.advance.update');
     Route::delete('/salary-advance/{salaryAdvance}', [SalaryAdvanceController::class, 'destroy'])->name('salary.advance.destroy');
+
+
+    //Salaries
+    Route::get('/salaries', [SalaryController::class, 'index'])->name('salaries');
+    Route::get('/salaries/{employee}', [SalaryController::class, 'show'])->name('salaries.show');
+
+    
     
 
 
