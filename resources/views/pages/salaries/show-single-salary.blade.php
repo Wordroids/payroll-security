@@ -49,6 +49,7 @@
                         </thead>
                         @php
                             $totalShiftEarning = 0;
+                            $totalOTHours = 0;
                         @endphp
 
                         <tbody>
@@ -84,6 +85,7 @@
 
                                 @php
                                     $totalShiftEarning += (($totalNormalDayHours + $totalNormalNightHours + $totalOTDayHours + $totalOTNightHours) / 12) * $site->guard_shift_rate;
+                                    $totalOTHours += $totalOTDayHours + $totalOTNightHours;
                                 @endphp
 
                                 <tr>
@@ -102,6 +104,12 @@
                     <div class="mt-4">
                         <h3 class="text-lg font-semibold text-gray-800">Total Shift Earnings:  Rs. {{ $totalShiftEarning }}.00</h3>
                     </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Total OT Hours: {{ $totalOTHours }} Hours</h3>
+                    </div>
+
+                    
 
                 </div>
             @else
