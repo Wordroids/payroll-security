@@ -72,7 +72,6 @@ class AttendanceController extends Controller
             }
         }
 
-
         return view('pages.attendances.site-entry', compact('sites', 'guards', 'selectedSite', 'selectedMonth', 'filledAttendances'));
     }
 

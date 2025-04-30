@@ -82,7 +82,11 @@
                                 </td>
                             @endfor
 
-                            <td class="border px-2 py-1 text-center text-blue-700 font-semibold">{{ $dayTotal }}
+                            <td class="border px-2 py-1 text-center text-blue-700 font-semibold">
+                                <div class="text-xs leading-tight"> 
+                                        <span class="text-blue-700">D: {{ $dayTotal }}</span><br>
+                                        <span class="text-purple-700">N: {{ $nightTotal }}</span>
+                                </div>
                             </td>
                             <td class="border px-2 py-1 text-center text-purple-700 font-semibold">{{ $nightTotal }}
                             </td>
