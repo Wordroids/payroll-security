@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SalaryAdvanceController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,14 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/sites/{site}/assign', [SiteController::class, 'assignGuards'])->name('sites.assign');
     Route::post('/sites/{site}/assign', [SiteController::class, 'storeAssignedGuards'])->name('sites.assign.store');
+
+    // Salary Advance 
+    Route::get('/salary-advance', [SalaryAdvanceController::class, 'salaryAdvance'])->name('salary.advance');
+    Route::get('/salary-advance/create', [SalaryAdvanceController::class, 'create'])->name('salary.advance.create');
+    Route::post('/salary-advance', [SalaryAdvanceController::class, 'store'])->name('salary.advance.store');
+    Route::get('/salary-advance/{salaryAdvance}/edit', [SalaryAdvanceController::class, 'edit'])->name('salary.advance.edit');
+    Route::put('/salary-advance/{salaryAdvance}', [SalaryAdvanceController::class, 'update'])->name('salary.advance.update');
+    Route::delete('/salary-advance/{salaryAdvance}', [SalaryAdvanceController::class, 'destroy'])->name('salary.advance.destroy');
     
 
 

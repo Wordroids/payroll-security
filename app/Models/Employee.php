@@ -23,4 +23,9 @@ class Employee extends Model
     {
         return $this->belongsToMany(Site::class);
     }
+
+    public function salaryAdvances()
+    {
+        return $this->hasMany(SalaryAdvance::class);
+    }
 }
