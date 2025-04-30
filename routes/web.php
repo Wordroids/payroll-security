@@ -42,9 +42,11 @@ Route::middleware('auth')->group(function () {
     
     // Attendance Management Routes
     Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
-
     Route::get('/attendances/site-entry', [AttendanceController::class, 'siteEntryForm'])->name('attendances.site-entry');
     Route::post('/attendances/site-entry', [AttendanceController::class, 'storeSiteEntry'])->name('attendances.site-entry.store');
+
+    Route::get('/sites/{site}/assign', [SiteController::class, 'assignGuards'])->name('sites.assign');
+    Route::post('/sites/{site}/assign', [SiteController::class, 'storeAssignedGuards'])->name('sites.assign.store');
     
 
 

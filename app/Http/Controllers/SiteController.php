@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreSiteRequest;
 use App\Http\Requests\UpdateSiteRequest;
+use App\Models\Employee;
 use App\Models\Site;
 use Illuminate\Http\Request;
 
@@ -94,6 +95,27 @@ class SiteController extends Controller
 
         return redirect()->route('sites.index')->with('success', 'Site updated successfully.');
     }
+
+    public function assignGuards(Site $site)
+    {
+        $employees = Employee::orderBy('name')->get();
+        $assigned = $site->employees->pluck('id')->toArray();
+
+        return view('pages.sites.assign', compact('site', 'employees', 'assigned'));
+    }
+
+    public function storeAssignedGuards(Request $request, Site $site)
+    {
+        $validated = $request->validate([
+            'employee_ids' => 'nullable|array',
+            'employee_ids.*' => 'exists:employees,id',
+        ]);
+
+        $site->employees()->sync($validated['employee_ids'] ?? []);
+
+        return redirect()->route('sites.index')->with('success', 'Guards assigned successfully.');
+    }
+
 
 
     /**

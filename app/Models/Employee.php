@@ -18,4 +18,9 @@ class Employee extends Model
         'date_of_birth',
         'date_of_hire'
     ];
+
+    public function sites()
+    {
+        return $this->belongsToMany(Site::class);
+    }
 }

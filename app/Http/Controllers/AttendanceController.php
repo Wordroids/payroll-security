@@ -55,7 +55,7 @@ class AttendanceController extends Controller
 
         $guards = [];
         if ($selectedSite) {
-            $guards = Employee::orderBy('name')->get(); // or filter by site if logic exists
+            $guards = Site::find($selectedSite)?->employees ?? [];
         }
 
         return view('pages.attendances.site-entry', compact('sites', 'guards', 'selectedSite', 'selectedMonth'));

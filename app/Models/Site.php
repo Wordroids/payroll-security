@@ -25,4 +25,9 @@ class Site extends Model
         'site_shift_rate',
         'guard_shift_rate'
     ];
+
+    public function employees()
+    {
+        return $this->belongsToMany(Employee::class);
+    }
 }

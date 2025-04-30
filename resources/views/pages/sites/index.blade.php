@@ -38,6 +38,9 @@
                             <td class="px-4 py-3">{{ $site->contact_number }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($site->start_date)->format('Y-m-d') }}</td>
                             <td class="px-4 py-3 text-right">
+                                <a href="{{ route('sites.assign', $site->id) }}"
+                                   class="text-blue-600 hover:text-blue-900 mr-4">Assign Guards</a>
+                                   
                                 <a href="{{ route('sites.edit', $site->id) }}"
                                    class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
 
