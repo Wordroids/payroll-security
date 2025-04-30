@@ -49,16 +49,26 @@
                                         @php
                                             $dayField = "attendances[{$guard->id}][{$day}][day]";
                                             $nightField = "attendances[{$guard->id}][{$day}][night]";
+
+                                            $dayValue =
+                                                old("attendances.{$guard->id}.{$day}.day") ??
+                                                ($filledAttendances[$guard->id][$day]['day'] ?? '');
+
+                                            $nightValue =
+                                                old("attendances.{$guard->id}.{$day}.night") ??
+                                                ($filledAttendances[$guard->id][$day]['night'] ?? '');
                                         @endphp
-                                        <td class="border px-1 py-1 text-center">
+                                        <td class="border  px-1 py-1 text-center">
                                             <input type="number" name="{{ $dayField }}"
-                                                value="{{ old($dayField) }}" class="w-16 border p-1 mb-1 text-sm"
+                                                value="{{ $dayValue }}" class="w-14 block border p-1 mb-1 text-sm"
                                                 min="0" max="24" placeholder="Day">
+
                                             <input type="number" name="{{ $nightField }}"
-                                                value="{{ old($nightField) }}" class="w-16 border p-1 text-sm"
+                                                value="{{ $nightValue }}" class="w-14 block border p-1 text-sm"
                                                 min="0" max="24" placeholder="Night">
                                         </td>
                                     @endfor
+
 
                                 </tr>
                             @endforeach

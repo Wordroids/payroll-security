@@ -56,9 +56,24 @@ class AttendanceController extends Controller
         $guards = [];
         if ($selectedSite) {
             $guards = Site::find($selectedSite)?->employees ?? [];
+            $startDate = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
+            $endDate = Carbon::createFromFormat('Y-m', $selectedMonth)->endOfMonth();
+
+            $records = Attendance::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('employee_id', $guards->pluck('id'))
+                ->where('site_id', $selectedSite)
+                ->get();
+
+            $filledAttendances = [];
+
+            foreach ($records as $record) {
+                $day = Carbon::parse($record->date)->day;
+                $filledAttendances[$record->employee_id][$day][$record->shift] = $record->worked_hours;
+            }
         }
 
-        return view('pages.attendances.site-entry', compact('sites', 'guards', 'selectedSite', 'selectedMonth'));
+
+        return view('pages.attendances.site-entry', compact('sites', 'guards', 'selectedSite', 'selectedMonth', 'filledAttendances'));
     }
 
     public function storeSiteEntry(Request $request)
