@@ -4,6 +4,19 @@
     <div class="h-full px-4 pb-6 overflow-y-auto bg-white">
         <ul class="space-y-2 text-sm font-medium text-gray-700">
 
+            {{-- Dashboard  --}}
+            <li>
+                <a href="{{ route('dashboard') }}"
+                    class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                    <svg class="w-5 h-5 text-gray-500 group-hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 3h18M3 9h18m-7 6h7m-7 6h7M3 15h7m-7 6h7"/>
+                    </svg>
+                    <span class="ml-3">Dashboard</span>
+                </a>
+            </li>
+
+
             {{-- Section: Guards --}}
             <li>
                 <button type="button"
