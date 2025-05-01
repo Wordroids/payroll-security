@@ -80,7 +80,14 @@ class SalaryController extends Controller
              
          }
 
-        //  dd($employee , $attendances);
+         //get the total salary advances for this employee
+            $salaryAdvances = $employee->salaryAdvances()->where('advance_date', '>=', $startDate)->where('advance_date', '<=', $endDate)->get();
+            $totalSalaryAdvance = 0;
+            foreach ($salaryAdvances as $advance) {
+                $totalSalaryAdvance += $advance->amount;
+            }
+            $employee->totalSalaryAdvance = $totalSalaryAdvance;
+
 
         return view('pages.salaries.show-single-salary', compact('employee' , 'month' , 'attendances'));
     }

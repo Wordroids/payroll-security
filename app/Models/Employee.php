@@ -20,6 +20,29 @@ class Employee extends Model
         'rank',
     ];
 
+    protected $appends = ['basic', 'br_allow' , 'special_ot_rate' , 'attendance_bonus'];
+
+    public function getBasicAttribute()
+    {
+        return $this->attributes['basic'] ?? 17000;
+    }
+
+    public function getBrAllowAttribute()
+    {
+        return $this->attributes['br_allow'] ?? 3500;
+    }
+
+    public function getSpecialOtRateAttribute()
+    {
+        return $this->attributes['special_ot_rate'] ?? 200;
+    }
+
+    public function getAttendanceBonusAttribute()
+    {
+        return $this->attributes['attendance_bonus'] ?? 5000;
+    }
+
+
     public function sites()
     {
         return $this->belongsToMany(Site::class);
@@ -34,6 +57,4 @@ class Employee extends Model
     {
         return $this->hasMany(Attendance::class);
     }
-
-
 }

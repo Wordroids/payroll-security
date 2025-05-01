@@ -20,7 +20,7 @@
         </div>
 
 
-        <form method="GET" action="{{ route('salaries.show', $employee->id) }}" class="mb-6 flex items-end gap-4">
+        <form method="GET" action="{{ route('salaries.show', $employee->id) }}" class="my-6 flex items-end gap-4">
             <div>
                 <label for="month" class="block text-sm font-medium text-gray-700">Select Month</label>
                 <input type="month" name="month" id="month" value="{{ $month }}"
@@ -84,7 +84,13 @@
                                 @endfor
 
                                 @php
-                                    $totalShiftEarning += (($totalNormalDayHours + $totalNormalNightHours + $totalOTDayHours + $totalOTNightHours) / 12) * $site->guard_shift_rate;
+                                    $totalShiftEarning +=
+                                        (($totalNormalDayHours +
+                                            $totalNormalNightHours +
+                                            $totalOTDayHours +
+                                            $totalOTNightHours) /
+                                            12) *
+                                        $site->guard_shift_rate;
                                     $totalOTHours += $totalOTDayHours + $totalOTNightHours;
                                 @endphp
 
@@ -102,14 +108,86 @@
                     </table>
 
                     <div class="mt-4">
-                        <h3 class="text-lg font-semibold text-gray-800">Total Shift Earnings:  Rs. {{ $totalShiftEarning }}.00</h3>
+                        <h3 class="text-lg font-semibold text-gray-800">Total Shift Earnings: Rs.
+                            {{ $totalShiftEarning }}.00</h3>
                     </div>
 
                     <div class="mt-4">
                         <h3 class="text-lg font-semibold text-gray-800">Total OT Hours: {{ $totalOTHours }} Hours</h3>
                     </div>
 
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">OT Rate:
+                            {{ number_format(((($employee->basic + $employee->br_allow) / 8) * 1.5) / 26, 2) }} Hours</h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Basic Salary: Rs.{{ $employee->basic }}.00</h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">BR Allowance: Rs.{{ $employee->br_allow }}.00
+                        </h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">OT Earnings:
+                            Rs.{{ number_format((((($employee->basic + $employee->br_allow) / 8) * 1.5) / 26) * $totalOTHours, 2) }}
+                        </h3>
+                    </div>
+
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Attendance Bonus:
+                            Rs.{{ $employee->attendance_bonus }}.00
+                        </h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Other Allowances: Rs.{{ number_format($totalShiftEarning - ($employee->attendance_bonus + $employee->br_allow +$employee->basic + ((((($employee->basic + $employee->br_allow) / 8) * 1.5) / 26) * $totalOTHours))) }}.00
+                        </h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Sub total: Rs.{{ number_format(($employee->attendance_bonus + $employee->br_allow +$employee->basic + ((((($employee->basic + $employee->br_allow) / 8) * 1.5) / 26) * $totalOTHours))) }}.00
+                        </h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Gross pay: Rs.{{ $grossPay = $totalShiftEarning }}.00
+                        </h3>
+                    </div>
+
                     
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">EPF 8%: Rs.{{ $tottalepf = (($employee->basic + $employee->br_allow) / 100) * 8 }}.00
+                        </h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Salary Advacnces: Rs.{{ $employee->totalSalaryAdvance }}.00
+                        </h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Total Deductions: Rs.{{ $totalDeductions = $tottalepf + $employee->totalSalaryAdvance }}.00
+                        </h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">Total Earnings: Rs.{{ $grossPay - $totalDeductions }}.00
+                        </h3>
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="text-lg font-semibold text-gray-800">EPF/ETF 15%: Rs.{{ number_format( ($employee->basic /100) * 15 ) }}.00
+                        </h3>
+                    </div>
+
+
+
+
+
 
                 </div>
             @else
