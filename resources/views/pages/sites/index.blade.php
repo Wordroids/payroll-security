@@ -26,7 +26,10 @@
                         <th class="px-4 py-3">Contact Person</th>
                         <th class="px-4 py-3">Phone</th>
                         <th class="px-4 py-3">Start Date</th>
-                        <th class="px-4 py-3 text-right">Actions</th>
+                        <th class="px-4 py-3 ">No. Of Guards</th>
+                        <th class="px-4 py-3 ">Site Rate</th>
+                        <th class="px-4 py-3 ">Guard Rate</th>
+                        <th class="px-4 py-3 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -37,6 +40,9 @@
                             <td class="px-4 py-3">{{ $site->contact_person }}</td>
                             <td class="px-4 py-3">{{ $site->contact_number }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($site->start_date)->format('Y-m-d') }}</td>
+                            <td class="px-4 py-3">{{ $site->no_of_guards }}</td>
+                            <td class="px-4 py-3">Rs.{{ $site->site_shift_rate }}.00</td>
+                            <td class="px-4 py-3">Rs.{{ $site->guard_shift_rate }}.00</td>
                             <td class="px-4 py-3 text-right">
                                 <a href="{{ route('sites.assign', $site->id) }}"
                                    class="text-blue-600 hover:text-blue-900 mr-4">Assign Guards</a>
