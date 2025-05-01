@@ -1,4 +1,7 @@
+
+
 <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+    
     <div class="flex items-center justify-between px-4 py-3 lg:px-6">
         {{-- Left Section --}}
         <div class="flex items-center">
