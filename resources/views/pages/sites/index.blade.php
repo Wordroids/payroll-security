@@ -2,7 +2,7 @@
     <div class="p-4 sm:p-6 lg:p-8">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h2 class="text-2xl font-semibold text-gray-800">Guard Sites</h2>
+                <h2 class="text-2xl font-semibold text-gray-800">Sites</h2>
                 <p class="mt-1 text-sm text-gray-600">List of all guard hiring sites.</p>
             </div>
             <a href="{{ route('sites.create') }}"

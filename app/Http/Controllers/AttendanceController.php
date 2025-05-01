@@ -30,7 +30,7 @@ class AttendanceController extends Controller
         // Load Sites with filtered employees
         $sites = Site::with(['employees' => function ($q) use ($employeeId) {
             if ($employeeId) {
-                $q->where('id', $employeeId);
+                $q->where('employee_id', $employeeId);
             }
         }])->get();
 
