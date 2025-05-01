@@ -111,5 +111,10 @@
                 </ul>
             </li>
         </ul>
+        <div class="absolute bottom-4 left-0 w-full px-4">
+            <p class="text-xs text-gray-400 text-center">
+                &copy; {{ now()->year }} <a class="text-purple-600 hover:font-bold" target="blank" href="https://wordroids.com">Wordroids</a>. All rights reserved.
+            </p>
+        </div>
     </div>
 </aside>
