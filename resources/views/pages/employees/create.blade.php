@@ -65,6 +65,7 @@
                         <option value="OIC" {{ old('rank') == 'OIC' ? 'selected' : '' }}>OIC</option>
                         <option value="LSO" {{ old('rank') == 'LSO' ? 'selected' : '' }}>LSO</option>
                         <option value="JSO" {{ old('rank') == 'JSO' ? 'selected' : '' }}>JSO</option>
+                        <option value="CSO" {{ old('rank') == 'CSO' ? 'selected' : '' }}>CSO</option>
                     </select>
                 </div>
 

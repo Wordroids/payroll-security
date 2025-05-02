@@ -66,6 +66,7 @@
                         <option value="OIC" {{ $employee->rank == 'OIC' ? 'selected' : '' }}>OIC</option>
                         <option value="LSO" {{ $employee->rank == 'LSO' ? 'selected' : '' }}>LSO</option>
                         <option value="JSO" {{ $employee->rank == 'JSO' ? 'selected' : '' }}>JSO</option>
+                        <option value="CSO" {{ $employee->rank == 'CSO' ? 'selected' : '' }}>CSO</option>
                     </select>
                 </div>
 
