@@ -30,9 +30,8 @@
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Advance Date</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Reason</th>
-                                        <th class="relative py-3.5 pr-4 pl-3 sm:pr-6">
-                                            <span class="sr-only">Edit</span>
-                                        </th>
+                                        <th class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Actions</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -79,6 +78,69 @@
                                         </tr>
                                     @endforelse
                                 </tbody>
+                                
+                            </table>
+                        </div>
+
+                        <!-- Employee-wise Summary -->
+                        <div class="mt-16 overflow-hidden shadow-sm ring-1 ring-black/5 sm:rounded-lg">
+                            <h2 class="px-6 py-3 bg-gray-50 text-left text-sm font-semibold text-gray-900">Employee-wise Advance Summary</h2>
+                            <table class="min-w-full divide-y divide-gray-300">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Emp No</th>
+                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
+                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Advances</th>
+                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    @php
+                                        $employeeSummary = $salaryAdvances->groupBy('employee_id')
+                                            ->map(function($advances) {
+                                                return [
+                                                    'employee' => $advances->first()->employee,
+                                                    'count' => $advances->count(),
+                                                    'total' => $advances->sum('amount')
+                                                ];
+                                            });
+                                    @endphp
+                                    
+                                    @forelse ($employeeSummary as $summary)
+                                        <tr>
+                                            <td class="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-6">
+                                                {{ $summary['employee']->emp_no ?? 'N/A' }}
+                                            </td>
+                                            <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                                {{ $summary['employee']->name ?? 'N/A' }}
+                                            </td>
+                                            <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                                {{ $summary['count'] }}
+                                            </td>
+                                            <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                                {{ number_format($summary['total'], 2) }}
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                                No summary data available.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                                <tfoot class="bg-gray-50">
+                                    <tr>
+                                        <td class="py-3.5 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-6">
+                                            Total Employees: {{ count($employeeSummary) }}
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="py-3.5 px-3 text-sm font-semibold text-gray-900 text-right">
+                                            Grand Amount: {{ number_format($salaryAdvances->sum('amount'), 2) }}
+                                        </td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
