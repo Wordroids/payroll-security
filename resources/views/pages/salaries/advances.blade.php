@@ -80,6 +80,13 @@
                                 </tbody>
                                 
                             </table>
+                            
+                        </div>
+                        <!-- Pagination -->
+                        <div class="mt-4">
+                           
+                        {{ $salaryAdvances->links() }}
+
                         </div>
 
                         <!-- Employee-wise Summary -->

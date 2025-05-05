@@ -15,7 +15,7 @@ class SalaryAdvanceController extends Controller
      */
     public function salaryAdvance()
     {
-        $salaryAdvances = SalaryAdvance::with('employee')->get();
+        $salaryAdvances = SalaryAdvance::with('employee')->paginate(10);
         return view('pages.salaries.advances', compact('salaryAdvances'));
     }
 
