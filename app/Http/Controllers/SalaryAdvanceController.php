@@ -13,10 +13,26 @@ class SalaryAdvanceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function salaryAdvance()
+    public function salaryAdvance(Request $request)
     {
-        $salaryAdvances = SalaryAdvance::with('employee')->paginate(10);
-        return view('pages.salaries.advances', compact('salaryAdvances'));
+
+        $currentMonth = $request->input('month', date('Y-m'));
+        $salaryAdvances = SalaryAdvance::with('employee')
+            ->where('advance_date', 'like', $currentMonth . '%')
+            ->paginate(10);
+
+
+        $employees = Employee::with(['salaryAdvances' => function ($query) use ($currentMonth) {
+            $query->where('advance_date', 'like', $currentMonth . '%');
+        }])
+            ->whereHas('salaryAdvances', function ($query) use ($currentMonth) {
+                $query->where('advance_date', 'like', $currentMonth . '%');
+            })
+            ->orderBy('emp_no')
+            ->get();
+
+        // dd($employees);
+        return view('pages.salaries.advances', compact('salaryAdvances', 'currentMonth', 'employees'));
     }
 
     /**
