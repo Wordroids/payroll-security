@@ -75,6 +75,9 @@
             <h2 class="text-xl font-semibold text-gray-700 mb-4">Salary Breakdown</h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+                <div><strong>Special OT Hours:</strong> {{ $specialOtHours }}</div>
+                <div><strong>Special OT Rate:</strong> Rs.200.00</div>
+                <div><strong>Special OT Earnings:</strong> Rs. {{ number_format($specialOtHours * 200, 2) }}</div>
                 <div><strong>Total Shift Earnings:</strong> Rs. {{ number_format($totalShiftEarning, 2) }}</div>
                 <div><strong>Total OT Hours:</strong> {{ $totalOTHours }} hrs</div>
                 <div><strong>OT Rate:</strong> Rs. {{ number_format($otRate, 2) }} / hr</div>
