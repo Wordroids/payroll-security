@@ -155,7 +155,7 @@ class SalaryController extends Controller
         $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
         $otherAllowances = round($totalShiftEarning - $subTotal, 2);
     
-        $grossPay = $totalShiftEarning;
+        $grossPay = $totalShiftEarning + ($specialOtHours * 200);
         $epfEmployee = ($combinedBase / 100) * 8;
         $epfEtfEmployer = ($employee->basic / 100) * 15;
         $totalDeductions = $epfEmployee + $employee->totalSalaryAdvance;
