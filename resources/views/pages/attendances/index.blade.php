@@ -141,13 +141,14 @@
             </table>
         </div> --}}
         @foreach ($sites as $site)
-        
             <div class="overflow-x-auto bg-white rounded shadow mb-20">
 
                 <table class="min-w-max w-full text-sm border-collapse border border-gray-300">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="border text-left bg-gray-200 font-semibold px-4 py-2 min-w-48 max-w-48 text-indigo-700"> Site:
+                            <th
+                                class="border text-left bg-gray-200 font-semibold px-4 py-2 min-w-48 max-w-48 text-indigo-700">
+                                Site:
                                 {{ $site->name }}
                             </th>
 
@@ -161,6 +162,7 @@
                             <th class="border px-2 py-1 text-center">Tot. Hrs</th>
                             <th class="border px-2 py-1 text-center">Days</th>
                             <th class="border px-2 py-1 text-center">Shifts</th>
+                            <th class="border px-2 py-1 text-center">S.P. OT</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,18 +177,22 @@
                                 $totalNormalNightHours = 0;
                                 $totalOTDayHours = 0;
                                 $totalOTNightHours = 0;
+                                $specialOtHours = 0;
                             @endphp
                             <tr>
                                 <td class="border px-2 py-1">{{ $employee->name }}</td>
 
                                 @for ($d = 1; $d <= $daysInMonth; $d++)
                                     @php
+
                                         $dayHours = $attendances[$employee->id][$site->id][$d]['day'] ?? null;
                                         $nightHours = $attendances[$employee->id][$site->id][$d]['night'] ?? null;
+
                                         $dayTotal += is_numeric($dayHours) ? $dayHours : 0;
                                         $nightTotal += is_numeric($nightHours) ? $nightHours : 0;
                                         $normalDayHours =
                                             $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
+
                                         $normalNightHours =
                                             $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
                                         $otDayHours = $attendances[$employee->id][$site->id][$d]['ot_day_hours'] ?? 0;
@@ -196,6 +202,11 @@
                                         $totalNormalNightHours += $normalNightHours;
                                         $totalOTDayHours += $otDayHours;
                                         $totalOTNightHours += $otNightHours;
+                                        if ($site->has_special_ot_hours) {
+                                           $specialOtHours = $specialOtHours + max( $dayHours - 12, 0);
+                                        }
+                                        
+
                                     @endphp
 
                                     <td class="border px-1 py-1 text-center">
@@ -213,6 +224,8 @@
                                         @endif
                                     </td>
                                 @endfor
+
+
 
                                 <td class="border px-2 py-1 text-center text-blue-700 font-semibold">
                                     <div class="text-xs leading-tight">
@@ -246,6 +259,10 @@
 
                                 <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">
                                     {{ ($totalNormalDayHours + $totalNormalNightHours + $totalOTDayHours + $totalOTNightHours) / 12 }}
+                                </td>
+
+                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">
+                                    {{ $specialOtHours }}
                                 </td>
                             </tr>
                         @endforeach

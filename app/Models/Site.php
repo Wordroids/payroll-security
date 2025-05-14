@@ -23,7 +23,8 @@ class Site extends Model
         'no_day_shifts',
         'no_night_shifts',
         'site_shift_rate',
-        'guard_shift_rate'
+        'guard_shift_rate',
+        'has_special_ot_hours',
     ];
 
     public function employees()
