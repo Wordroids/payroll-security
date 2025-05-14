@@ -7,6 +7,7 @@ use App\Http\Requests\StoreSalaryRequest;
 use App\Http\Requests\UpdateSalaryRequest;
 use App\Models\Attendance;
 use App\Models\Employee;
+use App\Models\Site;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -60,19 +61,41 @@ class SalaryController extends Controller
             $attendances[$attendance->employee_id][$attendance->site_id][$day][$attendance->shift] = $attendance->worked_hours;
         }
     
+        $specialOtHours = 0;
         // Process normal/OT hours
         foreach ($attendances as $empId => $sites) {
             foreach ($sites as $siteId => $days) {
-                foreach ($days as $day => $shifts) {
-                    if (isset($shifts['day'])) {
-                        $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
-                        $attendances[$empId][$siteId][$day]['ot_day_hours'] = max($shifts['day'] - 9, 0);
-                    }
-                    if (isset($shifts['night'])) {
-                        $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
-                        $attendances[$empId][$siteId][$day]['ot_night_hours'] = max($shifts['night'] - 9, 0);
+                $site = Site::find($siteId);
+                if ($site->has_special_ot_hours) {
+                    foreach ($days as $day => $shifts) {
+                        if (isset($shifts['day'])) {
+                            $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
+                            $attendances[$empId][$siteId][$day]['ot_day_hours'] =  min(max($shifts['day'] - 9, 0), 3);
+                        }
+                        if (isset($shifts['night'])) {
+                            $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
+                            $attendances[$empId][$siteId][$day]['ot_night_hours'] =  min(max($shifts['night'] - 9, 0), 3);
+                        }
+                        // special ot total 
+                        if (isset($shifts['day'])) {
+                            $specialOtHours +=  max( $shifts['day'] - 12, 0);
+                        }
                     }
                 }
+                else{
+                    foreach ($days as $day => $shifts) {
+                        if (isset($shifts['day'])) {
+                            $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
+                            $attendances[$empId][$siteId][$day]['ot_day_hours'] = max($shifts['day'] - 9, 0);
+                        }
+                        if (isset($shifts['night'])) {
+                            $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
+                            $attendances[$empId][$siteId][$day]['ot_night_hours'] = max($shifts['night'] - 9, 0);
+                        }
+                    }
+                }
+
+                
             }
         }
     
@@ -126,13 +149,13 @@ class SalaryController extends Controller
     
         // Rates
         $combinedBase = $employee->basic + $employee->br_allow;
-        $otRate = round(((($combinedBase / 8) * 1.5) / 26), 2);
+        $otRate = round(((($combinedBase / 9) * 1.5) / 26), 2);
         $otEarnings = round($otRate * $totalOTHours, 2);
     
         $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
         $otherAllowances = round($totalShiftEarning - $subTotal, 2);
     
-        $grossPay = $totalShiftEarning;
+        $grossPay = $totalShiftEarning + ($specialOtHours * 200);
         $epfEmployee = ($combinedBase / 100) * 8;
         $epfEtfEmployer = ($employee->basic / 100) * 15;
         $totalDeductions = $epfEmployee + $employee->totalSalaryAdvance;
@@ -153,7 +176,8 @@ class SalaryController extends Controller
             'epfEmployee',
             'epfEtfEmployer',
             'totalDeductions',
-            'totalEarnings'
+            'totalEarnings',
+            'specialOtHours',
         ));
     }
     
