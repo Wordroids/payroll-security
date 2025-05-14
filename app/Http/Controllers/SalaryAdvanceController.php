@@ -13,28 +13,26 @@ class SalaryAdvanceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function salaryAdvance(Request $request)
-    {
+   public function salaryAdvance(Request $request)
+{
+    $currentMonth = $request->input('month', date('Y-m'));
 
-        $currentMonth = $request->input('month', date('Y-m'));
-        $salaryAdvances = SalaryAdvance::with('employee')
-            ->where('advance_date', 'like', $currentMonth . '%')
-            ->paginate(10);
-
-
-        $employees = Employee::with(['salaryAdvances' => function ($query) use ($currentMonth) {
+    // Get employees with their salary advances for the selected month, with pagination
+    $employees = Employee::with(['salaryAdvances' => function ($query) use ($currentMonth) {
             $query->where('advance_date', 'like', $currentMonth . '%');
         }])
-            ->whereHas('salaryAdvances', function ($query) use ($currentMonth) {
-                $query->where('advance_date', 'like', $currentMonth . '%');
-            })
-            ->orderBy('emp_no')
-            ->get();
+        ->whereHas('salaryAdvances', function ($query) use ($currentMonth) {
+            $query->where('advance_date', 'like', $currentMonth . '%');
+        })
+        ->orderBy('emp_no')
+        ->paginate(10);
 
-        // dd($employees);
-        return view('pages.salaries.advances', compact('salaryAdvances', 'currentMonth', 'employees'));
-    }
+    // Calculate total advances for the month
+    $totalSalaryAdvancesFortheMonth = SalaryAdvance::where('advance_date', 'like', $currentMonth . '%')
+        ->sum('amount');
 
+    return view('pages.salaries.advances', compact('employees', 'currentMonth', 'totalSalaryAdvancesFortheMonth'));
+}
     /**
      * Show the form for creating a new resource.
      */
