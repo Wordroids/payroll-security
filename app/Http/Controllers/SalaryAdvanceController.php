@@ -7,32 +7,34 @@ use App\Http\Requests\StoreSalaryAdvanceRequest;
 use App\Http\Requests\UpdateSalaryAdvanceRequest;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SalaryAdvanceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-   public function salaryAdvance(Request $request)
-{
-    $currentMonth = $request->input('month', date('Y-m'));
+    public function salaryAdvance(Request $request)
+    {
+        $currentMonth = $request->input('month', date('Y-m'));
 
-    // Get employees with their salary advances for the selected month, with pagination
-    $employees = Employee::with(['salaryAdvances' => function ($query) use ($currentMonth) {
-            $query->where('advance_date', 'like', $currentMonth . '%');
-        }])
-        ->whereHas('salaryAdvances', function ($query) use ($currentMonth) {
-            $query->where('advance_date', 'like', $currentMonth . '%');
-        })
-        ->orderBy('emp_no')
-        ->paginate(10);
+        // Get employees with their salary advances for the selected month, with pagination
+        $employees = Employee::with(['salaryAdvances' => function ($query) use ($currentMonth) {
+                $query->where('advance_date', 'like', $currentMonth . '%');
+            }])
+            ->whereHas('salaryAdvances', function ($query) use ($currentMonth) {
+                $query->where('advance_date', 'like', $currentMonth . '%');
+            })
+            ->orderBy('emp_no')
+            ->paginate(10);
 
-    // Calculate total advances for the month
-    $totalSalaryAdvancesFortheMonth = SalaryAdvance::where('advance_date', 'like', $currentMonth . '%')
-        ->sum('amount');
+        // Calculate total advances for the month
+        $totalSalaryAdvancesFortheMonth = SalaryAdvance::where('advance_date', 'like', $currentMonth . '%')
+            ->sum('amount');
 
-    return view('pages.salaries.advances', compact('employees', 'currentMonth', 'totalSalaryAdvancesFortheMonth'));
-}
+        return view('pages.salaries.advances', compact('employees', 'currentMonth', 'totalSalaryAdvancesFortheMonth'));
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -67,31 +69,83 @@ class SalaryAdvanceController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Edit all advances for an employee in a specific month
      */
-    public function edit(SalaryAdvance $salaryAdvance)
+    public function edit($employeeId, Request $request)
     {
-        $employees = Employee::orderBy('emp_no')->get();
+        try {
+            // Get the month filter
+            $month = $request->input('month', date('Y-m'));
 
-        return view('pages.salaries.editAdvance', compact('salaryAdvance', 'employees'));
+            // Get the employee with advances for the selected month
+            $employee = Employee::with(['salaryAdvances' => function($query) use ($month) {
+                $query->whereYear('advance_date', '=', substr($month, 0, 4))
+                      ->whereMonth('advance_date', '=', substr($month, 5, 2))
+                      ->orderBy('advance_date');
+            }])->findOrFail($employeeId);
+
+            return view('pages.salaries.editAdvance', [
+                'employee' => $employee,
+                'advances' => $employee->salaryAdvances,
+                'month' => $month
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Error in edit method: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Error loading advance details');
+        }
     }
+
     /**
-     * Update the specified resource in storage.
+     * Get single advance details for editing
      */
-    public function update(Request $request, SalaryAdvance $salaryAdvance)
-    {
+    public function editSingle($id)
+{
+    try {
+        $advance = SalaryAdvance::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'amount' => $advance->amount,
+                'advance_date' => $advance->advance_date,
+                'reason' => $advance->reason ?? ''
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => 'Advance not found',
+            'message' => $e->getMessage()
+        ], 404);
+    }
+}
+//to update
+public function update(Request $request, $id)
+{
+    try {
         $validated = $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'advance_date' => 'required|date',
             'amount' => 'required|numeric|min:0',
+            'advance_date' => 'required|date',
             'reason' => 'nullable|string|max:255',
         ]);
 
-        $salaryAdvance->update($validated);
+        $advance = SalaryAdvance::findOrFail($id);
+        $advance->update($validated);
 
-        return redirect()->route('salary.advance')
-            ->with('success', 'Salary advance updated successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Advance updated successfully'
+        ]);
+    } catch (\Exception $e) {
+        Log::error("Error updating advance: " . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'error' => 'Error updating advance',
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
 
 
     /**
