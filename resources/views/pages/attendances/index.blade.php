@@ -205,7 +205,7 @@
                                         if ($site->has_special_ot_hours) {
                                            $specialOtHours = $specialOtHours + max( $dayHours - 12, 0);
                                         }
-                                        
+
 
                                     @endphp
 
@@ -213,10 +213,10 @@
                                         @if ($dayHours || $nightHours)
                                             <div class="text-xs leading-tight">
                                                 @if ($dayHours)
-                                                    <span class="text-blue-700">D: {{ $dayHours }}</span><br>
+                                                    <span class="text-blue-700"> {{ $dayHours }}</span><br>
                                                 @endif
                                                 @if ($nightHours)
-                                                    <span class="text-purple-700">N: {{ $nightHours }}</span>
+                                                    <span class="text-purple-700">{{ $nightHours }}</span>
                                                 @endif
                                             </div>
                                         @else
@@ -229,8 +229,8 @@
 
                                 <td class="border px-2 py-1 text-center text-blue-700 font-semibold">
                                     <div class="text-xs leading-tight">
-                                        <span class="text-blue-700">D: {{ $totalNormalDayHours }}</span><br>
-                                        <span class="text-purple-700">N: {{ $totalNormalNightHours }}</span>
+                                        <span class="text-blue-700"> {{ $totalNormalDayHours }}</span><br>
+                                        <span class="text-purple-700"> {{ $totalNormalNightHours }}</span>
                                     </div>
                                 </td>
 
@@ -240,8 +240,8 @@
 
                                 <td class="border px-2 py-1 text-center font-semibold">
                                     <div class="text-xs leading-tight">
-                                        <span class="text-blue-700">D: {{ $totalOTDayHours }}</span><br>
-                                        <span class="text-purple-700">N: {{ $totalOTNightHours }}</span>
+                                        <span class="text-blue-700"> {{ $totalOTDayHours }}</span><br>
+                                        <span class="text-purple-700"> {{ $totalOTNightHours }}</span>
                                     </div>
                                 </td>
 
