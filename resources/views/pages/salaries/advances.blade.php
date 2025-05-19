@@ -5,7 +5,11 @@
                 <div class="sm:flex-auto">
                     <h1 class="text-base font-semibold text-gray-900">Salary Advances</h1>
                     <p class="mt-2 text-sm text-gray-700">
-                        A list of all salary advances including employee details and advance data.
+                        @if ($showAll || !$currentMonth)
+                            Current salary advances.
+                        @else
+                            Salary advances for {{ \Carbon\Carbon::parse($currentMonth)->format('F Y') }}
+                        @endif
                     </p>
                 </div>
                 <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -17,7 +21,7 @@
             </div>
 
             <div class="mt-8 flow-root">
-                <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <form method="GET" action="{{ route('salary.advance') }}" class="mb-6 flex items-end gap-4">
                             <div>
@@ -31,9 +35,15 @@
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
                                     Filter
                                 </button>
+                                @if ($currentMonth)
+                                    <a href="{{ route('salary.advance', ['show_all' => true]) }}"
+                                        class="inline-flex items-center px-4 py-2 ml-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
+                                        Clear Filter
+                                    </a>
+                                @endif
                             </div>
                         </form>
-                        <div class="overflow-vissible shadow-sm ring-1 ring-black/5 sm:rounded-lg">
+                        <div class="overflow-visible shadow-sm ring-1 ring-black/5 sm:rounded-lg">
                             <table class="min-w-full divide-y divide-gray-300">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -92,7 +102,7 @@
                                             </td>
                                             <td
                                                 class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
-                                                <a href="{{ route('salary.advance.edit', $employee->id) }}"
+                                                <a href="{{ route('salary.advance.edit', ['employee' => $employee->id, 'month' => $currentMonth]) }}"
                                                     class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
                                                 <form action="{{ route('salary.advance.destroy', $employee->id) }}"
                                                     method="POST" class="inline-block"
@@ -114,22 +124,49 @@
                                     <tr>
                                         <td colspan="2"
                                             class="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            Total Salary Advances for the Month:
+                                            @if ($showAll || !$currentMonth)
+                                                Total Salary Advances (All Time):
+                                            @else
+                                                Total Salary Advances for the Month:
+                                            @endif
                                         </td>
                                         <td colspan="1" class="px-3 py-4 text-sm text-red-500 whitespace-nowrap">
-                                            Rs.{{ number_format($totalSalaryAdvancesFortheMonth, 2) }}
+                                            Rs.{{ number_format($totalSalaryAdvances, 2) }}
                                         </td>
+                                        <td></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <!-- Pagination -->
                         <div class="mt-4">
-                            {{ $employees->appends(['month' => $currentMonth])->links() }}
+                            {{ $employees->appends(['month' => $currentMonth, 'show_all' => $showAll])->links() }}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggers = document.querySelectorAll('[data-tooltip-target]');
+
+            tooltipTriggers.forEach(trigger => {
+                const tooltipId = trigger.getAttribute('data-tooltip-target');
+                const tooltip = document.getElementById(tooltipId);
+
+                trigger.addEventListener('mouseenter', () => {
+                    tooltip.classList.remove('invisible', 'opacity-0');
+                    tooltip.classList.add('visible', 'opacity-100');
+                });
+
+                trigger.addEventListener('mouseleave', () => {
+                    tooltip.classList.add('invisible', 'opacity-0');
+                    tooltip.classList.remove('visible', 'opacity-100');
+                });
+            });
+        });
+    </script>
 </x-app-layout>
