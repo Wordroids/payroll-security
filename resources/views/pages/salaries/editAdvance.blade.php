@@ -4,6 +4,14 @@
             <div class="sm:flex sm:items-center">
                 <div class="sm:flex-auto">
                     <h1 class="text-base font-semibold text-gray-900">Edit Salary Advances</h1>
+                    <p class="mt-2 text-sm text-gray-700">
+                        @if ($showAll)
+                            All salary advances for {{ $employee->name }}
+                        @else
+                            Salary advances for {{ $employee->name }} in
+                            {{ \Carbon\Carbon::parse($month)->format('F Y') }}
+                        @endif
+                    </p>
                 </div>
                 <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
                     <a href="{{ route('salary.advance') }}"
@@ -16,12 +24,12 @@
             <div class="mt-8 flow-root">
                 <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                        <form method="GET" action="{{ route('salary.advance.edit', $employee->id) }}"
+                        <form method="GET" action="{{ route('salary.advance.edit', ['employee' => $employee->id]) }}"
                             class="mb-6 flex items-end gap-4">
                             <div>
                                 <label for="month" class="block text-sm font-medium text-gray-700">Filter by
                                     Month</label>
-                                <input type="month" name="month" id="month" value="{{ $month }}"
+                                <input type="month" name="month" id="month" value="{{ $month ?? '' }}"
                                     class="border rounded p-2 text-sm w-full" />
                             </div>
                             <div class="pt-2">
@@ -29,6 +37,12 @@
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
                                     Filter
                                 </button>
+                                @if (request()->has('month'))
+                                    <a href="{{ route('salary.advance.edit', ['employee' => $employee->id]) }}"
+                                        class="inline-flex items-center px-4 py-2 ml-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
+                                        Clear Filter
+                                    </a>
+                                @endif
                             </div>
                         </form>
 
@@ -88,7 +102,7 @@
                                     @empty
                                         <tr>
                                             <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
-                                                No advances found for this month.
+                                                No advances found.
                                             </td>
                                         </tr>
                                     @endforelse
@@ -96,11 +110,15 @@
                             </table>
                         </div>
 
-                        <!-- Total for the month -->
+                        <!-- Total section -->
                         <div class="mt-4 p-4 bg-gray-50 rounded-lg">
                             <p class="text-sm font-medium text-gray-900">
-                                Total Advances for
-                                {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y') }}:
+                                @if ($showAll)
+                                    Total Advances (All Time) for {{ $employee->name }}:
+                                @else
+                                    Total Advances for {{ $employee->name }} in
+                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y') }}:
+                                @endif
                                 <span class="text-red-600">Rs.{{ number_format($advances->sum('amount'), 2) }}</span>
                             </p>
                         </div>
@@ -110,11 +128,9 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
     <div id="editModal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background overlay -->
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
             <!-- Modal content -->
@@ -197,7 +213,6 @@
                     if (data.success) {
                         document.getElementById('edit_amount').value = data.data.amount;
 
-
                         const advanceDate = data.data.advance_date;
                         document.getElementById('edit_advance_date').value =
                             advanceDate.includes(' ') ? advanceDate.split(' ')[0] : advanceDate;
@@ -216,7 +231,6 @@
                     closeEditModal();
                 });
         }
-
         //submit edit form
         function submitEditForm() {
             const form = document.getElementById('editAdvanceForm');
@@ -256,7 +270,6 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
         }
-
         // Initialize modal close on outside click
         document.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('editModal');
