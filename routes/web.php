@@ -74,6 +74,9 @@ Route::middleware('auth')->group(function () {
     });
 
     //Salaries
+    Route::get('salaries/overview', [SalaryController::class, 'overview'])->name('salaries.overview');
+    Route::get('/salaries/{employee}/slip-view/{month}', [SalaryController::class, 'viewSlip'])->name('salaries.slip.view');
+    Route::post('/salaries/{employee}/slip-download/{month}', [SalaryController::class, 'downloadSlip'])->name('salaries.slip.download');
     Route::get('/salaries', [SalaryController::class, 'index'])->name('salaries');
     Route::get('/salaries/{employee}', [SalaryController::class, 'show'])->name('salaries.show');
 
