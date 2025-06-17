@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="">
         <div class="bg-white shadow rounded-lg p-6 mb-6">
             <h1 class="text-2xl font-bold text-gray-800 mb-4">Salary Overview</h1>
 
@@ -15,9 +15,9 @@
                     <select name="employee_id" id="employee_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         <option value="">All Employees</option>
                         @foreach($allEmployees as $emp)
-                            <option value="{{ $emp->id }}" {{ $selectedEmployee == $emp->id ? 'selected' : '' }}>
-                                {{ $emp->name }} ({{ $emp->emp_no }})
-                            </option>
+                        <option value="{{ $emp->id }}" {{ $selectedEmployee == $emp->id ? 'selected' : '' }}>
+                            {{ $emp->name }} ({{ $emp->emp_no }})
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -31,8 +31,8 @@
         </div>
 
         <div class="bg-white shadow rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+            <div class="h-[600px] overflow-x-scroll shadow-sm ring-1 ring-black/5 sm:rounded-lg">
+                <table class="min-w-full divide-y divide-gray-300">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emp No</th>
@@ -53,56 +53,56 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($salaryData as $data)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $data['employee']->emp_no }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {{ $data['employee']->name }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['total_shifts'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['basic'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['br_allow'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['ot_earnings'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['attendance_bonus'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['other_allowances'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['sub_total'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['gross_pay'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['epf_employee'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['salary_advance'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ number_format($data['total_deductions'], 2) }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                                    {{ number_format($data['net_pay'], 2) }}
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $data['employee']->emp_no }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $data['employee']->name }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['total_shifts'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['basic'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['br_allow'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['ot_earnings'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['attendance_bonus'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['other_allowances'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['sub_total'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['gross_pay'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['epf_employee'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['salary_advance'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['total_deductions'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                {{ number_format($data['net_pay'], 2) }}
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="14" class="px-6 py-4 text-center text-sm text-gray-500">
-                                    No salary data found for the selected filters.
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="14" class="px-6 py-4 text-center text-sm text-gray-500">
+                                No salary data found for the selected filters.
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
