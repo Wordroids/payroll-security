@@ -12,8 +12,8 @@
             <div class="mt-8 flow-root">
                 <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                        <div class="overflow-hidden shadow-sm ring-1 ring-black/5 sm:rounded-lg">
-                            <table class="min-w-full divide-y divide-gray-300">
+                        <div class="h-[600px] overflow-x-scroll shadow-sm ring-1 ring-black/5 sm:rounded-lg">
+                            <table class="min-w-full h-[250px] divide-y divide-gray-300">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Emp No</th>
