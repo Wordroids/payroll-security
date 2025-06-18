@@ -14,10 +14,9 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $employees = Employee::all();
+        $employees = Employee::orderBy('emp_no')->get();
         return view('pages.employees.index', compact('employees'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
