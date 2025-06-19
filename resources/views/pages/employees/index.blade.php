@@ -37,7 +37,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
-                                    @forelse ($employees as $employee)
+                                    @forelse ($employees->sortBy('emp_no') as $employee)
                                         <tr>
                                             <td class="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-6">
                                                 {{ $employee->emp_no }}
@@ -67,7 +67,6 @@
                                             <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
                                                 <a href="{{ route('employees.edit', $employee->id) }}"
                                                    class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                                            
                                                 <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" class="inline-block"
                                                       onsubmit="return confirm('Are you sure you want to delete this employee?');">
                                                     @csrf
@@ -75,7 +74,6 @@
                                                     <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
                                                 </form>
                                             </td>
-                                            
                                         </tr>
                                     @empty
                                         <tr>
