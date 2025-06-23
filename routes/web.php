@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\MealsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalaryAdvanceController;
 use App\Http\Controllers\SalaryController;
@@ -71,6 +72,26 @@ Route::middleware('auth')->group(function () {
         // Update advance
         Route::put('/{id}', [SalaryAdvanceController::class, 'update'])
             ->name('salary.advance.update');
+    });
+
+    Route::prefix('meals')->group(function () {
+        // Index and create routes
+        Route::get('/', [MealsController::class, 'index'])->name('meals.index');
+        Route::get('/create', [MealsController::class, 'create'])->name('meals.create');
+        Route::post('/', [MealsController::class, 'store'])->name('meals.store');
+
+        // Employee-specific routes
+        Route::prefix('employee')->group(function () {
+            Route::get('/{employee}/edit', [MealsController::class, 'editEmployeeMeals'])
+                ->name('meals.employee.edit');
+            Route::delete('/{employee}', [MealsController::class, 'destroyEmployeeMeals'])
+                ->name('meals.employee.destroy');
+        });
+
+        // Single meal operations
+        Route::get('/{meal}/edit', [MealsController::class, 'edit'])->name('meals.edit');
+        Route::put('/{meal}', [MealsController::class, 'update'])->name('meals.update');
+        Route::delete('/{meal}', [MealsController::class, 'destroy'])->name('meals.destroy');
     });
 
     //Salaries
