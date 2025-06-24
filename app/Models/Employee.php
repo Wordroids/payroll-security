@@ -57,4 +57,13 @@ class Employee extends Model
     {
         return $this->hasMany(Attendance::class);
     }
+
+      public function meals()
+    {
+        return $this->hasMany(Meals::class);
+    }
+       public function uniforms()
+    {
+        return $this->hasMany(Uniform::class);
+    }
 }

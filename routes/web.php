@@ -3,10 +3,12 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\MealsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalaryAdvanceController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\UniformsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -71,6 +73,45 @@ Route::middleware('auth')->group(function () {
         // Update advance
         Route::put('/{id}', [SalaryAdvanceController::class, 'update'])
             ->name('salary.advance.update');
+    });
+
+    Route::prefix('meals')->group(function () {
+        // Index and create routes
+        Route::get('/', [MealsController::class, 'index'])->name('meals.index');
+        Route::get('/create', [MealsController::class, 'create'])->name('meals.create');
+        Route::post('/', [MealsController::class, 'store'])->name('meals.store');
+
+        // Employee-specific routes
+        Route::prefix('employee')->group(function () {
+            Route::get('/{employee}/edit', [MealsController::class, 'editEmployeeMeals'])
+                ->name('meals.employee.edit');
+            Route::delete('/{employee}', [MealsController::class, 'destroyEmployeeMeals'])
+                ->name('meals.employee.destroy');
+        });
+
+        // Single meal operations
+        Route::get('/{meal}/edit', [MealsController::class, 'edit'])->name('meals.edit');
+        Route::put('/{meal}', [MealsController::class, 'update'])->name('meals.update');
+        Route::delete('/{meal}', [MealsController::class, 'destroy'])->name('meals.destroy');
+    });
+
+    //Uniforms
+    Route::prefix('uniforms')->group(function () {
+
+        Route::get('/', [UniformsController::class, 'index'])->name('uniforms.index');
+        Route::get('/create', [UniformsController::class, 'create'])->name('uniforms.create');
+        Route::post('/', [UniformsController::class, 'store'])->name('uniforms.store');
+
+        // Individual uniform operations
+        Route::get('/uniform/{uniform}/edit', [UniformsController::class, 'edit'])->name('uniforms.edit');
+        Route::put('/uniform/{uniform}', [UniformsController::class, 'update'])->name('uniforms.update');
+        Route::delete('/uniform/{uniform}', [UniformsController::class, 'destroy'])->name('uniforms.destroy');
+
+        // Employee-specific routes
+        Route::prefix('employee')->group(function () {
+            Route::get('/{employee}/edit', [UniformsController::class, 'editEmployeeUniforms'])
+                ->name('uniforms.employee.edit');
+        });
     });
 
     //Salaries

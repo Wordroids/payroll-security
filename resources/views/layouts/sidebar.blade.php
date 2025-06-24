@@ -123,6 +123,10 @@
                             class="block px-2 py-1 rounded hover:bg-gray-100 transition">Salaries</a></li>
                     <li><a href="{{ route('salaries.overview') }}"
                             class="block px-2 py-1 rounded hover:bg-gray-100 transition">Salary Overview</a></li>
+                    <li><a href="{{ route('meals.index') }}"
+                            class="block px-2 py-1 rounded hover:bg-gray-100 transition">Meals</a></li>
+                    <li><a href="{{ route('uniforms.index') }}"
+                            class="block px-2 py-1 rounded hover:bg-gray-100 transition">Uniforms</a></li>
                 </ul>
             </li>
 
