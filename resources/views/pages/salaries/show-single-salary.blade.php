@@ -130,6 +130,8 @@
                     <div><strong>EPF (Employee 8%):</strong> Rs. {{ number_format($epfEmployee, 2) }}</div>
                     <div><strong>Salary Advances:</strong> Rs. {{ number_format($employee->totalSalaryAdvance, 2) }}
                     </div>
+                    <div><strong>Meal Deductions:</strong> Rs. {{ number_format($mealDeductions, 2) }}</div>
+                    <div><strong>Uniform Deductions:</strong> Rs. {{ number_format($uniformDeductions, 2) }}</div>
                     <div><strong>Total Deductions:</strong> Rs. {{ number_format($totalDeductions, 2) }}</div>
                 </div>
             </div>

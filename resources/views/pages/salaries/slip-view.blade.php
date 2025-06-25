@@ -81,11 +81,11 @@
             </tr>
             <tr class="border-b border-gray-200">
                 <td class="py-2">Meals</td>
-                <td class="py-2 text-right">-</td>
+                <td class="py-2 text-right">{{ number_format($mealDeductions, 2) }}</td>
             </tr>
             <tr class="border-b border-gray-200">
-                <td class="py-2">Uniform</td>
-                <td class="py-2 text-right">-</td>
+                <td class="py-2">Uniforms</td>
+                <td class="py-2 text-right">{{ number_format($uniformDeductions, 2) }}</td>
             </tr>
             <tr class="border-b border-gray-200">
                 <td class="py-2">Other Deduction</td>

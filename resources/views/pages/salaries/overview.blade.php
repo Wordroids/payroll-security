@@ -50,6 +50,8 @@
                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Gross Pay</th>
                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">EPF 8%</th>
                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Salary Adv</th>
+                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Meals</th>
+                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Uniform</th>
                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Deduct</th>
                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Net Pay</th>
                         </tr>
@@ -94,6 +96,12 @@
                                     {{ number_format($data['salary_advance'], 2) }}
                                 </td>
                                 <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                    {{ number_format($data['meal_deductions'], 2) }}
+                                </td>
+                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                    {{ number_format($data['uniform_deductions'], 2) }}
+                                </td>
+                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                     {{ number_format($data['total_deductions'], 2) }}
                                 </td>
                                 <td class="px-3 py-4 text-sm font-medium text-green-600 whitespace-nowrap">
@@ -102,14 +110,13 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="14" class="px-6 py-4 text-center text-sm text-gray-500">
+                                <td colspan="16" class="px-6 py-4 text-center text-sm text-gray-500">
                                     No salary data found for the selected filters.
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
-                        </div>
                     </div>
                 </div>
             </div>
