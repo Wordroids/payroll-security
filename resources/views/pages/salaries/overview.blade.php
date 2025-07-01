@@ -1,8 +1,7 @@
 <x-app-layout>
-    <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg">
-        <div class="px-4 sm:px-6 lg:px-8">
+    <div class="">
         <div class="bg-white shadow rounded-lg p-6 mb-6">
-            <h1 class="text-base font-semibold text-gray-900 mb-4">Salary Overview</h1>
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">Salary Overview</h1>
 
             <form method="GET" action="{{ route('salaries.overview') }}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -16,9 +15,9 @@
                     <select name="employee_id" id="employee_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         <option value="">All Employees</option>
                         @foreach($allEmployees as $emp)
-                            <option value="{{ $emp->id }}" {{ $selectedEmployee == $emp->id ? 'selected' : '' }}>
-                                {{ $emp->name }} ({{ $emp->emp_no }})
-                            </option>
+                        <option value="{{ $emp->id }}" {{ $selectedEmployee == $emp->id ? 'selected' : '' }}>
+                            {{ $emp->name }} ({{ $emp->emp_no }})
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -31,94 +30,90 @@
             </form>
         </div>
 
-      <div class="mt-8 flow-root">
-        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div class="overflow-hidden shadow-sm ring-1 ring-black/5 sm:rounded-lg">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="h-[600px] overflow-x-scroll shadow-sm ring-1 ring-black/5 sm:rounded-lg">
                 <table class="min-w-full divide-y divide-gray-300">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Emp No</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Shifts</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Basic</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">BR Allow</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">OT Earnings</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Att. Bonus</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Other Allow</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Sub Total</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Gross Pay</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">EPF 8%</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Salary Adv</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Meals</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Uniform</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Deduct</th>
-                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Net Pay</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Emp No</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shifts</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Basic</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BR Allow</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OT Earnings</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Att. Bonus</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Other Allow</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sub Total</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gross Pay</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">EPF 8%</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salary Adv</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meals</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uniform</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Deduct</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Pay</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
+                    <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($salaryData as $data)
-                            <tr>
-                                <td class="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-6">
-                                    {{ $data['employee']->emp_no }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ $data['employee']->name }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['total_shifts'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['basic'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['br_allow'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['ot_earnings'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['attendance_bonus'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['other_allowances'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['sub_total'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['gross_pay'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['epf_employee'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['salary_advance'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['meal_deductions'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['uniform_deductions'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                    {{ number_format($data['total_deductions'], 2) }}
-                                </td>
-                                <td class="px-3 py-4 text-sm font-medium text-green-600 whitespace-nowrap">
-                                    {{ number_format($data['net_pay'], 2) }}
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $data['employee']->emp_no }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $data['employee']->name }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['total_shifts'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['basic'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['br_allow'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['ot_earnings'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['attendance_bonus'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['other_allowances'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['sub_total'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['gross_pay'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['epf_employee'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['salary_advance'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['meal_deductions'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['uniform_deductions'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ number_format($data['total_deductions'], 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                {{ number_format($data['net_pay'], 2) }}
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="16" class="px-6 py-4 text-center text-sm text-gray-500">
-                                    No salary data found for the selected filters.
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="16" class="px-6 py-4 text-center text-sm text-gray-500">
+                                No salary data found for the selected filters.
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
