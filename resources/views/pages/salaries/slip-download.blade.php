@@ -177,6 +177,15 @@
                     <td>Salary Advance</td>
                     <td class="text-right">{{ number_format($totalSalaryAdvance, 2) }}</td>
                 </tr>
+                <tr>
+                    <td>Meals</td>
+                    <td class="text-right">{{ number_format($mealDeductions, 2) }}</td>
+                </tr>
+                <tr>
+                    <td>Uniforms</td>
+                    <td class="text-right">{{ number_format($uniformDeductions, 2) }}</td>
+                </tr>
+
                 <tr class="border-b-1 border-gray-300 font-semibold">
                     <td>Total Deduction</td>
                     <td class="text-right">{{ number_format($totalDeductions, 2) }}</td>
