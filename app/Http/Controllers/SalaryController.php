@@ -7,7 +7,9 @@ use App\Http\Requests\StoreSalaryRequest;
 use App\Http\Requests\UpdateSalaryRequest;
 use App\Models\Attendance;
 use App\Models\Employee;
+use App\Models\Meals;
 use App\Models\Site;
+use App\Models\Uniform;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -49,10 +51,31 @@ class SalaryController extends Controller
         $month = $request->input('month', now()->format('Y-m'));
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        $prevMonth = Carbon::createFromFormat('Y-m', $month)->subMonth()->format('Y-m');
         // Get attendance
         $records = Attendance::whereBetween('date', [$startDate, $endDate])
             ->where('employee_id', $employee->id)
             ->get();
+
+        // Meal deductions
+        $mealDeductions = Meals::where('employee_id', $employee->id)
+            ->whereMonth('date', '=', substr($month, 5, 2))
+            ->whereYear('date', '=', substr($month, 0, 4))
+            ->sum('total_amount');
+
+        // Uniform deductions (current month/2 + previous month/2)
+        $currentMonthUniform = Uniform::where('employee_id', $employee->id)
+            ->whereMonth('date', '=', substr($month, 5, 2))
+            ->whereYear('date', '=', substr($month, 0, 4))
+            ->sum('total_amount');
+
+        $prevMonthUniform = Uniform::where('employee_id', $employee->id)
+            ->whereMonth('date', '=', substr($prevMonth, 5, 2))
+            ->whereYear('date', '=', substr($prevMonth, 0, 4))
+            ->sum('total_amount');
+
+        $uniformDeductions = ($currentMonthUniform / 2) + ($prevMonthUniform / 2);
+
         $attendances = [];
         foreach ($records as $attendance) {
             $day = Carbon::parse($attendance->date)->day;
@@ -135,12 +158,11 @@ class SalaryController extends Controller
         $otRate = round(((($combinedBase / 9) * 1.5) / 26), 2);
         $otEarnings = round($otRate * $totalOTHours, 2);
         $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
-        // $otherAllowances = round($totalShiftEarning - $subTotal, 2);
         $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
         $grossPay = $totalShiftEarning + ($specialOtHours * 200);
         $epfEmployee = ($combinedBase / 100) * 8;
         $epfEtfEmployer = ($employee->basic / 100) * 15;
-        $totalDeductions = $epfEmployee + $employee->totalSalaryAdvance;
+        $totalDeductions = $epfEmployee + $employee->totalSalaryAdvance + $mealDeductions + $uniformDeductions;
         $totalEarnings = $grossPay - $totalDeductions;
         return view('pages.salaries.show-single-salary', compact(
             'employee',
@@ -159,6 +181,8 @@ class SalaryController extends Controller
             'totalDeductions',
             'totalEarnings',
             'specialOtHours',
+            'mealDeductions',
+            'uniformDeductions'
         ));
     }
     /**
@@ -172,6 +196,7 @@ class SalaryController extends Controller
 
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        $prevMonth = Carbon::createFromFormat('Y-m', $month)->subMonth()->format('Y-m');
 
         // Base query for employees
         $query = Employee::query();
@@ -243,6 +268,25 @@ class SalaryController extends Controller
 
             $totalSalaryAdvance = $salaryAdvances->sum('amount');
 
+            // Meal deductions 
+            $mealDeductions = Meals::where('employee_id', $employee->id)
+                ->whereMonth('date', '=', substr($month, 5, 2))
+                ->whereYear('date', '=', substr($month, 0, 4))
+                ->sum('total_amount');
+
+            // Uniform deductions (current month/2 + previous month/2)
+            $currentMonthUniform = Uniform::where('employee_id', $employee->id)
+                ->whereMonth('date', '=', substr($month, 5, 2))
+                ->whereYear('date', '=', substr($month, 0, 4))
+                ->sum('total_amount');
+
+            $prevMonthUniform = Uniform::where('employee_id', $employee->id)
+                ->whereMonth('date', '=', substr($prevMonth, 5, 2))
+                ->whereYear('date', '=', substr($prevMonth, 0, 4))
+                ->sum('total_amount');
+
+            $uniformDeductions = ($currentMonthUniform / 2) + ($prevMonthUniform / 2);
+
             // Initialize earnings
             $totalShiftEarning = 0;
             $totalOTHours = 0;
@@ -280,7 +324,7 @@ class SalaryController extends Controller
             $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
             $grossPay = $totalShiftEarning + ($specialOtHours * 200);
             $epfEmployee = ($combinedBase / 100) * 8;
-            $totalDeductions = $epfEmployee + $totalSalaryAdvance;
+            $totalDeductions = $epfEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
 
             $salaryData[] = [
                 'employee' => $employee,
@@ -294,6 +338,8 @@ class SalaryController extends Controller
                 'gross_pay' => $grossPay,
                 'epf_employee' => $epfEmployee,
                 'salary_advance' => $totalSalaryAdvance,
+                'meal_deductions' => $mealDeductions,
+                'uniform_deductions' => $uniformDeductions,
                 'total_deductions' => $totalDeductions,
                 'net_pay' => $grossPay - $totalDeductions,
             ];
@@ -306,7 +352,6 @@ class SalaryController extends Controller
             'month' => $month,
         ]);
     }
-
     /**
      * Show the salary slip in a preview modal
      */
@@ -355,6 +400,26 @@ class SalaryController extends Controller
         $employee->load(['sites', 'salaryAdvances']);
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        $prevMonth = Carbon::createFromFormat('Y-m', $month)->subMonth()->format('Y-m');
+
+        // Meal deductions
+        $mealDeductions = Meals::where('employee_id', $employee->id)
+            ->whereMonth('date', '=', substr($month, 5, 2))
+            ->whereYear('date', '=', substr($month, 0, 4))
+            ->sum('total_amount');
+
+        // Uniform deductions (current month/2 + previous month/2)
+        $currentMonthUniform = Uniform::where('employee_id', $employee->id)
+            ->whereMonth('date', '=', substr($month, 5, 2))
+            ->whereYear('date', '=', substr($month, 0, 4))
+            ->sum('total_amount');
+
+        $prevMonthUniform = Uniform::where('employee_id', $employee->id)
+            ->whereMonth('date', '=', substr($prevMonth, 5, 2))
+            ->whereYear('date', '=', substr($prevMonth, 0, 4))
+            ->sum('total_amount');
+
+        $uniformDeductions = ($currentMonthUniform / 2) + ($prevMonthUniform / 2);
 
         // Get attendance records
         $records = Attendance::whereBetween('date', [$startDate, $endDate])
@@ -447,7 +512,7 @@ class SalaryController extends Controller
         $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
         $grossPay = $totalShiftEarning + ($specialOtHours * 200);
         $epfEmployee = ($combinedBase / 100) * 8;
-        $totalDeductions = $epfEmployee + $totalSalaryAdvance;
+        $totalDeductions = $epfEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
         $totalEarnings = $grossPay - $totalDeductions;
 
         return [
@@ -461,6 +526,8 @@ class SalaryController extends Controller
             'grossPay' => $grossPay,
             'epfEmployee' => $epfEmployee,
             'totalSalaryAdvance' => $totalSalaryAdvance,
+            'mealDeductions' => $mealDeductions,
+            'uniformDeductions' => $uniformDeductions,
             'totalDeductions' => $totalDeductions,
             'totalEarnings' => $totalEarnings,
             'siteSummaries' => $siteSummaries,
@@ -469,7 +536,6 @@ class SalaryController extends Controller
             'otRate' => $otRate,
         ];
     }
-
     /**
      * Show the form for editing the specified resource.
      */
