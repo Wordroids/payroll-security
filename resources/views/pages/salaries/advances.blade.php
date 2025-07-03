@@ -5,10 +5,12 @@
                 <div class="sm:flex-auto">
                     <h1 class="text-base font-semibold text-gray-900">Salary Advances</h1>
                     <p class="mt-2 text-sm text-gray-700">
-                        @if ($showAll || !$currentMonth)
-                            Current salary advances.
+                        @if ($showAll)
+                            Showing all salary advances
+                        @elseif(!empty($filterMonth))
+                            Salary advances for {{ \Carbon\Carbon::parse($filterMonth)->format('F Y') }}
                         @else
-                            Salary advances for {{ \Carbon\Carbon::parse($currentMonth)->format('F Y') }}
+                            Salary advances for {{ \Carbon\Carbon::parse($currentDate)->format('d F Y') }}
                         @endif
                     </p>
                 </div>
@@ -25,22 +27,36 @@
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <form method="GET" action="{{ route('salary.advance') }}" class="mb-6 flex items-end gap-4">
                             <div>
-                                <label for="month" class="block text-sm font-medium text-gray-700">Filter by
-                                    Month</label>
-                                <input type="month" name="month" id="month" value="{{ $currentMonth }}"
+                                <label for="date" class="block text-sm font-medium text-gray-700">Filter by
+                                    Date</label>
+                                <input type="date" name="date" id="date"
+                                    value="{{ $currentDate ?? now()->format('Y-m-d') }}"
                                     class="border rounded p-2 text-sm w-full" />
                             </div>
-                            <div class="pt-2">
+                            <div>
+                                <label for="month" class="block text-sm font-medium text-gray-700">Or by
+                                    Month</label>
+                                <input type="month" name="month" id="month" value="{{ $filterMonth ?? '' }}"
+                                    class="border rounded p-2 text-sm w-full" />
+                            </div>
+                            <div class=" flex gap-2 pt-2">
                                 <button type="submit"
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
                                     Filter
                                 </button>
-                                @if ($currentMonth)
-                                    <a href="{{ route('salary.advance', ['show_all' => true]) }}"
+                                @if ($showAll || $filterMonth || ($currentDate && $currentDate !== now()->format('Y-m-d')))
+                                    <a href="{{ route('salary.advance') }}"
                                         class="inline-flex items-center px-4 py-2 ml-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
                                         Clear Filter
                                     </a>
                                 @endif
+                                @if (!($showAll || $filterMonth || ($currentDate && $currentDate !== now()->format('Y-m-d'))))
+                                    <a href="{{ route('salary.advance', ['show_all' => true]) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
+                                        Show All
+                                    </a>
+                                @endif
+
                             </div>
                         </form>
                         <div class="overflow-visible shadow-sm ring-1 ring-black/5 sm:rounded-lg">
@@ -102,7 +118,7 @@
                                             </td>
                                             <td
                                                 class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
-                                                <a href="{{ route('salary.advance.edit', ['employee' => $employee->id, 'month' => $currentMonth]) }}"
+                                                <a href="{{ route('salary.advance.edit', ['employee' => $employee->id, 'date' => $currentDate, 'month' => $filterMonth]) }}"
                                                     class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
                                                 <form action="{{ route('salary.advance.destroy', $employee->id) }}"
                                                     method="POST" class="inline-block"
@@ -124,10 +140,14 @@
                                     <tr>
                                         <td colspan="2"
                                             class="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            @if ($showAll || !$currentMonth)
+                                            @if ($showAll)
                                                 Total Salary Advances (All Time):
+                                            @elseif($filterMonth)
+                                                Total Salary Advances for
+                                                {{ \Carbon\Carbon::parse($filterMonth)->format('F Y') }}:
                                             @else
-                                                Total Salary Advances for the Month:
+                                                Total Salary Advances for
+                                                {{ \Carbon\Carbon::parse($currentDate)->format('d F Y') }}:
                                             @endif
                                         </td>
                                         <td colspan="1" class="px-3 py-4 text-sm text-red-500 whitespace-nowrap">
@@ -140,7 +160,7 @@
                         </div>
                         <!-- Pagination -->
                         <div class="mt-4">
-                            {{ $employees->appends(['month' => $currentMonth, 'show_all' => $showAll])->links() }}
+                            {{ $employees->appends(['date' => $currentDate, 'month' => $filterMonth, 'show_all' => $showAll])->links() }}
                         </div>
                     </div>
                 </div>

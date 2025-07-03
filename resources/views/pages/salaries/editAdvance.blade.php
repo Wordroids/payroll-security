@@ -5,11 +5,12 @@
                 <div class="sm:flex-auto">
                     <h1 class="text-base font-semibold text-gray-900">Edit Salary Advances</h1>
                     <p class="mt-2 text-sm text-gray-700">
-                        @if ($showAll)
-                            All salary advances for {{ $employee->name }}
-                        @else
+                        @if (!empty($month))
                             Salary advances for {{ $employee->name }} in
                             {{ \Carbon\Carbon::parse($month)->format('F Y') }}
+                        @else
+                            Salary advances for {{ $employee->name }} on
+                            {{ \Carbon\Carbon::parse($date)->format('d F Y') }}
                         @endif
                     </p>
                 </div>
@@ -27,19 +28,25 @@
                         <form method="GET" action="{{ route('salary.advance.edit', ['employee' => $employee->id]) }}"
                             class="mb-6 flex items-end gap-4">
                             <div>
-                                <label for="month" class="block text-sm font-medium text-gray-700">Filter by
+                                <label for="date" class="block text-sm font-medium text-gray-700">Filter by
+                                    Date</label>
+                                <input type="date" name="date" id="date" value="{{ $date ?? '' }}"
+                                    class="border rounded p-2 text-sm w-full" />
+                            </div>
+                            <div>
+                                <label for="month" class="block text-sm font-medium text-gray-700">Or by
                                     Month</label>
                                 <input type="month" name="month" id="month" value="{{ $month ?? '' }}"
                                     class="border rounded p-2 text-sm w-full" />
                             </div>
-                            <div class="pt-2">
+                            <div class="flex gap-2 pt-2">
                                 <button type="submit"
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
                                     Filter
                                 </button>
-                                @if (request()->has('month'))
-                                    <a href="{{ route('salary.advance.edit', ['employee' => $employee->id]) }}"
-                                        class="inline-flex items-center px-4 py-2 ml-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
+                                @if (request()->has('date') || request()->has('month'))
+                                    <a href="{{ route('salary.advance.edit', ['employee' => $employee->id, 'date' => now()->format('Y-m-d')]) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
                                         Clear Filter
                                     </a>
                                 @endif
@@ -113,11 +120,12 @@
                         <!-- Total section -->
                         <div class="mt-4 p-4 bg-gray-50 rounded-lg">
                             <p class="text-sm font-medium text-gray-900">
-                                @if ($showAll)
-                                    Total Advances (All Time) for {{ $employee->name }}:
-                                @else
+                                @if (!empty($month))
                                     Total Advances for {{ $employee->name }} in
-                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y') }}:
+                                    {{ \Carbon\Carbon::parse($month)->format('F Y') }}:
+                                @else
+                                    Total Advances for {{ $employee->name }} on
+                                    {{ \Carbon\Carbon::parse($date)->format('d F Y') }}:
                                 @endif
                                 <span class="text-red-600">Rs.{{ number_format($advances->sum('amount'), 2) }}</span>
                             </p>
@@ -270,6 +278,13 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
         }
+        
+        document.getElementById('date')?.addEventListener('change', function() {
+            document.getElementById('month').value = '';
+        });
+        document.getElementById('month')?.addEventListener('change', function() {
+            document.getElementById('date').value = '';
+        });
         // Initialize modal close on outside click
         document.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('editModal');
