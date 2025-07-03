@@ -103,24 +103,19 @@ class SalaryAdvanceController extends Controller
     public function edit($employeeId, Request $request)
     {
         try {
-            // Get the month filter if provided
             $date = $request->input('date');
             $month = $request->input('month');
-
-            // Default to today's date if no filters are provided
-            $showAll = false;
-            if (!$date && !$month) {
-                $date = now()->format('Y-m-d');
-            }
-
-            // Get the employee with advances
-            $employee = Employee::with(['salaryAdvances' => function ($query) use ($date, $month) {
-
+            $showAll = $request->boolean('show_all');
+            $employee = Employee::with(['salaryAdvances' => function ($query) use ($date, $month, $showAll) {
+                if (!$showAll) {
                     if ($month) {
                         $query->where('advance_date', 'like', $month . '%');
                     } elseif ($date) {
                         $query->whereDate('advance_date', $date);
+                    } else {
+                        $query->whereDate('advance_date', now()->format('Y-m-d'));
                     }
+                }
                 $query->orderBy('advance_date');
             }])->findOrFail($employeeId);
 
@@ -129,6 +124,7 @@ class SalaryAdvanceController extends Controller
                 'advances' => $employee->salaryAdvances,
                 'date' => $date,
                 'month' => $month,
+                'showAll' => $showAll
             ]);
         } catch (\Exception $e) {
             Log::error("Error in edit method: " . $e->getMessage());

@@ -5,12 +5,14 @@
                 <div class="sm:flex-auto">
                     <h1 class="text-base font-semibold text-gray-900">Edit Salary Advances</h1>
                     <p class="mt-2 text-sm text-gray-700">
-                        @if (!empty($month))
+                        @if ($showAll)
+                            All salary advances for {{ $employee->name }}
+                        @elseif(!empty($month))
                             Salary advances for {{ $employee->name }} in
                             {{ \Carbon\Carbon::parse($month)->format('F Y') }}
                         @else
                             Salary advances for {{ $employee->name }} on
-                            {{ \Carbon\Carbon::parse($date)->format('d F Y') }}
+                            {{ \Carbon\Carbon::parse($date ?? now()->format('Y-m-d'))->format('d F Y') }}
                         @endif
                     </p>
                 </div>
@@ -44,10 +46,17 @@
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
                                     Filter
                                 </button>
-                                @if (request()->has('date') || request()->has('month'))
-                                    <a href="{{ route('salary.advance.edit', ['employee' => $employee->id, 'date' => now()->format('Y-m-d')]) }}"
+                                @if ($showAll || $month || ($date && $date !== now()->format('Y-m-d')))
+                                    <a href="{{ route('salary.advance.edit', ['employee' => $employee->id]) }}"
                                         class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
-                                        Clear Filter
+                                        Show Today
+                                    </a>
+                                @endif
+
+                                @if (!($showAll || $month || ($date && $date !== now()->format('Y-m-d'))))
+                                    <a href="{{ route('salary.advance.edit', ['employee' => $employee->id, 'show_all' => true]) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
+                                        Show All
                                     </a>
                                 @endif
                             </div>
@@ -120,12 +129,14 @@
                         <!-- Total section -->
                         <div class="mt-4 p-4 bg-gray-50 rounded-lg">
                             <p class="text-sm font-medium text-gray-900">
-                                @if (!empty($month))
+                                @if ($showAll)
+                                    Total Advances (All Time) for {{ $employee->name }}:
+                                @elseif(!empty($month))
                                     Total Advances for {{ $employee->name }} in
                                     {{ \Carbon\Carbon::parse($month)->format('F Y') }}:
                                 @else
                                     Total Advances for {{ $employee->name }} on
-                                    {{ \Carbon\Carbon::parse($date)->format('d F Y') }}:
+                                    {{ \Carbon\Carbon::parse($date ?? now()->format('d F Y'))}}:
                                 @endif
                                 <span class="text-red-600">Rs.{{ number_format($advances->sum('amount'), 2) }}</span>
                             </p>
@@ -278,7 +289,6 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
         }
-        
         document.getElementById('date')?.addEventListener('change', function() {
             document.getElementById('month').value = '';
         });
