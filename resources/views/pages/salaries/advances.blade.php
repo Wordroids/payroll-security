@@ -53,7 +53,7 @@
                                 @if (!($showAll || $filterMonth || ($currentDate && $currentDate !== now()->format('Y-m-d'))))
                                     <a href="{{ route('salary.advance', ['show_all' => true]) }}"
                                         class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
-                                        Show All
+                                        All Records
                                     </a>
                                 @endif
 
