@@ -29,7 +29,7 @@
                             <div>
                                 <label for="date" class="block text-sm font-medium text-gray-700">Filter by Date</label>
                                 <input type="date" name="date" id="date"
-                                    value="{{ $filterMonth ? '' : $currentDate }}"
+                                    value="{{  $showAll ? '' : ($filterMonth ? '' : $currentDate )}}"
                                     class="border rounded p-2 text-sm w-full" />
                             </div>
                             <div>
@@ -231,22 +231,6 @@
             });
 
             // Date/month selection handling
-            const dateInput = document.getElementById('date');
-            const monthInput = document.getElementById('month');
-
-            if (dateInput && monthInput) {
-                dateInput.addEventListener('change', function() {
-                    if (this.value) {
-                        monthInput.value = '';
-                    }
-                });
-
-                monthInput.addEventListener('change', function() {
-                    if (this.value) {
-                        dateInput.value = '';
-                    }
-                });
-            }
                      const dateInput = document.getElementById('date');
             const monthInput = document.getElementById('month');
 
@@ -266,7 +250,7 @@
                 });
 
                 // Initialize based on current filters
-                @if($filterMonth)
+                @if($filterMonth || $showAll)
                     dateInput.value = '';
                 @endif
             }
