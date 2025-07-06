@@ -5,10 +5,12 @@
                 <div class="sm:flex-auto">
                     <h1 class="text-base font-semibold text-gray-900">Uniform Issuance</h1>
                     <p class="mt-2 text-sm text-gray-700">
-                        @if ($showAll || !$currentMonth)
-                            All uniform issuance records
+                        @if ($showAll)
+                            Showing all uniform records
+                        @elseif(!empty($filterMonth))
+                            Uniform records for {{ \Carbon\Carbon::parse($filterMonth)->format('F Y') }}
                         @else
-                            Uniform issuance for {{ \Carbon\Carbon::parse($currentMonth)->format('F Y') }}
+                            Uniform records for {{ \Carbon\Carbon::parse($currentDate)->format('d F Y') }}
                         @endif
                     </p>
                 </div>
@@ -25,14 +27,19 @@
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <form method="GET" action="{{ route('uniforms.index') }}" class="mb-6 flex items-end gap-4">
                             <div>
-                                <label for="month" class="block text-sm font-medium text-gray-700">Filter by
-                                    Month</label>
-                                <input type="month" name="month" id="month" value="{{ $currentMonth }}"
+                                <label for="date" class="block text-sm font-medium text-gray-700">Filter by Date</label>
+                                <input type="date" name="date" id="date"
+                                    value="{{ $filterMonth ? '' : $currentDate }}"
+                                    class="border rounded p-2 text-sm w-full" />
+                            </div>
+                            <div>
+                                <label for="month" class="block text-sm font-medium text-gray-700">Filter by Month</label>
+                                <input type="month" name="month" id="month" value="{{ $filterMonth ?? '' }}"
                                     class="border rounded p-2 text-sm w-full" />
                             </div>
                             <div>
                                 <label for="employee_id"
-                                    class="block text-sm font-medium text-gray-700">Employee</label>
+                                   aria-autocomplete="" class="block text-sm font-medium text-gray-700">Employee</label>
                                 <select name="employee_id" id="employee_id" class="border rounded p-2 text-sm w-full">
                                     <option value="">All Employees</option>
                                     @foreach ($allEmployees as $employee)
@@ -62,15 +69,21 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="pt-2">
+                            <div class="flex gap-2 pt-2">
                                 <button type="submit"
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
                                     Filter
                                 </button>
-                                @if ($currentMonth || $employeeId || request('type'))
-                                    <a href="{{ route('uniforms.index', ['show_all' => true]) }}"
+                                @if ($showAll || $filterMonth || ($currentDate && $currentDate !== now()->format('Y-m-d')) || $employeeId || $type)
+                                    <a href="{{ route('uniforms.index') }}"
                                         class="inline-flex items-center px-4 py-2 ml-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
                                         Clear Filter
+                                    </a>
+                                @endif
+                                @if (!($showAll || $filterMonth || ($currentDate && $currentDate !== now()->format('Y-m-d')) || $employeeId || $type))
+                                    <a href="{{ route('uniforms.index', ['show_all' => true]) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
+                                        All Records
                                     </a>
                                 @endif
                             </div>
@@ -100,8 +113,6 @@
                                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 {{ $employee->name ?? 'N/A' }}
                                             </td>
-
-
                                             <td
                                                 class="px-3 py-4 text-sm text-gray-700 whitespace-nowrap overflow-visible">
                                                 <div class="flex items-center space-x-2 relative">
@@ -157,7 +168,7 @@
                                             </td>
                                             <td
                                                 class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
-                                                <a href="{{ route('uniforms.employee.edit', ['employee' => $employee->id, 'month' => $currentMonth]) }}"
+                                                <a href="{{ route('uniforms.employee.edit', ['employee' => $employee->id, 'date' => $currentDate, 'month' => $filterMonth]) }}"
                                                     class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
                                             </td>
                                         </tr>
@@ -171,10 +182,12 @@
                                     <tr class="bg-gray-50">
                                         <td colspan="2"
                                             class="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            @if ($showAll || !$currentMonth)
+                                            @if ($showAll)
                                                 Total Uniform Costs (All Time):
+                                            @elseif($filterMonth)
+                                                Total Uniform Costs for {{ \Carbon\Carbon::parse($filterMonth)->format('F Y') }}:
                                             @else
-                                                Total Uniform Costs for the Month:
+                                                Total Uniform Costs for {{ \Carbon\Carbon::parse($currentDate)->format('d F Y') }}:
                                             @endif
                                         </td>
                                         <td colspan="1" class="px-3 py-4 text-sm text-red-500 whitespace-nowrap">
@@ -186,16 +199,15 @@
                             </table>
                         </div>
                         <!-- Pagination -->
-                        @if ($employees instanceof \Illuminate\Pagination\LengthAwarePaginator)
                             <div class="mt-4">
                                 {{ $employees->appends([
-                                        'month' => $currentMonth,
+                                       'date' => $currentDate,
+                                        'month' => $filterMonth,
                                         'employee_id' => $employeeId,
                                         'type' => request('type'),
                                         'show_all' => $showAll,
                                     ])->links() }}
                             </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -205,21 +217,60 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tooltipTriggers = document.querySelectorAll('[data-tooltip-target]');
-
             tooltipTriggers.forEach(trigger => {
                 const tooltipId = trigger.getAttribute('data-tooltip-target');
                 const tooltip = document.getElementById(tooltipId);
-
                 trigger.addEventListener('mouseenter', () => {
                     tooltip.classList.remove('invisible', 'opacity-0');
                     tooltip.classList.add('visible', 'opacity-100');
                 });
-
                 trigger.addEventListener('mouseleave', () => {
                     tooltip.classList.add('invisible', 'opacity-0');
                     tooltip.classList.remove('visible', 'opacity-100');
                 });
             });
+
+            // Date/month selection handling
+            const dateInput = document.getElementById('date');
+            const monthInput = document.getElementById('month');
+
+            if (dateInput && monthInput) {
+                dateInput.addEventListener('change', function() {
+                    if (this.value) {
+                        monthInput.value = '';
+                    }
+                });
+
+                monthInput.addEventListener('change', function() {
+                    if (this.value) {
+                        dateInput.value = '';
+                    }
+                });
+            }
+                     const dateInput = document.getElementById('date');
+            const monthInput = document.getElementById('month');
+
+            if (dateInput && monthInput) {
+                // Clear date when month is selected
+                monthInput.addEventListener('change', function() {
+                    if (this.value) {
+                        dateInput.value = '';
+                    }
+                });
+
+                // Clear month when date is selected
+                dateInput.addEventListener('change', function() {
+                    if (this.value) {
+                        monthInput.value = '';
+                    }
+                });
+
+                // Initialize based on current filters
+                @if($filterMonth)
+                    dateInput.value = '';
+                @endif
+            }
+
         });
     </script>
 </x-app-layout>

@@ -13,29 +13,38 @@ class UniformsController extends Controller
     //Index table
     public function index(Request $request)
     {
-        $currentMonth = $request->input('month');
+        $showAll = $request->input('show_all', false);
+        $currentDate = $request->input('date', now()->format('Y-m-d'));
+        $filterMonth = $request->input('month', null);
         $employeeId = $request->input('employee_id');
         $type = $request->input('type');
-        $showAll = $request->input('show_all', false);
 
         // Get employees with their uniforms
-        $query = Employee::with(['uniforms' => function ($query) use ($currentMonth, $showAll, $type) {
-            if (!$showAll && $currentMonth) {
-                $query->whereMonth('date', '=', substr($currentMonth, 5, 2))
-                    ->whereYear('date', '=', substr($currentMonth, 0, 4));
+        $query = Employee::with(['uniforms' => function ($query) use ($currentDate, $filterMonth, $showAll, $type) {
+            if (!$showAll) {
+                if ($filterMonth) {
+                $query->where('date', 'like', $filterMonth . '%');
+                } else {
+                    $query->whereDate('date', $currentDate);
+                }
             }
             if ($type) {
                 $query->where('type', $type);
             }
-        }])->whereHas('uniforms', function ($query) use ($currentMonth, $showAll, $type) {
-            if (!$showAll && $currentMonth) {
-                $query->whereMonth('date', '=', substr($currentMonth, 5, 2))
-                    ->whereYear('date', '=', substr($currentMonth, 0, 4));
+        }]);
+        // filtering by month or date
+        if (!$showAll) {
+            $query->whereHas('uniforms', function ($query) use ($currentDate, $filterMonth, $type) {
+            if ($filterMonth) {
+                $query->where('date', 'like', $filterMonth . '%');
+                } else {
+                    $query->whereDate('date', $currentDate);
             }
             if ($type) {
                 $query->where('type', $type);
             }
         });
+        }
 
         if ($employeeId) {
             $query->where('id', $employeeId);
@@ -46,9 +55,12 @@ class UniformsController extends Controller
 
         // Calculate total uniform costs
         $totalQuery = Uniform::query();
-        if (!$showAll && $currentMonth) {
-            $totalQuery->whereMonth('date', '=', substr($currentMonth, 5, 2))
-                ->whereYear('date', '=', substr($currentMonth, 0, 4));
+        if (!$showAll) {
+            if ($filterMonth) {
+            $totalQuery->where('date', 'like', $filterMonth . '%');
+            } else {
+                $totalQuery->whereDate('date', $currentDate);
+            }
         }
         if ($employeeId) {
             $totalQuery->where('employee_id', $employeeId);
@@ -61,7 +73,8 @@ class UniformsController extends Controller
         return view('pages.uniforms.index', [
             'employees' => $employees,
             'allEmployees' => $allEmployees,
-            'currentMonth' => $currentMonth,
+            'currentDate' => $currentDate,
+            'filterMonth' => $filterMonth,
             'employeeId' => $employeeId,
             'type' => $type,
             'totalUniformCosts' => $totalUniformCosts,
@@ -107,16 +120,22 @@ class UniformsController extends Controller
     public function editEmployeeUniforms($employeeId, Request $request)
     {
         try {
+            $date = $request->input('date');
             $month = $request->input('month');
-            $showAll = !$request->has('month');
+            $showAll = $request->boolean('show_all');
 
             $employee = Employee::findOrFail($employeeId);
 
             $query = $employee->uniforms()->orderBy('date', 'desc');
 
-            if (!$showAll && $month) {
-                $query->whereYear('date', '=', substr($month, 0, 4))
-                    ->whereMonth('date', '=', substr($month, 5, 2));
+            if (!$showAll) {
+                if ($month) {
+                $query->where('date', 'like', $month . '%');
+                } elseif ($date) {
+                    $query->whereDate('date', $date);
+                } else {
+                    $query->whereDate('date', now()->format('Y-m-d'));
+                }
             }
 
             $uniforms = $query->get();
@@ -124,6 +143,7 @@ class UniformsController extends Controller
             return view('pages.uniforms.edit', [
                 'employee' => $employee,
                 'uniforms' => $uniforms,
+                'date' => $date,
                 'month' => $month,
                 'showAll' => $showAll
             ]);
