@@ -5,10 +5,12 @@
                 <div class="sm:flex-auto">
                     <h1 class="text-base font-semibold text-gray-900">Meal Costs</h1>
                     <p class="mt-2 text-sm text-gray-700">
-                        @if ($showAll || !$currentMonth)
-                            Current meal costs
+                        @if ($showAll)
+                            Showing all Meals records
+                        @elseif(!empty($filterMonth))
+                           Meals records for {{ \Carbon\Carbon::parse($filterMonth)->format('F Y') }}
                         @else
-                            Meal costs for {{ \Carbon\Carbon::parse($currentMonth)->format('F Y') }}
+                           Meals records for {{ \Carbon\Carbon::parse($currentDate)->format('d F Y') }}
                         @endif
                     </p>
                 </div>
@@ -24,10 +26,16 @@
                 <div class="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
                     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                         <form method="GET" action="{{ route('meals.index') }}" class="mb-6 flex items-end gap-4">
+                           <div>
+                                <label for="date" class="block text-sm font-medium text-gray-700">Filter by Date</label>
+                                <input type="date" name="date" id="date"
+                                    value="{{  $showAll ? '' : ($filterMonth ? '' : $currentDate )}}"
+                                    class="border rounded p-2 text-sm w-full" />
+                            </div>
                             <div>
                                 <label for="month" class="block text-sm font-medium text-gray-700">Filter by
                                     Month</label>
-                                <input type="month" name="month" id="month" value="{{ $currentMonth }}"
+                                <input type="month" name="month" id="month" value="{{ $filterMonth ?? '' }}"
                                     class="border rounded p-2 text-sm w-full" />
                             </div>
                             <div>
@@ -48,10 +56,17 @@
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
                                     Filter
                                 </button>
-                                @if ($currentMonth || $employeeId)
-                                    <a href="{{ route('meals.index', ['show_all' => true]) }}"
+                                @if ($showAll || $filterMonth || ($currentDate && $currentDate !== now()->format('Y-m-d')) || $employeeId)
+                                    <a href="{{ route('meals.index')}}"
                                         class="inline-flex items-center px-4 py-2 ml-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
                                         Clear Filter
+                                    </a>
+                                @endif
+
+                               @if (!($showAll || $filterMonth || ($currentDate && $currentDate !== now()->format('Y-m-d')) || $employeeId ))
+                                    <a href="{{ route('meals.index', ['show_all' => true]) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
+                                        All Records
                                     </a>
                                 @endif
                             </div>
@@ -129,9 +144,9 @@
                                             </td>
                                             <td
                                                 class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
-                                                <a href="{{ route('meals.employee.edit', ['employee' => $employee->id, 'month' => $currentMonth]) }}"
+                                                <a href="{{ route('meals.employee.edit', ['employee' => $employee->id, 'date' => $currentDate, 'month' => $filterMonth]) }}"
                                                     class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</>
-                                             
+
                                             </td>
                                         </tr>
                                     @empty
@@ -144,10 +159,12 @@
                                     <tr>
                                         <td colspan="2"
                                             class="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-                                            @if ($showAll || !$currentMonth)
+                                            @if ($showAll)
                                                 Total Meal Costs (All Time):
+                                             @elseif($filterMonth)
+                                                Total Meals Costs for {{ \Carbon\Carbon::parse($filterMonth)->format('F Y') }}:
                                             @else
-                                                Total Meal Costs for the Month:
+                                                Total Meals Costs for {{ \Carbon\Carbon::parse($currentDate)->format('d F Y') }}:
                                             @endif
                                         </td>
                                         <td colspan="1" class="px-3 py-4 text-sm text-red-500 whitespace-nowrap">
@@ -160,7 +177,7 @@
                         </div>
                         <!-- Pagination -->
                         <div class="mt-4">
-                            {{ $employees->appends(['month' => $currentMonth, 'employee_id' => $employeeId, 'show_all' => $showAll])->links() }}
+                            {{ $employees->appends([ 'date' => $currentDate,'month' => $filterMonth, 'employee_id' => $employeeId, 'show_all' => $showAll])->links() }}
                         </div>
                     </div>
                 </div>
@@ -186,6 +203,30 @@
                     tooltip.classList.remove('visible', 'opacity-100');
                 });
             });
+                // Date/month selection handling
+                     const dateInput = document.getElementById('date');
+            const monthInput = document.getElementById('month');
+
+            if (dateInput && monthInput) {
+                // Clear date when month is selected
+                monthInput.addEventListener('change', function() {
+                    if (this.value) {
+                        dateInput.value = '';
+                    }
+                });
+
+                // Clear month when date is selected
+                dateInput.addEventListener('change', function() {
+                    if (this.value) {
+                        monthInput.value = '';
+                    }
+                });
+
+                // Initialize based on current filters
+                @if($filterMonth || $showAll)
+                    dateInput.value = '';
+                @endif
+            }
         });
     </script>
 </x-app-layout>
