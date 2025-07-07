@@ -16,9 +16,10 @@
                 </div>
             </div>
 
-            <div class="mt-8 flow-root">
-                <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <div class="mt-8"  style="height: calc(100vh - 175px); display: flex; flex-direction: column;">
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-x-auto overflow-y-auto">
+                    <div class="inline-block min-w-full py-2 align-middle">
                         <div class="overflow-hidden shadow-sm ring-1 ring-black/5 sm:rounded-lg">
                             <table class="min-w-full divide-y divide-gray-300">
                                 <thead class="bg-gray-50">
@@ -86,6 +87,11 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+
+                <div class="overflow-x-auto" style="height: 19px; margin-top: -17px;">
+                    <div style="height: 1px; visibility: hidden;">&nbsp;</div>
                 </div>
             </div>
         </div>
