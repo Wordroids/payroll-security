@@ -33,8 +33,8 @@ class UniformsController extends Controller
             }
         }]);
         // filtering by month or date
+        $query->whereHas('uniforms', function ($query) use ($currentDate, $filterMonth, $type,$showAll) {
         if (!$showAll) {
-            $query->whereHas('uniforms', function ($query) use ($currentDate, $filterMonth, $type) {
             if ($filterMonth) {
                 $query->where('date', 'like', $filterMonth . '%');
                 } else {
@@ -43,8 +43,8 @@ class UniformsController extends Controller
             if ($type) {
                 $query->where('type', $type);
             }
-        });
         }
+        });
 
         if ($employeeId) {
             $query->where('id', $employeeId);
