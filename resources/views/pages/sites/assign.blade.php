@@ -17,9 +17,9 @@
 
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Select Guards to Assign</label>
-                    
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto border rounded p-4">
-                        @forelse($employees as $emp)
+                        @forelse($employees->sortBy('emp_no') as $emp)
                             <label class="flex items-center space-x-3">
                                 <input type="checkbox" name="employee_ids[]"
                                        value="{{ $emp->id }}"
