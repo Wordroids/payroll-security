@@ -16,7 +16,7 @@ class MealsController extends Controller
         $currentDate = $request->input('date', now()->format('Y-m-d'));
         $filterMonth = $request->input('month', null);
         // Employees with meals
-        $query = Employee::with(['meals' => function($query) use ($currentDate, $filterMonth, $showAll) {
+        $query = Employee::with(['meals' => function ($query) use ($currentDate, $filterMonth, $showAll) {
            if (!$showAll) {
                 if ($filterMonth) {
                 $query->where('date', 'like', $filterMonth . '%');
@@ -26,17 +26,15 @@ class MealsController extends Controller
             }
         }]);
         // filtering by month or date
+        $query->whereHas('meals', function ($query) use ($currentDate, $filterMonth,$showAll) {
         if (!$showAll) {
-            $query->whereHas('meals', function ($query) use ($currentDate, $filterMonth) {
             if ($filterMonth) {
                 $query->where('date', 'like', $filterMonth . '%');
                 } else {
                     $query->whereDate('date', $currentDate);
             }
-
+                 }
         });
-        }
-
         // Filter by employee if specified
         if ($employeeId) {
             $query->where('id', $employeeId);
@@ -220,5 +218,5 @@ public function destroy($id)
         }
     }
 
-    
+
 }
