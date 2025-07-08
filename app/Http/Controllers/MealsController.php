@@ -11,46 +11,60 @@ class MealsController extends Controller
 {
     public function index(Request $request)
     {
-        $currentMonth = $request->input('month');
         $employeeId = $request->input('employee_id');
         $showAll = $request->input('show_all', false);
-
+        $currentDate = $request->input('date', now()->format('Y-m-d'));
+        $filterMonth = $request->input('month', null);
         // Employees with meals
-        $query = Employee::with(['meals' => function($query) use ($currentMonth, $showAll) {
-            if (!$showAll && $currentMonth) {
-                $query->whereMonth('date', '=', substr($currentMonth, 5, 2))
-                      ->whereYear('date', '=', substr($currentMonth, 0, 4));
+        $query = Employee::with(['meals' => function($query) use ($currentDate, $filterMonth, $showAll) {
+           if (!$showAll) {
+                if ($filterMonth) {
+                $query->where('date', 'like', $filterMonth . '%');
+                } else {
+                    $query->whereDate('date', $currentDate);
+                }
             }
-        }])->whereHas('meals');
+        }]);
+        // filtering by month or date
+        if (!$showAll) {
+            $query->whereHas('meals', function ($query) use ($currentDate, $filterMonth) {
+            if ($filterMonth) {
+                $query->where('date', 'like', $filterMonth . '%');
+                } else {
+                    $query->whereDate('date', $currentDate);
+            }
+
+        });
+        }
 
         // Filter by employee if specified
         if ($employeeId) {
             $query->where('id', $employeeId);
         }
 
-        // If filtering by month
-        if (!$showAll && $currentMonth) {
-            $query->whereHas('meals', function($query) use ($currentMonth) {
-                $query->whereMonth('date', '=', substr($currentMonth, 5, 2))
-                      ->whereYear('date', '=', substr($currentMonth, 0, 4));
-            });
-        }
 
         $employees = $query->orderBy('name')->paginate(10);
         $allEmployees = Employee::orderBy('name')->get();
 
         // Calculate total meal costs
         $totalQuery = Meals::query();
-        if (!$showAll && $currentMonth) {
-            $totalQuery->whereMonth('date', '=', substr($currentMonth, 5, 2))
-                        ->whereYear('date', '=', substr($currentMonth, 0, 4));
+        if (!$showAll) {
+            if ($filterMonth) {
+            $totalQuery->where('date', 'like', $filterMonth . '%');
+            } else {
+                $totalQuery->whereDate('date', $currentDate);
+            }
+        }
+        if ($employeeId) {
+            $totalQuery->where('employee_id', $employeeId);
         }
         $totalMealCosts = $totalQuery->sum('total_amount');
 
         return view('pages.meals.index', [
             'employees' => $employees,
             'allEmployees' => $allEmployees,
-            'currentMonth' => $currentMonth,
+            'currentDate' => $currentDate,
+            'filterMonth' => $filterMonth,
             'employeeId' => $employeeId,
             'totalMealCosts' => $totalMealCosts,
             'showAll' => $showAll
@@ -93,20 +107,30 @@ class MealsController extends Controller
     public function editEmployeeMeals($employeeId, Request $request)
     {
         try {
+            $date = $request->input('date');
             $month = $request->input('month');
-            $showAll = !$request->has('month');
+            $showAll = $request->boolean('show_all');
 
-            $employee = Employee::with(['meals' => function($query) use ($month, $showAll) {
-                if (!$showAll && $month) {
-                    $query->whereYear('date', '=', substr($month, 0, 4))
-                          ->whereMonth('date', '=', substr($month, 5, 2));
+            $employee = Employee::findOrFail($employeeId);
+            $query = $employee->meals()->orderBy('date', 'desc');
+
+
+             if (!$showAll) {
+                if ($month) {
+                $query->where('date', 'like', $month . '%');
+                } elseif ($date) {
+                    $query->whereDate('date', $date);
+                } else {
+                    $query->whereDate('date', now()->format('Y-m-d'));
                 }
-                $query->orderBy('date');
-            }])->findOrFail($employeeId);
+            }
+
+            $meals = $query->get();
 
             return view('pages.meals.edit', [
                 'employee' => $employee,
-                'meals' => $employee->meals,
+                'meals' => $meals,
+                'date' => $date,
                 'month' => $month,
                 'showAll' => $showAll
             ]);

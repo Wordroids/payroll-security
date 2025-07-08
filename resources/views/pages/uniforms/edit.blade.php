@@ -7,9 +7,12 @@
                     <p class="mt-2 text-sm text-gray-700">
                         @if ($showAll)
                             All uniform records for {{ $employee->name }}
-                        @else
+                        @elseif(!empty($month))
                             Uniform records for {{ $employee->name }} in
                             {{ \Carbon\Carbon::parse($month)->format('F Y') }}
+                        @else
+                            Uniform records for {{ $employee->name }} on
+                            {{ \Carbon\Carbon::parse($date ?? now()->format('Y-m-d'))->format('d F Y') }}
                         @endif
                     </p>
                 </div>
@@ -28,6 +31,11 @@
                             action="{{ route('uniforms.employee.edit', ['employee' => $employee->id]) }}"
                             class="mb-6 flex items-end gap-4">
                             <div>
+                                <label for="date" class="block text-sm font-medium text-gray-700">Filter by Date</label>
+                                <input type="date" name="date" id="date" value="{{ $date ?? '' }}"
+                                    class="border rounded p-2 text-sm w-full" />
+                            </div>
+                            <div>
                                 <label for="month" class="block text-sm font-medium text-gray-700">Filter by
                                     Month</label>
                                 <input type="month" name="month" id="month" value="{{ $month ?? '' }}"
@@ -38,10 +46,16 @@
                                     class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700">
                                     Filter
                                 </button>
-                                @if (request()->has('month'))
+                                @if ($showAll || $month || ($date && $date !== now()->format('Y-m-d')))
                                     <a href="{{ route('uniforms.employee.edit', ['employee' => $employee->id]) }}"
                                         class="inline-flex items-center px-4 py-2 ml-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
                                         Clear Filter
+                                    </a>
+                                @endif
+                                @if (!($showAll || $month || ($date && $date !== now()->format('Y-m-d'))))
+                                    <a href="{{ route('uniforms.employee.edit', ['employee' => $employee->id, 'show_all' => true]) }}"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded text-sm hover:bg-gray-300">
+                                        All Records
                                     </a>
                                 @endif
                             </div>
@@ -121,9 +135,12 @@
                             <p class="text-sm font-medium text-gray-900">
                                 @if ($showAll)
                                     Total Uniform Costs (All Time) for {{ $employee->name }}:
-                                @else
+                                @elseif(!empty($month))
                                     Total Uniform Costs for {{ $employee->name }} in
-                                    {{ \Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y') }}:
+                                    {{ \Carbon\Carbon::parse($month)->format('F Y') }}:
+                                @else
+                                    Total Uniform Costs for {{ $employee->name }} on
+                                    {{ \Carbon\Carbon::parse($date ?? now()->format('Y-m-d'))->format('d F Y') }}:
                                 @endif
                                 <span
                                     class="text-red-600">Rs.{{ number_format($uniforms->sum('total_amount'), 2) }}</span>
@@ -223,6 +240,29 @@
         const baseUrl = "{{ url('/') }}";
         let currentUniformId = null;
 
+            document.addEventListener('DOMContentLoaded', function() {
+            // Handle date/month selection
+            const dateInput = document.getElementById('date');
+            const monthInput = document.getElementById('month');
+
+            if (dateInput && monthInput) {
+                dateInput.addEventListener('change', function() {
+                    if (this.value) {
+                        monthInput.value = '';
+                    }
+                });
+
+                monthInput.addEventListener('change', function() {
+                    if (this.value) {
+                        dateInput.value = '';
+                    }
+                });
+
+                @if($month)
+                    dateInput.value = '';
+                @endif
+            }
+        });
         function openEditModal(uniformId) {
             currentUniformId = uniformId;
             document.getElementById('editModal').classList.remove('hidden');
