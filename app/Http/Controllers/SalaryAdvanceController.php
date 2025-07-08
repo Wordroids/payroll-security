@@ -16,21 +16,28 @@ class SalaryAdvanceController extends Controller
      */
     public function salaryAdvance(Request $request)
     {
-        $currentMonth = $request->input('month');
         $showAll = $request->input('show_all', false);
-
+        $currentDate = $request->input('date', now()->format('Y-m-d'));
+        $filterMonth = $request->input('month', null);
         // Employees with salary advances
-        $query = Employee::with(['salaryAdvances' => function ($query) use ($currentMonth, $showAll) {
-            if (!$showAll && $currentMonth) {
-                $query->where('advance_date', 'like', $currentMonth . '%');
+        $query = Employee::with(['salaryAdvances' => function ($query) use ($currentDate, $filterMonth, $showAll) {
+            if (!$showAll) {
+                if ($filterMonth) {
+                    $query->where('advance_date', 'like', $filterMonth . '%');
+                } else {
+                    $query->whereDate('advance_date', $currentDate);
+                }
             }
-        }])
-            ->whereHas('salaryAdvances');
+        }]);
 
         // If filtering by month
-        if (!$showAll && $currentMonth) {
-            $query->whereHas('salaryAdvances', function ($query) use ($currentMonth) {
-                $query->where('advance_date', 'like', $currentMonth . '%');
+        if (!$showAll) {
+            $query->whereHas('salaryAdvances', function ($query) use ($currentDate, $filterMonth) {
+                if ($filterMonth) {
+                    $query->where('advance_date', 'like', $filterMonth . '%');
+                } else {
+                    $query->whereDate('advance_date', $currentDate);
+                }
             });
         }
 
@@ -38,14 +45,20 @@ class SalaryAdvanceController extends Controller
 
         // Calculate total advances
         $totalQuery = SalaryAdvance::query();
-        if (!$showAll && $currentMonth) {
-            $totalQuery->where('advance_date', 'like', $currentMonth . '%');
+        if (!$showAll) {
+            if ($filterMonth) {
+                $totalQuery->where('advance_date', 'like', $filterMonth . '%');
+            } else {
+                $totalQuery->whereDate('advance_date', $currentDate);
+            }
         }
         $totalSalaryAdvances = $totalQuery->sum('amount');
 
         return view('pages.salaries.advances', [
             'employees' => $employees,
-            'currentMonth' => $currentMonth,
+            'currentMonth' => $filterMonth,
+            'currentDate' => $currentDate,
+            'filterMonth' => $filterMonth,
             'totalSalaryAdvances' => $totalSalaryAdvances,
             'showAll' => $showAll
         ]);
@@ -90,15 +103,18 @@ class SalaryAdvanceController extends Controller
     public function edit($employeeId, Request $request)
     {
         try {
-            // Get the month filter if provided
+            $date = $request->input('date');
             $month = $request->input('month');
-            $showAll = !$request->has('month'); // Show all if no month filter
-
-            // Get the employee with advances
-            $employee = Employee::with(['salaryAdvances' => function ($query) use ($month, $showAll) {
-                if (!$showAll && $month) {
-                    $query->whereYear('advance_date', '=', substr($month, 0, 4))
-                        ->whereMonth('advance_date', '=', substr($month, 5, 2));
+            $showAll = $request->boolean('show_all');
+            $employee = Employee::with(['salaryAdvances' => function ($query) use ($date, $month, $showAll) {
+                if (!$showAll) {
+                    if ($month) {
+                        $query->where('advance_date', 'like', $month . '%');
+                    } elseif ($date) {
+                        $query->whereDate('advance_date', $date);
+                    } else {
+                        $query->whereDate('advance_date', now()->format('Y-m-d'));
+                    }
                 }
                 $query->orderBy('advance_date');
             }])->findOrFail($employeeId);
@@ -106,6 +122,7 @@ class SalaryAdvanceController extends Controller
             return view('pages.salaries.editAdvance', [
                 'employee' => $employee,
                 'advances' => $employee->salaryAdvances,
+                'date' => $date,
                 'month' => $month,
                 'showAll' => $showAll
             ]);
