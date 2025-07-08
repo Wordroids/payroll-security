@@ -31,11 +31,9 @@
                 </form>
             </div>
 
-            <div class="mt-6" style="height: calc(100vh - 280px); display: flex; flex-direction: column;">
-                <div class="flex-1 overflow-hidden">
-                    <div class="h-full overflow-x-auto overflow-y-auto">
-                    <div class="inline-block min-w-full py-2 align-middle ">
-                        <div class="overflow-hidden shadow-sm ring-1 ring-black/5 sm:rounded-lg">
+            <div class="mt-6" style="height: calc(100vh - 280px);">
+                <div class="h-full w-full overflow-auto relative">
+                    <div class="absolute inset-0 min-w-max">
                             <table class="min-w-full divide-y divide-gray-300">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -118,12 +116,7 @@
                                     @endforelse
                                 </tbody>
                             </table>
-                        </div>
                     </div>
-                    </div>
-                </div>
-                <div class="overflow-x-auto" style="height: 19px; margin-top: -17px;">
-                    <div style="height: 1px; visibility: hidden;">&nbsp;</div>
                 </div>
             </div>
         </div>
