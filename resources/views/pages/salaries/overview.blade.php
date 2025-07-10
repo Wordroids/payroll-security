@@ -31,39 +31,64 @@
                 </form>
             </div>
 
-            <div class="mt-6" style="height: calc(100vh - 280px);">
-                <div class="h-full w-full overflow-auto relative">
-                    <div class="absolute inset-0 min-w-max">
+            <div class="mt-6" style="height: calc(100vh - 280px); display: flex; flex-direction: column;">
+                <div class="flex-1 overflow-auto relative">
+                    <div class="absolute inset-0 overflow-auto">
+                        <div class="inline-flex min-w-max">
+                            <!-- Fixed columns (Emp No and Name) -->
+                            <div class="sticky left-0 z-20 bg-white">
                             <table class="min-w-full divide-y divide-gray-300">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Emp No</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Shifts</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Basic</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">BR Allow</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">OT Earnings</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Att. Bonus</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Other Allow</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Sub Total</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Gross Pay</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">EPF 8%</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Salary Adv</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Meals</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Uniform</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Deduct</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Net Pay</th>
+                                        <th class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 sticky top-0 z-30 bg-gray-50">Emp No</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-30 bg-gray-50">Name</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
                                     @forelse($salaryData as $data)
                                     <tr>
-                                        <td class="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-6">
+                                        <td class="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-6 bg-white">
                                             {{ $data['employee']->emp_no }}
                                         </td>
-                                        <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                        <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap bg-white">
                                             {{ $data['employee']->name }}
                                         </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500 bg-white">
+                                                No salary data found.
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Scrollable columns -->
+                            <div>
+                                <table class="min-w-full divide-y divide-gray-300">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Shifts</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Basic</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">BR Allow</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">OT Earnings</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Att. Bonus</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Other Allow</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Sub Total</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Gross Pay</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">EPF 8%</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Salary Adv</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Meals</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Uniform</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Total Deduct</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Net Pay</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200 bg-white">
+                                        @forelse($salaryData as $data)
+                                        <tr>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                             {{ number_format($data['total_shifts'], 2) }}
                                         </td>
@@ -109,13 +134,15 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="16" class="px-6 py-4 text-center text-sm text-gray-500">
+                                        <td colspan="14" class="px-6 py-4 text-center text-sm text-gray-500">
                                             No salary data found for the selected filters.
                                         </td>
                                     </tr>
                                     @endforelse
                                 </tbody>
                             </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

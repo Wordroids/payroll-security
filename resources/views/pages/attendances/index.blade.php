@@ -141,34 +141,51 @@
             </table>
         </div> --}}
         @foreach ($sites as $site)
-            <div class="overflow-x-auto bg-white rounded shadow mb-20">
-
+            <div class="mb-20" style="position: relative; overflow-x: auto; overflow-y: auto; max-height: calc(100vh - 300px);">
+                <div style="display: flex; min-width: max-content;">
+                    <!-- Fixed columns (Site and Employee Name) -->
+                    <div style="position: sticky; left: 0; z-index: 20; background-color: white;">
                 <table class="min-w-max w-full text-sm border-collapse border border-gray-300">
-                    <thead class="bg-gray-100">
+                    <thead style="background-color: #f3f4f6;">
                         <tr>
                             <th
-                                class="border text-left bg-gray-200 font-semibold px-4 py-2 min-w-48 max-w-48 text-indigo-700">
+                                class="border px-4 py-1 min-w-48 max-w-48 text-indigo-700 text-left h-[42px]">
                                 Site:
                                 {{ $site->name }}
                             </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($site->employees as $employee)
+                                    <tr>
+                                        <td class="border px-2 py-1 min-w-48 max-w-48" style="height: 42px;">
+                                            {{ $employee->name }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
+                    <!-- Scrollable columns -->
+                    <div>
+                        <table style="border-collapse: collapse;">
+                            <thead style="background-color: #f3f4f6;">
+                                <tr>
                             @for ($d = 1; $d <= $daysInMonth; $d++)
-                                <th class="border px-2 py-1 text-center">{{ $d }}</th>
+                                <th class="border px-2 py-1 text-center h-[42px]">{{ $d }}</th>
                             @endfor
-                            <th class="border px-2 py-1 text-center">Norm Hrs</th>
-                            <th class="border px-2 py-1 text-center">Tot. Norm. Hrs</th>
-                            <th class="border px-2 py-1 text-center">OT Hrs</th>
-                            <th class="border px-2 py-1 text-center">Tot. OT Hrs</th>
-                            <th class="border px-2 py-1 text-center">Tot. Hrs</th>
-                            <th class="border px-2 py-1 text-center">Days</th>
-                            <th class="border px-2 py-1 text-center">Shifts</th>
-                            <th class="border px-2 py-1 text-center">S.P. OT</th>
+                            <th class="border px-2 py-1 text-center h-[42px]">Norm Hrs</th>
+                            <th class="border px-2 py-1 text-center h-[42px]">Tot. Norm. Hrs</th>
+                            <th class="border px-2 py-1 text-center h-[42px]">OT Hrs</th>
+                            <th class="border px-2 py-1 text-center h-[42px]">Tot. OT Hrs</th>
+                            <th class="border px-2 py-1 text-center h-[42px]">Tot. Hrs</th>
+                            <th class="border px-2 py-1 text-center h-[42px]">Days</th>
+                            <th class="border px-2 py-1 text-center h-[42px]">Shifts</th>
+                            <th class="border px-2 py-1 text-center h-[42px]">S.P. OT</th>
                         </tr>
                     </thead>
                     <tbody>
-
-
-
                         @foreach ($site->employees as $employee)
                             @php
                                 $dayTotal = 0;
@@ -180,19 +197,14 @@
                                 $specialOtHours = 0;
                             @endphp
                             <tr>
-                                <td class="border px-2 py-1">{{ $employee->name }}</td>
-
                                 @for ($d = 1; $d <= $daysInMonth; $d++)
                                     @php
-
                                         $dayHours = $attendances[$employee->id][$site->id][$d]['day'] ?? null;
                                         $nightHours = $attendances[$employee->id][$site->id][$d]['night'] ?? null;
-
                                         $dayTotal += is_numeric($dayHours) ? $dayHours : 0;
                                         $nightTotal += is_numeric($nightHours) ? $nightHours : 0;
                                         $normalDayHours =
                                             $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
-
                                         $normalNightHours =
                                             $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
                                         $otDayHours = $attendances[$employee->id][$site->id][$d]['ot_day_hours'] ?? 0;
@@ -205,11 +217,9 @@
                                         if ($site->has_special_ot_hours) {
                                            $specialOtHours = $specialOtHours + max( $dayHours - 12, 0);
                                         }
-
-
                                     @endphp
 
-                                    <td class="border px-1 py-1 text-center">
+                                    <td class="border px-1 py-1 text-center" style="height: 42px;">
                                         @if ($dayHours || $nightHours)
                                             <div class="text-xs leading-tight">
                                                 @if ($dayHours)
@@ -225,51 +235,49 @@
                                     </td>
                                 @endfor
 
-
-
-                                <td class="border px-2 py-1 text-center text-blue-700 font-semibold">
+                                <td class="border px-2 py-1 text-center text-blue-700 font-semibold" style="height: 42px;">
                                     <div class="text-xs leading-tight">
                                         <span class="text-blue-700"> {{ $totalNormalDayHours }}</span><br>
                                         <span class="text-purple-700"> {{ $totalNormalNightHours }}</span>
                                     </div>
                                 </td>
 
-                                <td class="border px-2 py-1 text-center text-purple-700 font-semibold">
+                                <td class="border px-2 py-1 text-center text-purple-700 font-semibold" style="height: 42px;">
                                     {{ $totalNormalDayHours + $totalNormalNightHours }}
                                 </td>
 
-                                <td class="border px-2 py-1 text-center font-semibold">
+                                <td class="border px-2 py-1 text-center font-semibold" style="height: 42px;">
                                     <div class="text-xs leading-tight">
                                         <span class="text-blue-700"> {{ $totalOTDayHours }}</span><br>
                                         <span class="text-purple-700"> {{ $totalOTNightHours }}</span>
                                     </div>
                                 </td>
 
-                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">
+                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight" style="height: 42px;">
                                     {{ $totalOTDayHours + $totalOTNightHours }}
                                 </td>
 
-                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">
+                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight" style="height: 42px;">
                                     {{ $totalNormalDayHours + $totalNormalNightHours + $totalOTDayHours + $totalOTNightHours }}
                                 </td>
 
-                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">
+                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight" style="height: 42px;">
                                     {{ ($totalNormalDayHours + $totalNormalNightHours + $totalOTDayHours + $totalOTNightHours) / 24 }}
                                 </td>
 
-                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">
+                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight" style="height: 42px;">
                                     {{ ($totalNormalDayHours + $totalNormalNightHours + $totalOTDayHours + $totalOTNightHours) / 12 }}
                                 </td>
 
-                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight">
+                                <td class="border px-2 py-1 text-center font-semibold text-xs leading-tight" style="height: 42px;">
                                     {{ $specialOtHours }}
                                 </td>
                             </tr>
                         @endforeach
-
                     </tbody>
                 </table>
-
+                    </div>
+                </div>
             </div>
         @endforeach
     </div>
