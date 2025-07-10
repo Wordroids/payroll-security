@@ -30,11 +30,16 @@
                 <input type="hidden" name="month" value="{{ $selectedMonth }}">
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-max w-full text-sm text-left border border-collapse">
+                    <div class="relative" style="min-width: max-content;">
+                    <table class="w-full text-sm text-left border border-collapse">
+                            <colgroup>
+                                <col class="w-10">
+                                <col class="w-48">
+                            </colgroup>
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="border px-2 py-1">#</th>
-                                <th class="border px-2 py-1">Guard Name</th>
+                                <th class="border px-2 py-1 sticky left-0 z-10 bg-gray-100" style="min-width: 2.5rem;">#</th>
+                                <th class="border px-2 py-1 sticky left-10 z-10 bg-gray-100" style="min-width: 12rem;">Guard Name</th>
                                 @for ($day = 1; $day <= 31; $day++)
                                     <th class="border px-2 py-1 text-center">{{ $day }}</th>
                                 @endfor
@@ -43,8 +48,8 @@
                         <tbody>
                             @foreach ($guards as $index => $guard)
                                 <tr>
-                                    <td class="border px-2 py-1">{{ $index + 1 }}</td>
-                                    <td class="border px-2 py-1">{{ $guard->name }}</td>
+                                    <td class="border px-2 py-1 sticky left-0 z-10 bg-white" style="min-width: 2.5rem;">{{ $index + 1 }}</td>
+                                    <td class="border px-2 py-1 sticky left-10 z-10 bg-white" style="min-width: 12rem;">{{ $guard->name }}</td>
                                     @for ($day = 1; $day <= 31; $day++)
                                         @php
                                             $dayField = "attendances[{$guard->id}][{$day}][day]";
@@ -68,12 +73,11 @@
                                                 min="0" max="24" placeholder="Night">
                                         </td>
                                     @endfor
-
-
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
 
                 <div class="mt-4">
