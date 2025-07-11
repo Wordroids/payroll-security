@@ -80,7 +80,7 @@
                                     <tr>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Items</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total</th>
+                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
                                         <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Notes</th>
                                         <th class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Actions
                                         </th>
@@ -92,16 +92,8 @@
                                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 {{ \Carbon\Carbon::parse($meal->date)->format('Y-m-d') }}
                                             </td>
-                                            <td class="px-3 py-4 text-sm text-gray-500">
-                                                @foreach ($meal->meal_items as $item)
-                                                    <div class="mb-1">
-                                                        {{ $item['quantity'] }} x
-                                                        Rs.{{ number_format($item['unit_price'], 2) }}
-                                                    </div>
-                                                @endforeach
-                                            </td>
                                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                                Rs.{{ number_format($meal->total_amount, 2) }}
+                                                Rs.{{ number_format($meal->amount, 2) }}
                                             </td>
                                             <td class="px-3 py-4 text-sm text-gray-500">
                                                 {{ $meal->notes }}
@@ -115,7 +107,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
                                                 No meal records found.
                                             </td>
                                         </tr>
@@ -137,7 +129,7 @@
                                     {{ \Carbon\Carbon::parse($date ?? now()->format('Y-m-d'))->format('d F Y') }}:
                                 @endif
                                 <span
-                                    class="text-red-600">Rs.{{ number_format($meals->sum('total_amount'), 2) }}</span>
+                                    class="text-red-600">Rs.{{ number_format($meals->sum('amount'), 2) }}</span>
                             </p>
                         </div>
                     </div>
@@ -171,15 +163,13 @@
                                             <input type="date" name="date" id="edit_date" required
                                                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                         </div>
-
-                                        <div id="mealItemsContainer">
-
+                                        <div>
+                                        <label for="edit_amount"
+                                            class="block text-sm font-medium text-gray-700">Amount</label>
+                                        <input type="number" name="amount" id="edit_amount" step="0.01" min="0" required
+                                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                         </div>
 
-                                        <button type="button" onclick="addMealItem()"
-                                            class="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            Add Item
-                                        </button>
 
                                         <div>
                                             <label for="edit_notes"
@@ -259,15 +249,10 @@
                         const formattedDate = mealDate.toISOString().split('T')[0];
 
                         document.getElementById('edit_date').value = formattedDate;
+                        document.getElementById('edit_amount').value = data.data.amount;
                         document.getElementById('edit_notes').value = data.data.notes || '';
 
 
-                        const container = document.getElementById('mealItemsContainer');
-                        container.innerHTML = '';
-
-                        data.data.meal_items.forEach((item, index) => {
-                            addMealItem(item.unit_price, item.quantity, index);
-                        });
 
                         document.getElementById('editMealForm').action = `${baseUrl}/meals/${mealId}`;
                     } else {
@@ -313,34 +298,6 @@
             }
         }
 
-        function addMealItem(unitPrice = '', quantity = '', index = null) {
-            const container = document.getElementById('mealItemsContainer');
-            const itemIndex = index !== null ? index : container.children.length;
-
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'meal-item border rounded p-3 mb-3';
-            itemDiv.innerHTML = `
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Unit Price</label>
-                <input type="number" step="0.01" name="meal_items[${itemIndex}][unit_price]"
-                    value="${unitPrice}" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Quantity</label>
-                <input type="number" name="meal_items[${itemIndex}][quantity]"
-                    value="${quantity}" min="1" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-        </div>
-        <button type="button" onclick="this.parentNode.remove()"
-            class="mt-2 inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200">
-            Remove Item
-        </button>
-    `;
-            container.appendChild(itemDiv);
-        }
 
         function submitEditForm() {
             const form = document.getElementById('editMealForm');

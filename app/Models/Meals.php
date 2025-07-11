@@ -12,13 +12,11 @@ class Meals extends Model
     protected $fillable = [
         'employee_id',
         'date',
-        'meal_items',
-        'total_amount',
+        'amount',
         'notes',
 
     ];
     protected $casts = [
-        'meal_items' => 'array',
         'date' => 'date',
     ];
 

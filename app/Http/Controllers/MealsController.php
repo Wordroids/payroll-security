@@ -56,7 +56,7 @@ class MealsController extends Controller
         if ($employeeId) {
             $totalQuery->where('employee_id', $employeeId);
         }
-        $totalMealCosts = $totalQuery->sum('total_amount');
+        $totalMealCosts = $totalQuery->sum('amount');
 
         return view('pages.meals.index', [
             'employees' => $employees,
@@ -80,21 +80,15 @@ class MealsController extends Controller
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'date' => 'required|date',
-            'meal_items' => 'required|array|min:1',
-            'meal_items.*.unit_price' => 'required|numeric|min:0',
-            'meal_items.*.quantity' => 'required|integer|min:1',
+            'amount' => 'required|numeric|min:0',
             'notes' => 'nullable|string'
         ]);
 
-        $totalAmount = collect($validated['meal_items'])->sum(function($item) {
-            return $item['unit_price'] * $item['quantity'];
-        });
 
         Meals::create([
             'employee_id' => $validated['employee_id'],
             'date' => $validated['date'],
-            'meal_items' => $validated['meal_items'],
-            'total_amount' => $totalAmount,
+            'amount' =>$validated['amount'] ,
             'notes' => $validated['notes'] ?? null
         ]);
 
@@ -147,7 +141,7 @@ class MealsController extends Controller
             'success' => true,
             'data' => [
                 'date' => $meal->date,
-                'meal_items' => $meal->meal_items,
+                'amount' => $meal->amount,
                 'notes' => $meal->notes ?? '',
                 'employee' => $meal->employee
             ]
@@ -185,21 +179,15 @@ public function destroy($id)
         try {
             $validated = $request->validate([
                 'date' => 'required|date',
-                'meal_items' => 'required|array|min:1',
-                'meal_items.*.unit_price' => 'required|numeric|min:0',
-                'meal_items.*.quantity' => 'required|integer|min:1',
+                'amount' => 'required|numeric|min:0',
                 'notes' => 'nullable|string'
             ]);
 
-            $totalAmount = collect($validated['meal_items'])->sum(function($item) {
-                return $item['unit_price'] * $item['quantity'];
-            });
 
             $meal = Meals::findOrFail($id);
             $meal->update([
                 'date' => $validated['date'],
-                'meal_items' => $validated['meal_items'],
-                'total_amount' => $totalAmount,
+                'amount' => $validated['amount'],
                 'notes' => $validated['notes'] ?? null
             ]);
 
