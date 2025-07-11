@@ -99,7 +99,7 @@
                                             <td
                                                 class="px-3 py-4 text-sm text-gray-700 whitespace-nowrap overflow-visible">
                                                 <div class="flex items-center space-x-2 relative">
-                                                    <span>Rs.{{ number_format($employee->meals->sum('total_amount'), 2) }}</span>
+                                                    <span>Rs.{{ number_format($employee->meals->sum('amount'), 2) }}</span>
                                                     <!-- Tooltip Trigger Icon -->
                                                     <svg data-tooltip-target="tooltip-meals-{{ $employee->id }}"
                                                         class="w-5 h-5 text-gray-500 hover:text-indigo-600 cursor-pointer transition"
@@ -117,19 +117,9 @@
                                                                 <li class="border-b border-gray-600 pb-2">
                                                                     <div class="flex justify-between items-start mb-1">
                                                                         <span
-                                                                            class="block font-semibold text-indigo-300">Rs.{{ number_format($meal->total_amount, 2) }}</span>
+                                                                            class="block font-semibold text-indigo-300">Rs.{{ number_format($meal->amount, 2) }}</span>
                                                                         <span
                                                                             class="block text-gray-300 text-xs">{{ $meal->date->format('d M Y') }}</span>
-                                                                    </div>
-                                                                    <div class="text-gray-400 text-xs">
-                                                                        @foreach ($meal->meal_items as $item)
-                                                                            <div class="mb-1">
-                                                                                {{ $item['quantity'] }} x
-                                                                                Rs.{{ number_format($item['unit_price'], 2) }}
-                                                                                =
-                                                                                Rs.{{ number_format($item['quantity'] * $item['unit_price'], 2) }}
-                                                                            </div>
-                                                                        @endforeach
                                                                     </div>
                                                                     @if ($meal->notes)
                                                                         <div class="text-gray-400 text-xs italic mt-1">
