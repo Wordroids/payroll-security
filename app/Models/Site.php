@@ -25,8 +25,11 @@ class Site extends Model
         'site_shift_rate',
         'guard_shift_rate',
         'has_special_ot_hours',
+        'special_ot_rate',
     ];
-
+    protected $casts = [
+        'has_special_ot_hours' => 'boolean',
+    ];
     public function employees()
     {
         return $this->belongsToMany(Employee::class);

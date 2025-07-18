@@ -46,14 +46,20 @@ class SiteController extends Controller
             'no_night_shifts' => 'nullable|integer|min:0',
             'site_shift_rate' => 'nullable|numeric|min:0',
             'guard_shift_rate' => 'nullable|numeric|min:0',
+            'has_special_ot_hours' => 'boolean',
+            'special_ot_rate' => 'nullable|numeric|min:0|required_if:has_special_ot_hours,true',
         ]);
 
+        try {
         Site::create($validated);
-
         return redirect()->route('sites.index')->with('success', 'Site created successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Site creation failed: ' . $e->getMessage());
+            return back()
+                ->withInput()
+                ->with('error', 'Failed to create site. Please try again.');
     }
-
-
+    }
     /**
      * Display the specified resource.
      */
@@ -89,8 +95,14 @@ class SiteController extends Controller
             'no_night_shifts' => 'nullable|integer|min:0',
             'site_shift_rate' => 'nullable|numeric|min:0',
             'guard_shift_rate' => 'nullable|numeric|min:0',
+            'has_special_ot_hours' => 'boolean',
+            'special_ot_rate' => 'nullable|numeric|min:0|required_if:has_special_ot_hours,true',
         ]);
 
+        if (!isset($validated['has_special_ot_hours'])) {
+            $validated['has_special_ot_hours'] = false;
+            $validated['special_ot_rate'] = null;
+        }
         $site->update($validated);
 
         return redirect()->route('sites.index')->with('success', 'Site updated successfully.');

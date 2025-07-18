@@ -61,7 +61,7 @@ class SalaryController extends Controller
         $mealDeductions = Meals::where('employee_id', $employee->id)
             ->whereMonth('date', '=', substr($month, 5, 2))
             ->whereYear('date', '=', substr($month, 0, 4))
-            ->sum('total_amount');
+            ->sum('amount');
 
         // Uniform deductions (current month/2 + previous month/2)
         $currentMonthUniform = Uniform::where('employee_id', $employee->id)
@@ -272,7 +272,7 @@ class SalaryController extends Controller
             $mealDeductions = Meals::where('employee_id', $employee->id)
                 ->whereMonth('date', '=', substr($month, 5, 2))
                 ->whereYear('date', '=', substr($month, 0, 4))
-                ->sum('total_amount');
+                ->sum('amount');
 
             // Uniform deductions (current month/2 + previous month/2)
             $currentMonthUniform = Uniform::where('employee_id', $employee->id)
@@ -406,7 +406,7 @@ class SalaryController extends Controller
         $mealDeductions = Meals::where('employee_id', $employee->id)
             ->whereMonth('date', '=', substr($month, 5, 2))
             ->whereYear('date', '=', substr($month, 0, 4))
-            ->sum('total_amount');
+            ->sum('amount');
 
         // Uniform deductions (current month/2 + previous month/2)
         $currentMonthUniform = Uniform::where('employee_id', $employee->id)
