@@ -82,39 +82,50 @@ class SalaryController extends Controller
             $attendances[$attendance->employee_id][$attendance->site_id][$day][$attendance->shift] = $attendance->worked_hours;
         }
         $specialOtHours = 0;
+        $specialOtDayHours = 0;
+        $specialOtNightHours = 0;
+        $specialOtEarnings = 0;
+
+
+
         // Process normal/OT hours
         foreach ($attendances as $empId => $sites) {
             foreach ($sites as $siteId => $days) {
                 $site = Site::find($siteId);
-                if ($site->has_special_ot_hours) {
-                    foreach ($days as $day => $shifts) {
+            foreach ($days as $day => $shifts) {
+                // Day shift calculations
                         if (isset($shifts['day'])) {
-                            $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
-                            $attendances[$empId][$siteId][$day]['ot_day_hours'] =  min(max($shifts['day'] - 9, 0), 3);
-                        }
-                        if (isset($shifts['night'])) {
-                            $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
-                            $attendances[$empId][$siteId][$day]['ot_night_hours'] =  min(max($shifts['night'] - 9, 0), 3);
-                        }
-                        // special ot total
-                        if (isset($shifts['day'])) {
-                            $specialOtHours +=  max($shifts['day'] - 12, 0);
-                        }
+                    $dayHours = $shifts['day'];
+                    $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($dayHours, 9);
+                    $attendances[$empId][$siteId][$day]['ot_day_hours'] = max(min($dayHours, 12) - 9, 0);
+
+                    if ($site->has_special_ot_hours) {
+                        $specialOtDay = max($dayHours - 12, 0);
+                        $attendances[$empId][$siteId][$day]['special_ot_day_hours'] = $specialOtDay;
+                        $specialOtDayHours += $specialOtDay;
+                        $specialOtEarnings += $specialOtDay * $site->special_ot_rate;
                     }
-                } else {
-                    foreach ($days as $day => $shifts) {
-                        if (isset($shifts['day'])) {
-                            $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
-                            $attendances[$empId][$siteId][$day]['ot_day_hours'] = max($shifts['day'] - 9, 0);
-                        }
+                }
+
+                // Night shift calculations
                         if (isset($shifts['night'])) {
-                            $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
-                            $attendances[$empId][$siteId][$day]['ot_night_hours'] = max($shifts['night'] - 9, 0);
-                        }
+                           $nightHours = $shifts['night'];
+                            $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($nightHours, 9);
+                            $attendances[$empId][$siteId][$day]['ot_night_hours'] = max(min($nightHours, 12) - 9, 0);
+
+                    if ($site->has_special_ot_hours) {
+                        $specialOtNight = max($nightHours - 12, 0);
+                        $attendances[$empId][$siteId][$day]['special_ot_night_hours'] = $specialOtNight;
+                        $specialOtNightHours += $specialOtNight;
+                        $specialOtEarnings += $specialOtNight * $site->special_ot_rate;
                     }
                 }
             }
         }
+    }
+
+      $specialOtHours = $specialOtDayHours + $specialOtNightHours;
+
         // Total Salary Advances
         $salaryAdvances = $employee->salaryAdvances()
             ->whereBetween('advance_date', [$startDate, $endDate])
@@ -159,7 +170,8 @@ class SalaryController extends Controller
         $otEarnings = round($otRate * $totalOTHours, 2);
         $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
         $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
-        $grossPay = $totalShiftEarning + ($specialOtHours * 200);
+        //$grossPay = $totalShiftEarning + ($specialOtHours * 200);
+        $grossPay = $totalShiftEarning + $specialOtEarnings;
         $epfEmployee = ($combinedBase / 100) * 8;
         $epfEtfEmployer = ($employee->basic / 100) * 15;
         $totalDeductions = $epfEmployee + $employee->totalSalaryAdvance + $mealDeductions + $uniformDeductions;
@@ -182,7 +194,11 @@ class SalaryController extends Controller
             'totalEarnings',
             'specialOtHours',
             'mealDeductions',
-            'uniformDeductions'
+            'uniformDeductions',
+            'specialOtDayHours',
+            'specialOtNightHours',
+            'specialOtEarnings',
+            'startDate',
         ));
     }
     /**
@@ -268,7 +284,7 @@ class SalaryController extends Controller
 
             $totalSalaryAdvance = $salaryAdvances->sum('amount');
 
-            // Meal deductions 
+            // Meal deductions
             $mealDeductions = Meals::where('employee_id', $employee->id)
                 ->whereMonth('date', '=', substr($month, 5, 2))
                 ->whereYear('date', '=', substr($month, 0, 4))
@@ -322,7 +338,8 @@ class SalaryController extends Controller
 
             $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
             $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
-            $grossPay = $totalShiftEarning + ($specialOtHours * 200);
+           $grossPay = $totalShiftEarning + $otEarnings + ($specialOtHours * 200) ;
+           //$grossPay = $totalShiftEarning + $specialOtEarnings;
             $epfEmployee = ($combinedBase / 100) * 8;
             $totalDeductions = $epfEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
 
