@@ -88,13 +88,71 @@
             {{-- Special OT --}}
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Special Overtime</h2>
-                <div class="space-y-2 text-sm text-gray-700">
-                    <div><strong>Special OT Hours:</strong> {{ $specialOtHours }}</div>
-                    <div><strong>Special OT Rate:</strong> Rs. 200.00</div>
-                    <div><strong>Special OT Earnings:</strong> Rs. {{ number_format($specialOtHours * 200, 2) }}</div>
+     <div class="overflow-x-auto mb-4">
+        <table class="min-w-full text-sm text-left text-gray-700">
+            <thead class="bg-gray-100 font-semibold text-gray-800 border-b">
+                <tr>
+                    <th class="px-4 py-2">Site</th>
+                    <th class="px-4 py-2">Day Hours</th>
+                    <th class="px-4 py-2">Night Hours</th>
+                    <th class="px-4 py-2">Total Hours</th>
+                    <th class="px-4 py-2">Rate</th>
+                    <th class="px-4 py-2">Earnings</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    $totalSpecialOtEarnings = 0;
+                @endphp
+
+                @foreach($employee->sites as $site)
+                    @php
+                        $siteSpecialOtDayHours = 0;
+                        $siteSpecialOtNightHours = 0;
+
+                        // Calculate special OT hours for this site
+                        if($site->has_special_ot_hours) {
+                            for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
+                                $siteSpecialOtDayHours += $attendances[$employee->id][$site->id][$d]['special_ot_day_hours'] ?? 0;
+                                $siteSpecialOtNightHours += $attendances[$employee->id][$site->id][$d]['special_ot_night_hours'] ?? 0;
+                            }
+
+                            $siteSpecialOtHours = $siteSpecialOtDayHours + $siteSpecialOtNightHours;
+                            $siteSpecialOtEarnings = $siteSpecialOtHours * $site->special_ot_rate;
+                            $totalSpecialOtEarnings += $siteSpecialOtEarnings;
+                        }
+                    @endphp
+
+                    @if($site->has_special_ot_hours && ($siteSpecialOtDayHours > 0 || $siteSpecialOtNightHours > 0))
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-4 py-2">{{ $site->name }}</td>
+                            <td class="px-4 py-2">{{ $siteSpecialOtDayHours }}</td>
+                            <td class="px-4 py-2">{{ $siteSpecialOtNightHours }}</td>
+                            <td class="px-4 py-2">{{ $siteSpecialOtHours }}</td>
+                            <td class="px-4 py-2">Rs. {{ number_format($site->special_ot_rate, 2) }}</td>
+                            <td class="px-4 py-2">Rs. {{ number_format($siteSpecialOtEarnings, 2) }}</td>
+                        </tr>
+                    @endif
+                @endforeach
+
+                @if($totalSpecialOtEarnings > 0)
+                    <tr class="border-t font-semibold">
+                        <td class="px-4 py-2">Total</td>
+                        <td class="px-4 py-2">{{ $specialOtDayHours }}</td>
+                        <td class="px-4 py-2">{{ $specialOtNightHours }}</td>
+                        <td class="px-4 py-2">{{ $specialOtHours }}</td>
+                        <td class="px-4 py-2"></td>
+                        <td class="px-4 py-2">Rs. {{ number_format($totalSpecialOtEarnings, 2) }}</td>
+                    </tr>
+                @else
+                    <tr>
+                        <td colspan="6" class="px-4 py-2 text-center text-gray-500">No special overtime hours recorded</td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
                 </div>
             </div>
-
             {{-- Basic Salary and Allowances --}}
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Basic Salary & Allowances</h2>
