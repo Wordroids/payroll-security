@@ -89,6 +89,12 @@ class SiteController extends Controller
         return view('pages.sites.edit', compact('site'));
     }
 
+    //To view site details
+    public function view(Site $site)
+    {
+        return view('pages.sites.view', compact('site'));
+    }
+
     /**
      * Update the specified resource in storage.
      */
