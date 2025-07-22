@@ -48,10 +48,23 @@ class SiteController extends Controller
             'guard_shift_rate' => 'nullable|numeric|min:0',
             'has_special_ot_hours' => 'boolean',
             'special_ot_rate' => 'nullable|numeric|min:0|required_if:has_special_ot_hours,true',
+            'ranks' => 'sometimes|array',
+            'ranks.*.rank' => 'required|string',
+            'ranks.*.site_shift_rate' => 'required|numeric|min:0',
+            'ranks.*.guard_shift_rate' => 'required|numeric|min:0',
         ]);
 
         try {
-        Site::create($validated);
+        $site =Site::create($validated);
+
+        if (isset($validated['ranks'])) {
+                foreach ($validated['ranks'] as $rankData) {
+                    $site->rankRates()->create([
+                        'rank' => $rankData['rank'],
+                        'site_shift_rate' => $rankData['site_shift_rate'],
+                        'guard_shift_rate' => $rankData['guard_shift_rate']
+                    ]);
+                }}
         return redirect()->route('sites.index')->with('success', 'Site created successfully.');
         } catch (\Exception $e) {
             \Log::error('Site creation failed: ' . $e->getMessage());
@@ -97,6 +110,10 @@ class SiteController extends Controller
             'guard_shift_rate' => 'nullable|numeric|min:0',
             'has_special_ot_hours' => 'boolean',
             'special_ot_rate' => 'nullable|numeric|min:0|required_if:has_special_ot_hours,true',
+            'ranks' => 'sometimes|array',
+            'ranks.*.rank' => 'required|string',
+            'ranks.*.site_shift_rate' => 'required|numeric|min:0',
+            'ranks.*.guard_shift_rate' => 'required|numeric|min:0',
         ]);
 
         if (!isset($validated['has_special_ot_hours'])) {
@@ -104,6 +121,20 @@ class SiteController extends Controller
             $validated['special_ot_rate'] = null;
         }
         $site->update($validated);
+           // Update rank rates
+        if (isset($validated['ranks'])) {
+            //  delete existing rates
+            $site->rankRates()->delete();
+
+            // Add new rates
+            foreach ($validated['ranks'] as $rankData) {
+                $site->rankRates()->create([
+                    'rank' => $rankData['rank'],
+                    'site_shift_rate' => $rankData['site_shift_rate'],
+                    'guard_shift_rate' => $rankData['guard_shift_rate']
+                ]);
+            }
+        }
 
         return redirect()->route('sites.index')->with('success', 'Site updated successfully.');
     }
