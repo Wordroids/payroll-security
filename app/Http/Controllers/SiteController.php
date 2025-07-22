@@ -89,6 +89,12 @@ class SiteController extends Controller
         return view('pages.sites.edit', compact('site'));
     }
 
+    //To view site details
+    public function view(Site $site)
+    {
+        return view('pages.sites.view', compact('site'));
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -143,7 +149,10 @@ class SiteController extends Controller
     {
         $employees = Employee::orderBy('name')->get();
         $assigned = $site->employees->pluck('id')->toArray();
-
+        // to get existing ranks for assigned employees
+        $assignedWithRanks = $site->employees->mapWithKeys(function ($employee) {
+        return [$employee->id => $employee->pivot->rank ?? 'CSO'];
+    });
         return view('pages.sites.assign', compact('site', 'employees', 'assigned'));
     }
 
@@ -152,9 +161,18 @@ class SiteController extends Controller
         $validated = $request->validate([
             'employee_ids' => 'nullable|array',
             'employee_ids.*' => 'exists:employees,id',
+            'ranks' => 'nullable|array',
+            'ranks.*' => 'in:CSO,JSO,LSO,OIC,SSO',
         ]);
+                $syncData = [];
+    if (!empty($validated['employee_ids'])) {
+        foreach ($validated['employee_ids'] as $employeeId) {
+            $syncData[$employeeId] = ['rank' => $validated['ranks'][$employeeId] ?? 'CSO'];
+        }
+    }
 
-        $site->employees()->sync($validated['employee_ids'] ?? []);
+    $site->employees()->sync($syncData);
+
 
         return redirect()->route('sites.index')->with('success', 'Guards assigned successfully.');
     }

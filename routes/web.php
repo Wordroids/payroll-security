@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
     Route::get('sites/{site}/edit', [SiteController::class, 'edit'])->name('sites.edit');
     Route::put('sites/{site}', [SiteController::class, 'update'])->name('sites.update');
+    Route::get('sites/{site}/view', [SiteController::class, 'view'])->name('sites.view');
     Route::delete('sites/{site}', [SiteController::class, 'destroy'])->name('sites.destroy');
     // Attendance Management Routes
     Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');

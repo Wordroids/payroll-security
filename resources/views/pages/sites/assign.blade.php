@@ -3,7 +3,6 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-6">
             Assign Guards to Site
         </h1>
-        
         <div class="bg-white shadow rounded-xl p-6">
             <div class="mb-6">
                 <h2 class="text-xl font-semibold text-gray-700">
@@ -18,15 +17,32 @@
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Select Guards to Assign</label>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto border rounded p-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto border rounded p-4">
                         @forelse($employees->sortBy('emp_no') as $emp)
-                            <label class="flex items-center space-x-3">
+                            <div class="border rounded p-3 hover:bg-gray-50">
+                                <div class="flex items-start space-x-3">
                                 <input type="checkbox" name="employee_ids[]"
                                        value="{{ $emp->id }}"
                                        {{ in_array($emp->id, $assigned) ? 'checked' : '' }}
-                                       class="text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
-                                <span class="text-sm text-gray-700">{{ $emp->emp_no }} - {{ $emp->name }} </span>
-                            </label>
+                                       class="mt-1 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                                <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-700">
+                                            {{ $emp->emp_no }} - {{ $emp->name }}
+                                        </div>
+                                        <div class="mt-2">
+                                            <label for="rank_{{ $emp->id }}" class="block text-xs text-gray-500 mb-1">Rank</label>
+                                            <select name="ranks[{{ $emp->id }}]" id="rank_{{ $emp->id }}"
+                                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                                                <option value="CSO" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'CSO') ? 'selected' : '' }}>CSO</option>
+                                                <option value="JSO" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'JSO') ? 'selected' : '' }}>JSO</option>
+                                                <option value="LSO" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'LSO') ? 'selected' : '' }}>LSO</option>
+                                                <option value="OIC" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'OIC') ? 'selected' : '' }}>OIC</option>
+                                                <option value="SSO" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'SSO') ? 'selected' : '' }}>SSO</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         @empty
                             <p class="text-gray-500 text-sm">No employees found.</p>
                         @endforelse

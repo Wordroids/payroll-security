@@ -45,7 +45,7 @@ class Employee extends Model
 
     public function sites()
     {
-        return $this->belongsToMany(Site::class);
+        return $this->belongsToMany(Site::class) ->withPivot('rank');
     }
 
     public function salaryAdvances()
