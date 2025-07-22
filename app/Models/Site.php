@@ -22,8 +22,6 @@ class Site extends Model
         'no_of_guards',
         'no_day_shifts',
         'no_night_shifts',
-        'site_shift_rate',
-        'guard_shift_rate',
         'has_special_ot_hours',
         'special_ot_rate',
     ];
@@ -38,5 +36,10 @@ class Site extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function rankRates()
+    {
+        return $this->hasMany(SiteRankRate::class);
     }
 }

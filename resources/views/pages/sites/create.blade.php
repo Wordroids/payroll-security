@@ -105,23 +105,6 @@
                     @enderror
                 </div>
 
-                <div>
-                    <label for="site_shift_rate" class="block text-sm font-medium text-gray-700">Site Shift Rate</label>
-                    <input type="number" step="0.01" name="site_shift_rate" id="site_shift_rate" value="{{ old('site_shift_rate') }}"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
-                    @error('site_shift_rate')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="guard_shift_rate" class="block text-sm font-medium text-gray-700">Guard Shift Rate</label>
-                    <input type="number" step="0.01" name="guard_shift_rate" id="guard_shift_rate" value="{{ old('guard_shift_rate') }}"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
-                    @error('guard_shift_rate')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
 
                 <div class="md:col-span-2">
                     <div class="form-check">
@@ -150,6 +133,16 @@
                 </div>
 
                 <div class="md:col-span-2">
+                    <h3 class="text-lg font-medium text-gray-700 mb-2">Rank Rates</h3>
+                    <div id="rank-rates-container">
+
+                    </div>
+                    <button type="button" onclick="addRankRate()"
+                        class="mt-2 inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Add Rank Rate
+                    </button>
+                </div>
+                <div class="md:col-span-2">
                     <button type="submit"
                             class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Save Site
@@ -164,5 +157,51 @@
         const checkbox = document.getElementById('has_special_ot_hours');
         container.style.display = checkbox.checked ? 'block' : 'none';
     }
+
+     //To add Rank Rates
+        function addRankRate() {
+        const container = document.getElementById('rank-rates-container');
+        const index = container.children.length;
+
+        const rankDiv = document.createElement('div');
+        rankDiv.className = 'rank-rate-entry mb-4 p-3 border rounded';
+        rankDiv.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="ranks_${index}_rank" class="block text-sm font-medium text-gray-700">Rank</label>
+                    <select name="ranks[${index}][rank]" id="ranks_${index}_rank" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                        <option value="">Select Rank</option>
+                        <option value="SSO">SSO</option>
+                        <option value="OIC">OIC</option>
+                        <option value="LSO">LSO</option>
+                        <option value="JSO">JSO</option>
+                        <option value="CSO">CSO</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="ranks_${index}_site_shift_rate" class="block text-sm font-medium text-gray-700">Site Shift Rate</label>
+                    <input type="number" step="0.01" name="ranks[${index}][site_shift_rate]" id="ranks_${index}_site_shift_rate" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                </div>
+                <div>
+                    <label for="ranks_${index}_guard_shift_rate" class="block text-sm font-medium text-gray-700">Guard Shift Rate</label>
+                    <input type="number" step="0.01" name="ranks[${index}][guard_shift_rate]" id="ranks_${index}_guard_shift_rate" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                </div>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()"
+                    class="mt-2 inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                Remove
+            </button>
+        `;
+
+        container.appendChild(rankDiv);
+    }
+
+    // to add one rank rate by default
+    document.addEventListener('DOMContentLoaded', function() {
+        addRankRate();
+    });
 </script>
 </x-app-layout>
