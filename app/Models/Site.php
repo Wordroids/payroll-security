@@ -30,7 +30,7 @@ class Site extends Model
     ];
     public function employees()
     {
-        return $this->belongsToMany(Employee::class);
+        return $this->belongsToMany(Employee::class) ->withPivot('rank') ;
     }
 
     public function attendances()
