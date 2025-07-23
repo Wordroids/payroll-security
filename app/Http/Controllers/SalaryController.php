@@ -143,11 +143,27 @@ class SalaryController extends Controller
             $normalNightHours = 0;
             $otDayHours = 0;
             $otNightHours = 0;
+
+            // Get the employee's rank
+            $rank = $site->pivot->rank ?? 'CSO';
+
+            // Get the shift rate for the rank
+            $rankRate = $site->rankRates()->where('rank', $rank)->first();
+
+
+            if (!$rankRate) {
+                \Log::warning("No rank rate found for rank {$rank} at site {$site->id}");
+            }
+
+            $shiftRate = $rankRate ? $rankRate->guard_shift_rate : $site->guard_shift_rate;
+
+
+            if (!$shiftRate) {
+                \Log::warning("No shift rate found for site {$site->id} - using fallback");
+                $shiftRate = 0;
+            }
+
             for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
-                $dayHours = $attendances[$employee->id][$site->id][$d]['day'] ?? 0;
-                $nightHours = $attendances[$employee->id][$site->id][$d]['night'] ?? 0;
-                $dayTotal += $dayHours;
-                $nightTotal += $nightHours;
                 $normalDayHours += $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
                 $normalNightHours += $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
                 $otDayHours += $attendances[$employee->id][$site->id][$d]['ot_day_hours'] ?? 0;
@@ -155,13 +171,15 @@ class SalaryController extends Controller
             }
             $totalSiteHours = $normalDayHours + $normalNightHours + $otDayHours + $otNightHours;
             $siteShifts = $totalSiteHours / 12;
-            $siteEarning = ($totalSiteHours / 12) * $site->guard_shift_rate;
+            $siteEarning = ($totalSiteHours / 12) * $shiftRate;
             $totalShiftEarning += $siteEarning;
             $totalOTHours += $otDayHours + $otNightHours;
             $siteSummaries[] = [
                 'site' => $site,
                 'shifts' => $siteShifts,
                 'earning' => $siteEarning,
+                'rank' => $rank,
+                'rate' => $shiftRate
             ];
         }
         // Rates
