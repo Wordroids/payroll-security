@@ -8,10 +8,14 @@
                         A list of all the Guards in your system including their name, phone, address, NIC and dates.
                     </p>
                 </div>
-                <div style="margin-top: 1rem; margin-left: 0;">
+                <div style="margin-top: 1rem; margin-left: 0; display: flex; gap: 0.5rem;">
                     <a href="{{ route('employees.create') }}"
                         style="display: block; border-radius: 0.375rem; background-color: #4f46e5; padding: 0.5rem 0.75rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: white; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
                         Add Guard
+                    </a>
+                    <a href="{{ route('employees.printGaurds') }}"
+                        style="display: block; border-radius: 0.375rem; background-color: #dc2626; padding: 0.5rem 0.75rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: white; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
+                        Download PDF
                     </a>
                 </div>
             </div>
