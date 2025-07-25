@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\Site;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AttendanceController extends Controller
 {
@@ -161,6 +162,110 @@ class AttendanceController extends Controller
     }
 
 
+    //to download as a pdf
+    public function downloadPDF(Request $request)
+    {
+        $month = $request->input('month', now()->format('Y-m'));
+        $employeeId = $request->input('employee_id');
+
+        // Get the attendance data
+        $data = $this->getAttendanceData($month, $employeeId);
+
+        // Get employee name if filtered
+        $employeeName = null;
+        if ($employeeId) {
+            $employee = Employee::find($employeeId);
+            $employeeName = $employee ? $employee->name : '';
+        }
+
+        // Generate PDF filename
+        $filename = 'attendance_' . $month;
+        if ($employeeName) {
+            $filename .= '_' . str_replace(' ', '_', $employeeName);
+        }
+        $filename .= '.pdf';
+
+        // Load the PDF view
+        $pdf = PDF::loadView('pages.attendances.pdf', $data)
+            ->setPaper('a4', 'landscape')
+            ->setOption('margin-top', 5)
+            ->setOption('margin-bottom', 5)
+            ->setOption('margin-left', 5)
+            ->setOption('margin-right', 5)
+            ->setOption('dpi', 150);
+
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Helper method to get attendance data
+     */
+    private function getAttendanceData($month, $employeeId)
+    {
+        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+
+        // Get all employees
+        $allEmployees = Employee::orderBy('name')->get();
+
+        // Load Sites with filtered employees
+        $sites = Site::with(['employees' => function ($q) use ($employeeId) {
+            if ($employeeId) {
+                $q->where('employee_id', $employeeId);
+            }
+        }])->get();
+
+        // Fetch attendances
+        $records = Attendance::whereBetween('date', [$startDate, $endDate])
+            ->when($employeeId, fn($q) => $q->where('employee_id', $employeeId))
+            ->get();
+
+        $attendances = [];
+
+        foreach ($records as $attendance) {
+            $day = Carbon::parse($attendance->date)->day;
+            $attendances[$attendance->employee_id][$attendance->site_id][$day][$attendance->shift] = $attendance->worked_hours;
+        }
+
+        foreach ($attendances as $empId => $sitess) {
+            foreach ($sitess as $siteId => $days) {
+                $site = Site::find($siteId);
+
+                if ($site->has_special_ot_hours) {
+                    foreach ($days as $day => $shifts) {
+                        if (isset($shifts['day'])) {
+                            $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
+                            $attendances[$empId][$siteId][$day]['ot_day_hours'] = min(max($shifts['day'] - 9, 0), 3);
+                        }
+                        if (isset($shifts['night'])) {
+                            $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
+                            $attendances[$empId][$siteId][$day]['ot_night_hours'] = min(max($shifts['night'] - 9, 0), 3);
+                        }
+                    }
+                } else {
+                    foreach ($days as $day => $shifts) {
+                        if (isset($shifts['day'])) {
+                            $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
+                            $attendances[$empId][$siteId][$day]['ot_day_hours'] = max($shifts['day'] - 9, 0);
+                        }
+                        if (isset($shifts['night'])) {
+                            $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
+                            $attendances[$empId][$siteId][$day]['ot_night_hours'] = max($shifts['night'] - 9, 0);
+                        }
+                    }
+                }
+            }
+        }
+
+        return [
+            'month' => $month,
+            'employeeId' => $employeeId,
+            'attendances' => $attendances,
+            'allEmployees' => $allEmployees,
+            'sites' => $sites,
+            'daysInMonth' => $startDate->daysInMonth,
+        ];
+    }
 
     /**
      * Store a newly created resource in storage.
