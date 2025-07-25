@@ -92,39 +92,39 @@ class SalaryController extends Controller
         foreach ($attendances as $empId => $sites) {
             foreach ($sites as $siteId => $days) {
                 $site = Site::find($siteId);
-            foreach ($days as $day => $shifts) {
-                // Day shift calculations
-                        if (isset($shifts['day'])) {
-                    $dayHours = $shifts['day'];
-                    $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($dayHours, 9);
-                    $attendances[$empId][$siteId][$day]['ot_day_hours'] = max(min($dayHours, 12) - 9, 0);
+                foreach ($days as $day => $shifts) {
+                    // Day shift calculations
+                    if (isset($shifts['day'])) {
+                        $dayHours = $shifts['day'];
+                        $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($dayHours, 9);
+                        $attendances[$empId][$siteId][$day]['ot_day_hours'] = max(min($dayHours, 12) - 9, 0);
 
-                    if ($site->has_special_ot_hours) {
-                        $specialOtDay = max($dayHours - 12, 0);
-                        $attendances[$empId][$siteId][$day]['special_ot_day_hours'] = $specialOtDay;
-                        $specialOtDayHours += $specialOtDay;
-                        $specialOtEarnings += $specialOtDay * $site->special_ot_rate;
+                        if ($site->has_special_ot_hours) {
+                            $specialOtDay = max($dayHours - 12, 0);
+                            $attendances[$empId][$siteId][$day]['special_ot_day_hours'] = $specialOtDay;
+                            $specialOtDayHours += $specialOtDay;
+                            $specialOtEarnings += $specialOtDay * $site->special_ot_rate;
+                        }
                     }
-                }
 
-                // Night shift calculations
-                        if (isset($shifts['night'])) {
-                           $nightHours = $shifts['night'];
-                            $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($nightHours, 9);
-                            $attendances[$empId][$siteId][$day]['ot_night_hours'] = max(min($nightHours, 12) - 9, 0);
+                    // Night shift calculations
+                    if (isset($shifts['night'])) {
+                        $nightHours = $shifts['night'];
+                        $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($nightHours, 9);
+                        $attendances[$empId][$siteId][$day]['ot_night_hours'] = max(min($nightHours, 12) - 9, 0);
 
-                    if ($site->has_special_ot_hours) {
-                        $specialOtNight = max($nightHours - 12, 0);
-                        $attendances[$empId][$siteId][$day]['special_ot_night_hours'] = $specialOtNight;
-                        $specialOtNightHours += $specialOtNight;
-                        $specialOtEarnings += $specialOtNight * $site->special_ot_rate;
+                        if ($site->has_special_ot_hours) {
+                            $specialOtNight = max($nightHours - 12, 0);
+                            $attendances[$empId][$siteId][$day]['special_ot_night_hours'] = $specialOtNight;
+                            $specialOtNightHours += $specialOtNight;
+                            $specialOtEarnings += $specialOtNight * $site->special_ot_rate;
+                        }
                     }
                 }
             }
         }
-    }
 
-      $specialOtHours = $specialOtDayHours + $specialOtNightHours;
+        $specialOtHours = $specialOtDayHours + $specialOtNightHours;
 
         // Total Salary Advances
         $salaryAdvances = $employee->salaryAdvances()
@@ -594,6 +594,192 @@ class SalaryController extends Controller
             \Log::error('Stack trace: ' . $e->getTraceAsString());
             throw $e;
         }
+    }
+
+    //to print salary overview
+
+    public function exportSalaryOverviewPdf(Request $request)
+    {
+
+        $month = $request->input('month', now()->format('Y-m'));
+        $employeeId = $request->input('employee_id');
+
+        $data = [
+            'salaryData' => $this->getSalaryOverviewData($month, $employeeId),
+            'month' => $month,
+            'selectedEmployee' => $employeeId,
+        ];
+
+
+        $filename = 'salary_overview_' . $month;
+        if ($employeeId) {
+            $employee = Employee::find($employeeId);
+            $filename .= '_' . Str::slug($employee->name);
+        }
+        $filename .= '.pdf';
+
+        // Load the PDF view
+        $pdf = PDF::loadView('pages.salaries.overview-pdf', $data)
+            ->setPaper('a4', 'landscape')
+            ->setOption('margin-top', 10)
+            ->setOption('margin-bottom', 10)
+            ->setOption('margin-left', 5)
+            ->setOption('margin-right', 5);
+
+        return $pdf->download($filename);
+    }
+    private function getSalaryOverviewData($month, $employeeId)
+    {
+        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        $prevMonth = Carbon::createFromFormat('Y-m', $month)->subMonth()->format('Y-m');
+
+
+        $query = Employee::query();
+
+
+        if ($employeeId) {
+            $query->where('id', $employeeId);
+        }
+
+        $employees = $query->get();
+        $salaryData = [];
+
+        foreach ($employees as $employee) {
+            $employee->load(['sites', 'salaryAdvances']);
+
+            // Get attendance
+            $records = Attendance::whereBetween('date', [$startDate, $endDate])
+                ->where('employee_id', $employee->id)
+                ->get();
+
+            $attendances = [];
+            $specialOtHours = 0;
+
+            foreach ($records as $attendance) {
+                $day = Carbon::parse($attendance->date)->day;
+                $attendances[$attendance->employee_id][$attendance->site_id][$day][$attendance->shift] = $attendance->worked_hours;
+            }
+
+            // Process normal/OT hours
+            foreach ($attendances as $empId => $sites) {
+                foreach ($sites as $siteId => $days) {
+                    $site = Site::find($siteId);
+                    if ($site->has_special_ot_hours) {
+                        foreach ($days as $day => $shifts) {
+                            if (isset($shifts['day'])) {
+                                $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
+                                $attendances[$empId][$siteId][$day]['ot_day_hours'] = min(max($shifts['day'] - 9, 0), 3);
+                            }
+                            if (isset($shifts['night'])) {
+                                $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
+                                $attendances[$empId][$siteId][$day]['ot_night_hours'] = min(max($shifts['night'] - 9, 0), 3);
+                            }
+                            // special ot total
+                            if (isset($shifts['day'])) {
+                                $specialOtHours += max($shifts['day'] - 12, 0);
+                            }
+                        }
+                    } else {
+                        foreach ($days as $day => $shifts) {
+                            if (isset($shifts['day'])) {
+                                $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($shifts['day'], 9);
+                                $attendances[$empId][$siteId][$day]['ot_day_hours'] = max($shifts['day'] - 9, 0);
+                            }
+                            if (isset($shifts['night'])) {
+                                $attendances[$empId][$siteId][$day]['normal_night_hours'] = min($shifts['night'], 9);
+                                $attendances[$empId][$siteId][$day]['ot_night_hours'] = max($shifts['night'] - 9, 0);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Total Salary Advances
+            $salaryAdvances = $employee->salaryAdvances()
+                ->whereBetween('advance_date', [$startDate, $endDate])
+                ->get();
+
+            $totalSalaryAdvance = $salaryAdvances->sum('amount');
+
+            // Meal deductions
+            $mealDeductions = Meals::where('employee_id', $employee->id)
+                ->whereMonth('date', '=', substr($month, 5, 2))
+                ->whereYear('date', '=', substr($month, 0, 4))
+                ->sum('amount');
+
+            // Uniform deductions (current month/2 + previous month/2)
+            $currentMonthUniform = Uniform::where('employee_id', $employee->id)
+                ->whereMonth('date', '=', substr($month, 5, 2))
+                ->whereYear('date', '=', substr($month, 0, 4))
+                ->sum('total_amount');
+
+            $prevMonthUniform = Uniform::where('employee_id', $employee->id)
+                ->whereMonth('date', '=', substr($prevMonth, 5, 2))
+                ->whereYear('date', '=', substr($prevMonth, 0, 4))
+                ->sum('total_amount');
+
+            $uniformDeductions = ($currentMonthUniform / 2) + ($prevMonthUniform / 2);
+
+            // Initialize earnings
+            $totalShiftEarning = 0;
+            $totalOTHours = 0;
+            $totalShifts = 0;
+
+            // Calculate per-site earnings
+            foreach ($employee->sites as $site) {
+                $normalDayHours = 0;
+                $normalNightHours = 0;
+                $otDayHours = 0;
+                $otNightHours = 0;
+
+                for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
+                    $normalDayHours += $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
+                    $normalNightHours += $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
+                    $otDayHours += $attendances[$employee->id][$site->id][$d]['ot_day_hours'] ?? 0;
+                    $otNightHours += $attendances[$employee->id][$site->id][$d]['ot_night_hours'] ?? 0;
+                }
+
+                $totalSiteHours = $normalDayHours + $normalNightHours + $otDayHours + $otNightHours;
+                $siteShifts = $totalSiteHours / 12;
+                $siteEarning = ($totalSiteHours / 12) * $site->guard_shift_rate;
+
+                $totalShiftEarning += $siteEarning;
+                $totalOTHours += $otDayHours + $otNightHours;
+                $totalShifts += $siteShifts;
+            }
+
+            // Rates
+            $combinedBase = $employee->basic + $employee->br_allow;
+            $otRate = round(((($combinedBase / 9) * 1.5) / 26), 2);
+            $otEarnings = round($otRate * $totalOTHours, 2);
+
+            $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
+            $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
+            $grossPay = $totalShiftEarning + $otEarnings + ($specialOtHours * 200);
+            $epfEmployee = ($combinedBase / 100) * 8;
+            $totalDeductions = $epfEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
+
+            $salaryData[] = [
+                'employee' => $employee,
+                'total_shifts' => $totalShifts,
+                'basic' => $employee->basic,
+                'br_allow' => $employee->br_allow,
+                'ot_earnings' => $otEarnings,
+                'attendance_bonus' => $employee->attendance_bonus,
+                'other_allowances' => $otherAllowances,
+                'sub_total' => $subTotal,
+                'gross_pay' => $grossPay,
+                'epf_employee' => $epfEmployee,
+                'salary_advance' => $totalSalaryAdvance,
+                'meal_deductions' => $mealDeductions,
+                'uniform_deductions' => $uniformDeductions,
+                'total_deductions' => $totalDeductions,
+                'net_pay' => $grossPay - $totalDeductions,
+            ];
+        }
+
+        return $salaryData;
     }
     /**
      * Show the form for editing the specified resource.

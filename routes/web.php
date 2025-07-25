@@ -121,7 +121,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/salaries/{employee}/slip-download/{month}', [SalaryController::class, 'downloadSlip'])->name('salaries.slip.download');
     Route::get('/salaries', [SalaryController::class, 'index'])->name('salaries');
     Route::get('/salaries/{employee}', [SalaryController::class, 'show'])->name('salaries.show');
-
+    Route::get('/salaries/overview/pdf', [SalaryController::class, 'exportSalaryOverviewPdf'])->name('salaries.overview.pdf');
     //User Resources
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
