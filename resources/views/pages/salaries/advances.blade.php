@@ -14,10 +14,18 @@
                         @endif
                     </p>
                 </div>
-                <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+                <div class="sm:flex sm:items-center gap-2 ">
                     <a href="{{ route('salary.advance.create') }}"
                         class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                         Add Salary Advance
+                    </a>
+                    <a href="{{ route('salary.advance.export.pdf', [
+                        'month' => request()->has('month') ? request('month') : null,
+                        'date' => !request()->has('month') && request()->has('date') ? request('date') : null,
+                        'show_all' => request('show_all', false),
+                    ]) }}"
+                        class="block rounded-md bg-red-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                        Download PDF
                     </a>
                 </div>
             </div>

@@ -781,6 +781,94 @@ class SalaryController extends Controller
 
         return $salaryData;
     }
+
+    // to download pdf of salary advances
+    public function exportSalaryAdvancesPdf(Request $request)
+    {
+        // Get filter parameters
+        $date = $request->input('date');
+        $month = $request->input('month');
+        $showAll = $request->boolean('show_all');
+
+
+        \Log::debug('Export PDF Parameters', [
+            'date' => $date,
+            'month' => $month,
+            'show_all' => $showAll
+        ]);
+
+
+        $query = Employee::query();
+
+        //filters
+        if (!$showAll) {
+            if ($date) {
+
+                $month = null;
+
+                $query->whereHas('salaryAdvances', function ($q) use ($date) {
+                    $q->whereDate('advance_date', $date);
+                })->with(['salaryAdvances' => function ($q) use ($date) {
+                    $q->whereDate('advance_date', $date);
+                }]);
+            } elseif ($month) {
+                // Clear date , if month is specified
+                $date = null;
+
+                $startDate = Carbon::parse($month)->startOfMonth();
+                $endDate = Carbon::parse($month)->endOfMonth();
+
+                $query->whereHas('salaryAdvances', function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('advance_date', [$startDate, $endDate]);
+                })->with(['salaryAdvances' => function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('advance_date', [$startDate, $endDate]);
+                }]);
+            } else {
+                // Default to today if no specific filter
+                $today = now()->format('Y-m-d');
+                $query->whereHas('salaryAdvances', function ($q) use ($today) {
+                    $q->whereDate('advance_date', $today);
+                })->with(['salaryAdvances' => function ($q) use ($today) {
+                    $q->whereDate('advance_date', $today);
+                }]);
+            }
+        } else {
+            $query->with('salaryAdvances');
+        }
+
+        $employees = $query->get();
+
+        // Calculate total
+        $totalSalaryAdvances = $employees->sum(function ($employee) {
+            return $employee->salaryAdvances->sum('amount');
+        });
+
+        // Generate PDF
+        $pdf = PDF::loadView('pages.salaries.advances-pdf', [
+            'employees' => $employees,
+            'totalSalaryAdvances' => $totalSalaryAdvances,
+            'date' => $date,
+            'month' => $month,
+            'showAll' => $showAll
+        ])->setPaper('a4', 'landscape');
+
+        // Generate filename
+        $filename = 'salary-advances-';
+        if ($showAll) {
+            $filename .= 'all-records';
+        } elseif ($month) {
+            $filename .= Carbon::parse($month)->format('F-Y');
+        } elseif ($date) {
+            $filename .= Carbon::parse($date)->format('Y-m-d');
+        } else {
+            $filename .= Carbon::now()->format('Y-m-d');
+        }
+        $filename .= '.pdf';
+
+        return $pdf->download($filename);
+    }
+
+
     /**
      * Show the form for editing the specified resource.
      */
