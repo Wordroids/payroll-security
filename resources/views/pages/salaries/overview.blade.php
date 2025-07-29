@@ -101,9 +101,6 @@
                                             {{ number_format($data['basic'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['br_allow'], 2) }}
-                                        </td>
-                                        <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                             {{ number_format($data['ot_earnings'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">

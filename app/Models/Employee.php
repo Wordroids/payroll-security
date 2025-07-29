@@ -20,17 +20,13 @@ class Employee extends Model
         'rank',
     ];
 
-    protected $appends = ['basic', 'br_allow' , 'special_ot_rate' , 'attendance_bonus'];
+    protected $appends = ['basic','special_ot_rate' , 'attendance_bonus'];
 
     public function getBasicAttribute()
     {
-        return $this->attributes['basic'] ?? 17000;
+        return $this->attributes['basic'] ?? 27000;
     }
 
-    public function getBrAllowAttribute()
-    {
-        return $this->attributes['br_allow'] ?? 3500;
-    }
 
     public function getSpecialOtRateAttribute()
     {

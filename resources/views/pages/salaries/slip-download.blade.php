@@ -140,10 +140,6 @@
                     <td class="text-right">{{ number_format($employee->basic, 2) }}</td>
                 </tr>
                 <tr>
-                    <td>Budgetary Allowances</td>
-                    <td class="text-right">{{ number_format($employee->br_allow, 2) }}</td>
-                </tr>
-                <tr>
                     <td>Over Time</td>
                     <td class="text-right">{{ number_format($otEarnings, 2) }}</td>
                 </tr>

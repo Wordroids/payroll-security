@@ -183,10 +183,10 @@ class SalaryController extends Controller
             ];
         }
         // Rates
-        $combinedBase = $employee->basic + $employee->br_allow;
+        $combinedBase = $employee->basic;
         $otRate = round(((($combinedBase / 9) * 1.5) / 26), 2);
         $otEarnings = round($otRate * $totalOTHours, 2);
-        $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
+        $subTotal = $employee->basic + $employee->attendance_bonus + $otEarnings;
         $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
         //$grossPay = $totalShiftEarning + ($specialOtHours * 200);
         $grossPay = $totalShiftEarning + $specialOtEarnings;
@@ -350,11 +350,11 @@ class SalaryController extends Controller
             }
 
             // Rates
-            $combinedBase = $employee->basic + $employee->br_allow;
+            $combinedBase = $employee->basic;
             $otRate = round(((($combinedBase / 9) * 1.5) / 26), 2);
             $otEarnings = round($otRate * $totalOTHours, 2);
 
-            $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
+            $subTotal = $employee->basic + $employee->attendance_bonus + $otEarnings;
             $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
             $grossPay = $totalShiftEarning + $otEarnings + ($specialOtHours * 200);
             //$grossPay = $totalShiftEarning + $specialOtEarnings;
@@ -365,7 +365,6 @@ class SalaryController extends Controller
                 'employee' => $employee,
                 'total_shifts' => $totalShifts,
                 'basic' => $employee->basic,
-                'br_allow' => $employee->br_allow,
                 'ot_earnings' => $otEarnings,
                 'attendance_bonus' => $employee->attendance_bonus,
                 'other_allowances' => $otherAllowances,
@@ -446,7 +445,6 @@ class SalaryController extends Controller
                 'employee' => $employee,
                 'month' => $month,
                 'basic' => $employee->basic ?? 0,
-                'br_allow' => $employee->br_allow ?? 0,
                 'attendance_bonus' => $employee->attendance_bonus ?? 0,
                 'mealDeductions' => 0,
                 'uniformDeductions' => 0,
@@ -578,10 +576,10 @@ class SalaryController extends Controller
             $data['siteSummaries'] = $siteSummaries;
 
         // Calculate other components
-        $combinedBase = $data['basic'] + $data['br_allow'];
+        $combinedBase = $data['basic'];
         $data['otRate'] = round(((($combinedBase / 9) * 1.5) / 26), 2);
         $data['otEarnings'] = round($data['otRate'] * $data['totalOTHours'], 2);
-        $subTotal = $data['basic'] + $data['br_allow'] + $data['attendance_bonus'] + $data['otEarnings'];
+        $subTotal = $data['basic'] + $data['attendance_bonus'] + $data['otEarnings'];
         $data['otherAllowances'] = max(round($data['totalShiftEarning'] - $subTotal, 2), 0);
         $data['grossPay'] = $data['totalShiftEarning'] + $data['specialOtEarnings'];
         $data['epfEmployee'] = ($combinedBase / 100) * 8;
@@ -750,11 +748,11 @@ class SalaryController extends Controller
             }
 
             // Rates
-            $combinedBase = $employee->basic + $employee->br_allow;
+            $combinedBase = $employee->basic ;
             $otRate = round(((($combinedBase / 9) * 1.5) / 26), 2);
             $otEarnings = round($otRate * $totalOTHours, 2);
 
-            $subTotal = $employee->basic + $employee->br_allow + $employee->attendance_bonus + $otEarnings;
+            $subTotal = $employee->basic + $employee->attendance_bonus + $otEarnings;
             $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
             $grossPay = $totalShiftEarning + $otEarnings + ($specialOtHours * 200);
             $epfEmployee = ($combinedBase / 100) * 8;
@@ -764,7 +762,6 @@ class SalaryController extends Controller
                 'employee' => $employee,
                 'total_shifts' => $totalShifts,
                 'basic' => $employee->basic,
-                'br_allow' => $employee->br_allow,
                 'ot_earnings' => $otEarnings,
                 'attendance_bonus' => $employee->attendance_bonus,
                 'other_allowances' => $otherAllowances,
