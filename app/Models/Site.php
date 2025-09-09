@@ -23,14 +23,13 @@ class Site extends Model
         'no_day_shifts',
         'no_night_shifts',
         'has_special_ot_hours',
-        'special_ot_rate',
     ];
     protected $casts = [
         'has_special_ot_hours' => 'boolean',
     ];
     public function employees()
     {
-        return $this->belongsToMany(Employee::class) ->withPivot('rank') ;
+        return $this->belongsToMany(Employee::class)->withPivot('rank');
     }
 
     public function attendances()
@@ -41,5 +40,16 @@ class Site extends Model
     public function rankRates()
     {
         return $this->hasMany(SiteRankRate::class);
+    }
+
+    public function getCalculatedSpecialOtRateAttribute()
+    {
+        if (!$this->has_special_ot_hours) {
+            return 0;
+        }
+
+        // special OT rate: guard_shift_rate/12*1.5
+        $guardShiftRate = $this->guard_shift_rate ?? 0;
+        return round(($guardShiftRate / 12 * 1.5), 2);
     }
 }

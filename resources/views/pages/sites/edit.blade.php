@@ -80,24 +80,12 @@
                     <div class="form-check">
                         <input type="checkbox" name="has_special_ot_hours" id="has_special_ot_hours" value="1"
                             class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                            @if (old('has_special_ot_hours', $site->has_special_ot_hours)) checked @endif onclick="toggleSpecialOtRate()">
+                            @if (old('has_special_ot_hours', $site->has_special_ot_hours)) checked @endif>
                         <label for="has_special_ot_hours" class="ml-2 text-sm font-medium text-gray-700">
-                            Special overtime Rate
+                            Special Overtime Hours (Hours beyond 12 will be considered as Special OT)
                         </label>
                     </div>
                     @error('has_special_ot_hours')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="md:col-span-2" id="special_ot_rate_container"
-                    style="display: {{ old('has_special_ot_hours', $site->has_special_ot_hours) ? 'block' : 'none' }}">
-                    <label for="special_ot_rate" class="block text-sm font-medium text-gray-700">Special OT Rate (per
-                        hour)</label>
-                    <input type="number" step="0.01" name="special_ot_rate" id="special_ot_rate"
-                        value="{{ old('special_ot_rate', $site->special_ot_rate ?? 200) }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
-                    @error('special_ot_rate')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -168,7 +156,7 @@
                 </div>
                 <div class="md:col-span-2">
                     <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Update Site
                     </button>
                 </div>
@@ -177,20 +165,6 @@
     </div>
 
     <script>
-        function toggleSpecialOtRate() {
-            const container = document.getElementById('special_ot_rate_container');
-            const checkbox = document.getElementById('has_special_ot_hours');
-            const rateField = document.getElementById('special_ot_rate');
-
-            container.style.display = checkbox.checked ? 'block' : 'none';
-
-            if (!checkbox.checked) {
-                rateField.value = '';
-            } else if (!rateField.value) {
-                rateField.value = '200';
-            }
-        }
-
 
         function addRankRate() {
         const container = document.getElementById('rank-rates-container');

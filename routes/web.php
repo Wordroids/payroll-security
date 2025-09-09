@@ -7,6 +7,7 @@ use App\Http\Controllers\MealsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalaryAdvanceController;
 use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\SalarySettingController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\UniformsController;
 use App\Http\Controllers\UserController;
@@ -135,6 +136,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    //Salary Settings Routes
+    Route::get('/salary-settings', [SalarySettingController::class, 'index'])->name('salary-settings.index');
+    Route::put('/salary-settings', [SalarySettingController::class, 'update'])->name('salary-settings.update');
 });
 
 require __DIR__ . '/auth.php';

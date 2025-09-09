@@ -166,7 +166,7 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="w-2/3">E.P.F 8%</td>
+                    <td class="w-2/3">E.P.F 12%</td>
                     <td class="text-right">{{ number_format($epfEmployee, 2) }}</td>
                 </tr>
                 <tr>

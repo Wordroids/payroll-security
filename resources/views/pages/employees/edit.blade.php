@@ -56,6 +56,25 @@
                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                 </div>
 
+                {{-- Basic Salary --}}
+                <div>
+                    <label for="basic_salary" class="block text-sm font-medium text-gray-700">Basic Salary</label>
+                    <input type="number" name="basic_salary" id="basic_salary" step="0.01"
+                        value="{{ old('basic_salary', $employee->basic_salary ?? '') }}"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="Leave empty to use default">
+                </div>
+
+                {{-- Attendance Bonus --}}
+                <div>
+                    <label for="attendance_bonus" class="block text-sm font-medium text-gray-700">Attendance
+                        Bonus</label>
+                    <input type="number" name="attendance_bonus" id="attendance_bonus" step="0.01"
+                        value="{{ old('attendance_bonus', $employee->attendance_bonus ?? '') }}"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="Leave empty to use default">
+                </div>
+
                 {{-- Rank --}}
                 <div>
                     <label for="rank" class="block text-sm font-medium text-gray-700">Rank</label>

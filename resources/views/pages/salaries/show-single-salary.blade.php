@@ -209,7 +209,8 @@
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Deductions Summary</h2>
                 <div class="space-y-2 text-sm text-gray-700">
-                    <div><strong>EPF (Employee 8%):</strong> Rs. {{ number_format($epfEmployee, 2) }}</div>
+                    <div><strong>EPF (Employee 12%):</strong> Rs. {{ number_format($epfEmployee, 2) }}</div>
+                     <div><strong>ETF (Employer 3%):</strong> Rs. {{ number_format($etfEmployee, 2) }}</div>
                     <div><strong>Salary Advances:</strong> Rs. {{ number_format($employee->totalSalaryAdvance, 2) }}
                     </div>
                     <div><strong>Meal Deductions:</strong> Rs. {{ number_format($mealDeductions, 2) }}</div>
