@@ -28,6 +28,7 @@
                 <div><strong>Date of Hire:</strong>
                     {{ \Carbon\Carbon::parse($employee->date_of_hire)->format('Y-m-d') }}</div>
                 <div class="col-span-full"><strong>Address:</strong> {{ $employee->address }}</div>
+                <div><strong>EPF/ETF:</strong> {{ $employee->include_epf_etf ? 'Included' : 'Excluded' }}</div>
             </div>
         </div>
 
@@ -209,8 +210,12 @@
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Deductions Summary</h2>
                 <div class="space-y-2 text-sm text-gray-700">
+                @if ($employee->include_epf_etf)
                     <div><strong>EPF (Employee 12%):</strong> Rs. {{ number_format($epfEmployee, 2) }}</div>
                      <div><strong>ETF (Employer 3%):</strong> Rs. {{ number_format($etfEmployee, 2) }}</div>
+                @else
+                    <div><strong>EPF/ETF:</strong> Excluded from calculations</div>
+                @endif
                     <div><strong>Salary Advances:</strong> Rs. {{ number_format($employee->totalSalaryAdvance, 2) }}
                     </div>
                     <div><strong>Meal Deductions:</strong> Rs. {{ number_format($mealDeductions, 2) }}</div>

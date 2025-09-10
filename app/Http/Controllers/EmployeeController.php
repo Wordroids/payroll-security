@@ -42,8 +42,10 @@ class EmployeeController extends Controller
             'rank' => 'required|string|max:255',
             'basic_salary' => 'nullable|numeric|min:0',
             'attendance_bonus' => 'nullable|numeric|min:0',
-           
+            'include_epf_etf' => 'sometimes|boolean',
         ]);
+
+        $validated['include_epf_etf'] = $request->has('include_epf_etf');
 
         Employee::create($validated);
 
@@ -82,9 +84,10 @@ class EmployeeController extends Controller
             'rank' => 'required|string|max:255',
             'basic_salary' => 'nullable|numeric|min:0',
             'attendance_bonus' => 'nullable|numeric|min:0',
+            'include_epf_etf' => 'sometimes|boolean',
 
         ]);
-
+        $validated['include_epf_etf'] = $request->has('include_epf_etf');
         $employee->update($validated);
 
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');

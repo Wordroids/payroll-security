@@ -75,6 +75,16 @@
                         placeholder="Leave empty to use default">
                 </div>
 
+                <div class="pt-4">
+                    <div class="flex items-center">
+                        <input type="checkbox" name="include_epf_etf" id="include_epf_etf" value="1"
+                            {{ old('include_epf_etf', $employee->include_epf_etf) ? 'checked' : '' }}
+                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                        <label for="include_epf_etf" class="ml-2 block text-sm text-gray-700">
+                            Include EPF & ETF in salary calculations
+                        </label>
+                    </div>
+                </div>
                 {{-- Rank --}}
                 <div>
                     <label for="rank" class="block text-sm font-medium text-gray-700">Rank</label>

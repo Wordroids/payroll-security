@@ -20,8 +20,12 @@ class Employee extends Model
         'rank',
         'basic_salary',
         'attendance_bonus',
+        'include_epf_etf'
     ];
 
+    protected $casts = [
+        'include_epf_etf' => 'boolean',
+    ];
     protected $appends = ['basic', 'attendance_bonus'];
 
     public function getBasicAttribute()
