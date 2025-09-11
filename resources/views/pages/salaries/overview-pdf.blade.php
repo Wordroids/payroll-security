@@ -85,8 +85,9 @@
                 <th class="epf-etf-status">EPF/ETF</th>
                 <th>Shifts</th>
                 <th>Basic</th>
-                <th>BR Allow</th>
                 <th>OT Earnings</th>
+                <th>Special OT</th>
+                <th>Shift Earnings</th>
                 <th>Att. Bonus</th>
                 <th>Other Allow</th>
                 <th>Sub Total</th>
@@ -109,6 +110,8 @@
                     <td>{{ number_format($data['total_shifts'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['basic'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['ot_earnings'], 2) }}</td>
+                    <td class="text-right">{{ number_format($data['special_ot_earnings'], 2) }}</td>
+                    <td class="text-right">{{ number_format($data['totalShiftEarning'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['attendance_bonus'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['other_allowances'], 2) }}</td>
                     <td class="text-right text-bold">{{ number_format($data['sub_total'], 2) }}</td>

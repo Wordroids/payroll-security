@@ -320,6 +320,16 @@ class SalaryController extends Controller
                 $otDayHours = 0;
                 $otNightHours = 0;
 
+                // Get the employee's rank for this site
+                $rank = $site->pivot->rank ?? 'CSO';
+                $rankRate = $site->rankRates()->where('rank', $rank)->first();
+                $shiftRate = $rankRate ? $rankRate->guard_shift_rate : $site->guard_shift_rate;
+
+                if (!$shiftRate) {
+                    \Log::warning("No shift rate found for site {$site->id} - using fallback");
+                    $shiftRate = 0;
+                }
+
                 for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
                     $normalDayHours += $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
                     $normalNightHours += $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
@@ -329,13 +339,12 @@ class SalaryController extends Controller
 
                 $totalSiteHours = $normalDayHours + $normalNightHours + $otDayHours + $otNightHours;
                 $siteShifts = $totalSiteHours / 12;
-                $siteEarning = ($totalSiteHours / 12) * $site->guard_shift_rate;
+                $siteEarning = ($totalSiteHours / 12) * $shiftRate;
 
                 $totalShiftEarning += $siteEarning;
                 $totalOTHours += $otDayHours + $otNightHours;
                 $totalShifts += $siteShifts;
             }
-
             // OT rate: 30000/240*1.5
             $otRate = round(($employee->basic / 240 * 1.5), 2);
             $otEarnings = round($otRate * $totalOTHours, 2);
@@ -353,6 +362,7 @@ class SalaryController extends Controller
                 'basic' => $employee->basic,
                 'ot_earnings' => $otEarnings,
                 'special_ot_earnings' => $specialOtEarnings,
+                'totalShiftEarning' => $totalShiftEarning,
                 'attendance_bonus' => $employee->attendance_bonus,
                 'other_allowances' => $otherAllowances,
                 'sub_total' => $subTotal,
@@ -573,8 +583,8 @@ class SalaryController extends Controller
         $subTotal = $data['basic'] + $data['attendance_bonus'] + $data['otEarnings'];
         $data['otherAllowances'] = max(round($data['totalShiftEarning'] - $subTotal, 2), 0);
         // gross pay
-        $data['grossPay'] = $data['specialOtEarnings'] + $data['totalShiftEarning'] ;
-        $data['epfEmployee'] = $employee->include_epf_etf ? ($employee->basic / 100) * 12:0;
+        $data['grossPay'] = $data['specialOtEarnings'] + $data['totalShiftEarning'];
+        $data['epfEmployee'] = $employee->include_epf_etf ? ($employee->basic / 100) * 12 : 0;
         $data['totalDeductions'] = $data['epfEmployee'] + $data['totalSalaryAdvance'] + $data['mealDeductions'] + $data['uniformDeductions'];
             $data['totalEarnings'] = $data['grossPay'] - $data['totalDeductions'];
 
@@ -723,6 +733,16 @@ class SalaryController extends Controller
                 $otDayHours = 0;
                 $otNightHours = 0;
 
+                // Get the employee's rank for the site
+                $rank = $site->pivot->rank ?? 'CSO';
+                $rankRate = $site->rankRates()->where('rank', $rank)->first();
+                $shiftRate = $rankRate ? $rankRate->guard_shift_rate : $site->guard_shift_rate;
+
+                if (!$shiftRate) {
+                    \Log::warning("No shift rate found for site {$site->id} - using fallback");
+                    $shiftRate = 0;
+                }
+
                 for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
                     $normalDayHours += $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
                     $normalNightHours += $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
@@ -732,7 +752,7 @@ class SalaryController extends Controller
 
                 $totalSiteHours = $normalDayHours + $normalNightHours + $otDayHours + $otNightHours;
                 $siteShifts = $totalSiteHours / 12;
-                $siteEarning = ($totalSiteHours / 12) * $site->guard_shift_rate;
+                $siteEarning = ($totalSiteHours / 12) * $shiftRate;
 
                 $totalShiftEarning += $siteEarning;
                 $totalOTHours += $otDayHours + $otNightHours;
@@ -740,15 +760,18 @@ class SalaryController extends Controller
             }
 
             // Rates
-            $combinedBase = $employee->basic ;
-            $otRate = round(((($combinedBase / 9) * 1.5) / 26), 2);
+            $otRate = round(($employee->basic / 240 * 1.5), 2);
             $otEarnings = round($otRate * $totalOTHours, 2);
 
             $subTotal = $employee->basic + $employee->attendance_bonus + $otEarnings;
             $otherAllowances = max(round($totalShiftEarning - $subTotal, 2), 0);
-            $grossPay = $totalShiftEarning +  + ($specialOtHours * ( $site->guard_shift_rate*12/1.5));
-            $epfEmployee =  $employee->include_epf_etf ?($employee->basic / 100) * 12:0;
-            $etfEmployee =  $employee->include_epf_etf ?($employee->basic / 100) * 3:0;
+            $firstSite = $employee->sites->first();
+            $guardShiftRate = $firstSite ? $firstSite->guard_shift_rate : 0;
+            $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+            $specialOtEarnings = $specialOtHours * $specialOtRate;
+            $grossPay = $specialOtEarnings + $totalShiftEarning;
+            $epfEmployee =  $employee->include_epf_etf ? ($employee->basic / 100) * 12 : 0;
+            $etfEmployee =  $employee->include_epf_etf ? ($employee->basic / 100) * 3 : 0;
             $totalDeductions = $epfEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
 
             $salaryData[] = [
@@ -756,6 +779,8 @@ class SalaryController extends Controller
                 'total_shifts' => $totalShifts,
                 'basic' => $employee->basic,
                 'ot_earnings' => $otEarnings,
+                'special_ot_earnings' => $specialOtEarnings,
+                'totalShiftEarning' => $totalShiftEarning,
                 'attendance_bonus' => $employee->attendance_bonus,
                 'other_allowances' => $otherAllowances,
                 'sub_total' => $subTotal,
