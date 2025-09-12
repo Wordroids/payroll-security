@@ -47,6 +47,7 @@
                                     <tr>
                                         <th class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 sticky top-0 z-30 bg-gray-50">Emp No</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-30 bg-gray-50">Name</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-30 bg-gray-50">EPF/ETF</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -57,6 +58,9 @@
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap bg-white">
                                             {{ $data['employee']->name }}
+                                        </td>
+                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap bg-white">
+                                            {{ $data['employee']->include_epf_etf ? 'Yes' : 'No' }}
                                         </td>
                                         </tr>
                                         @empty
@@ -83,7 +87,8 @@
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Other Allow</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Sub Total</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Gross Pay</th>
-                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">EPF 8%</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">EPF 12%</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">ETF 3%</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Salary Adv</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Meals</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Uniform</th>
@@ -116,7 +121,10 @@
                                             {{ number_format($data['gross_pay'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['epf_employee'], 2) }}
+                                            {{ $data['employee']->include_epf_etf ? number_format($data['epf_employee'], 2) : 'Excluded' }}
+                                        </td>
+                                        <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                            {{ $data['employee']->include_epf_etf ? number_format($data['etf_employee'], 2) : 'Excluded' }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                             {{ number_format($data['salary_advance'], 2) }}
