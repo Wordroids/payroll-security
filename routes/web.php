@@ -74,6 +74,10 @@ Route::middleware('auth')->group(function () {
         // Update advance
         Route::put('/{id}', [SalaryAdvanceController::class, 'update'])
             ->name('salary.advance.update');
+
+        Route::get('/salary/advances/export-pdf', [SalaryController::class, 'exportSalaryAdvancesPdf'])
+            ->name('salary.advance.export.pdf');
+
     });
 
     Route::prefix('meals')->group(function () {
