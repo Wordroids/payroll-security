@@ -42,9 +42,19 @@
                 <td class="py-2 text-right">{{ number_format($employee->br_allow, 2) }}</td>
             </tr>
             <tr class="border-b border-gray-200">
+                <td class="py-2">Shift Earnings</td>
+                <td class="py-2 text-right">{{ number_format($totalShiftEarning, 2) }}</td>
+            </tr>
+            <tr class="border-b border-gray-200">
                 <td class="py-2">Over Time</td>
                 <td class="py-2 text-right">{{ number_format($otEarnings, 2) }}</td>
             </tr>
+            @if($specialOtEarnings > 0)
+            <tr class="border-b border-gray-200">
+                <td class="py-2">Special Overtime ({{ $specialOtHours }} hrs)</td>
+                <td class="py-2 text-right">{{ number_format($specialOtEarnings, 2) }}</td>
+            </tr>
+            @endif
             <tr class="border-b border-gray-200">
                 <td class="py-2">Attendance Allowance</td>
                 <td class="py-2 text-right">{{ number_format($employee->attendance_bonus, 2) }}</td>
@@ -106,10 +116,6 @@
         <tr class="border-b border-gray-200">
             <td class="py-2">Total Shifts Done</td>
             <td class="py-2 text-right">{{ number_format(array_sum(array_column($siteSummaries, 'shifts')), 2) }}</td>
-        </tr>
-        <tr class="border-b border-gray-200">
-            <td class="py-2">Shift Rate</td>
-            <td class="py-2 text-right">{{ number_format($employee->sites->first()->guard_shift_rate ?? 0, 2) }}</td>
         </tr>
     </table>
 

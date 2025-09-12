@@ -52,29 +52,57 @@
 
         {{-- Shift Breakdown --}}
         <div class="bg-white rounded-xl shadow p-6">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Assigned Shift Locations</h2>
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Assigned Sites & Shifts</h2>
             @if ($siteSummaries)
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm text-left text-gray-700">
                         <thead class="bg-gray-100 font-semibold text-gray-800 border-b">
                             <tr>
-                                <th class="px-4 py-2">Location</th>
-                                <th class="px-4 py-2">Shifts</th>
-                                <th class="px-4 py-2">Rate</th>
+                                <th class="px-4 py-2">Site</th>
+                                <th class="px-4 py-2">Rank</th>
+                                <th class="px-4 py-2">Normal Hours</th>
+                                <th class="px-4 py-2">OT Hours</th>
+                                <th class="px-4 py-2">Shift Rate</th>
+                                <th class="px-4 py-2">Total Shifts</th>
                                 <th class="px-4 py-2">Earnings</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($siteSummaries as $summary)
+                                @php
+                                    $siteId = $summary['site']->id;
+                                    $normalHours = 0;
+                                    $otHours = 0;
+
+                                    //  hours for the site
+                                    for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
+                                        $normalHours +=
+                                            ($attendances[$employee->id][$siteId][$d]['normal_day_hours'] ?? 0) +
+                                            ($attendances[$employee->id][$siteId][$d]['normal_night_hours'] ?? 0);
+                                        $otHours +=
+                                            ($attendances[$employee->id][$siteId][$d]['ot_day_hours'] ?? 0) +
+                                            ($attendances[$employee->id][$siteId][$d]['ot_night_hours'] ?? 0);
+                                    }
+
+                                    $totalSiteHours = $normalHours + $otHours;
+                                    $siteShifts = $totalSiteHours / 12;
+                                    $shiftRate = $summary['rate'];
+                                    $siteEarning = $siteShifts * $shiftRate;
+                                @endphp
                                 <tr class="border-b hover:bg-gray-50">
-                                    <td class="px-4 py-2">{{ $summary['site']->name }} -
-                                        {{ $summary['site']->location }}</td>
-                                    <td class="px-4 py-2">{{ number_format($summary['shifts'], 2) }}</td>
-                                    <td class="px-4 py-2">Rs.
-                                        {{ number_format($summary['site']->guard_shift_rate, 2) }}</td>
-                                    <td class="px-4 py-2">Rs. {{ number_format($summary['earning'], 2) }}</td>
+                                    <td class="px-4 py-2">{{ $summary['site']->name }}</td>
+                                    <td class="px-4 py-2">{{ $summary['rank'] }}</td>
+                                    <td class="px-4 py-2">{{ number_format($normalHours, 2) }}</td>
+                                    <td class="px-4 py-2">{{ number_format($otHours, 2) }}</td>
+                                    <td class="px-4 py-2">Rs. {{ number_format($shiftRate, 2) }}</td>
+                                    <td class="px-4 py-2">{{ number_format($siteShifts, 2) }}</td>
+                                    <td class="px-4 py-2">Rs. {{ number_format($siteEarning, 2) }}</td>
                                 </tr>
                             @endforeach
+                            <tr class="border-t font-semibold">
+                                <td class="px-4 py-2" colspan="6">Total Shift Earnings</td>
+                                <td class="px-4 py-2">Rs. {{ number_format($totalShiftEarning, 2) }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -83,8 +111,6 @@
             @endif
         </div>
 
-        {{-- Salary Components --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {{-- Special OT --}}
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Special Overtime</h2>
@@ -106,12 +132,11 @@
                 @endphp
 
                 @foreach($employee->sites as $site)
+                  @if ($site->has_special_ot_hours)
                     @php
                         $siteSpecialOtDayHours = 0;
                         $siteSpecialOtNightHours = 0;
 
-                        // Calculate special OT hours for this site
-                        if($site->has_special_ot_hours) {
                             for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
                                 $siteSpecialOtDayHours += $attendances[$employee->id][$site->id][$d]['special_ot_day_hours'] ?? 0;
                                 $siteSpecialOtNightHours += $attendances[$employee->id][$site->id][$d]['special_ot_night_hours'] ?? 0;
@@ -120,10 +145,9 @@
                             $siteSpecialOtHours = $siteSpecialOtDayHours + $siteSpecialOtNightHours;
                             $siteSpecialOtEarnings = $siteSpecialOtHours * $site->special_ot_rate;
                             $totalSpecialOtEarnings += $siteSpecialOtEarnings;
-                        }
                     @endphp
 
-                    @if($site->has_special_ot_hours && ($siteSpecialOtDayHours > 0 || $siteSpecialOtNightHours > 0))
+                    @if($siteSpecialOtHours > 0)
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-2">{{ $site->name }}</td>
                             <td class="px-4 py-2">{{ $siteSpecialOtDayHours }}</td>
@@ -132,6 +156,7 @@
                             <td class="px-4 py-2">Rs. {{ number_format($site->special_ot_rate, 2) }}</td>
                             <td class="px-4 py-2">Rs. {{ number_format($siteSpecialOtEarnings, 2) }}</td>
                         </tr>
+                                @endif
                     @endif
                 @endforeach
 
@@ -153,6 +178,7 @@
         </table>
                 </div>
             </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {{-- Basic Salary and Allowances --}}
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Basic Salary & Allowances</h2>
@@ -162,13 +188,10 @@
                     <div><strong>Attendance Bonus:</strong> Rs. {{ number_format($employee->attendance_bonus, 2) }}
                     </div>
                     <div><strong>Other Allowances:</strong> Rs. {{ number_format($otherAllowances, 2) }}</div>
-                </div>
             </div>
         </div>
 
         {{-- Earnings and Deductions --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {{-- Earnings --}}
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Earnings Summary</h2>
                 <div class="space-y-2 text-sm text-gray-700">
@@ -176,8 +199,10 @@
                     <div><strong>OT Hours:</strong> {{ $totalOTHours }} hrs</div>
                     <div><strong>OT Rate:</strong> Rs. {{ number_format($otRate, 2) }} / hr</div>
                     <div><strong>OT Earnings:</strong> Rs. {{ number_format($otEarnings, 2) }}</div>
+                    <div><strong>Special OT Earnings:</strong> Rs. {{ number_format($specialOtEarnings, 2) }}</div>
                     <div><strong>Sub Total:</strong> Rs. {{ number_format($subTotal, 2) }}</div>
                     <div><strong>Gross Pay:</strong> Rs. {{ number_format($grossPay, 2) }}</div>
+                </div>
                 </div>
             </div>
 
@@ -191,7 +216,6 @@
                     <div><strong>Meal Deductions:</strong> Rs. {{ number_format($mealDeductions, 2) }}</div>
                     <div><strong>Uniform Deductions:</strong> Rs. {{ number_format($uniformDeductions, 2) }}</div>
                     <div><strong>Total Deductions:</strong> Rs. {{ number_format($totalDeductions, 2) }}</div>
-                </div>
             </div>
         </div>
 
@@ -214,7 +238,6 @@
                 <div
                     class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-
                         <div id="salarySlipContent" class="p-4">
                             <!--Salary Slip Content-->
                         </div>
