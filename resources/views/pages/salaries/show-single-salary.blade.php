@@ -184,7 +184,6 @@
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Basic Salary & Allowances</h2>
                 <div class="space-y-2 text-sm text-gray-700">
                     <div><strong>Basic Salary:</strong> Rs. {{ number_format($employee->basic, 2) }}</div>
-                    <div><strong>BR Allowance:</strong> Rs. {{ number_format($employee->br_allow, 2) }}</div>
                     <div><strong>Attendance Bonus:</strong> Rs. {{ number_format($employee->attendance_bonus, 2) }}
                     </div>
                     <div><strong>Other Allowances:</strong> Rs. {{ number_format($otherAllowances, 2) }}</div>

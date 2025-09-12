@@ -38,10 +38,6 @@
                 <td class="py-2 text-right">{{ number_format($employee->basic, 2) }}</td>
             </tr>
             <tr class="border-b border-gray-200">
-                <td class="py-2">Budgetary Allowances</td>
-                <td class="py-2 text-right">{{ number_format($employee->br_allow, 2) }}</td>
-            </tr>
-            <tr class="border-b border-gray-200">
                 <td class="py-2">Shift Earnings</td>
                 <td class="py-2 text-right">{{ number_format($totalShiftEarning, 2) }}</td>
             </tr>

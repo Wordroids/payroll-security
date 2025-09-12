@@ -105,7 +105,6 @@
                     <td class="employee-name">{{ $data['employee']->name }}</td>
                     <td>{{ number_format($data['total_shifts'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['basic'], 2) }}</td>
-                    <td class="text-right">{{ number_format($data['br_allow'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['ot_earnings'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['attendance_bonus'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['other_allowances'], 2) }}</td>
