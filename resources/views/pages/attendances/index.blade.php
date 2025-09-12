@@ -30,6 +30,12 @@
             <div class="pt-2">
                 <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded">Filter</button>
             </div>
+            <div class="pt-2">
+                <a href="{{ route('attendances.pdf', request()->query()) }}"
+                    class="bg-red-600 text-white px-4 py-2 rounded inline-block">
+                    Download PDF
+                </a>
+            </div>
         </form>
 
         {{-- <div class="overflow-x-auto bg-white rounded shadow">
