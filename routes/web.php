@@ -28,7 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
     Route::put('employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
     Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
-
+    Route::get('/employees/print-gaurds', [EmployeeController::class, 'printGaurds'])->name('employees.printGaurds');
     // Sites Management Routes
     Route::get('sites', [SiteController::class, 'index'])->name('sites.index');
     Route::get('sites/create', [SiteController::class, 'create'])->name('sites.create');

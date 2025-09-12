@@ -6,6 +6,7 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EmployeeController extends Controller
 {
@@ -92,5 +93,15 @@ class EmployeeController extends Controller
         $employee->delete();
 
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
+    }
+
+
+    //to print gaurds
+    public function printGaurds()
+    {
+        $employees = Employee::orderBy('emp_no')->get();
+        $pdf = PDF::loadView('pages.employees.print', compact('employees'))
+            ->setPaper('a4', 'landscape');
+        return $pdf->download('guards-list.pdf');
     }
 }
