@@ -78,8 +78,12 @@
         </thead>
         <tbody>
             <tr class="border-b border-gray-200">
-                <td class="py-2 w-2/3">E.P.F 8%</td>
+                <td class="py-2 w-2/3">E.P.F 12%</td>
                 <td class="py-2 text-right">{{ number_format($epfEmployee, 2) }}</td>
+            </tr>
+            <tr class="border-b border-gray-200">
+                <td class="py-2 w-2/3">E.T.F 3%</td>
+                <td class="py-2 text-right">{{ number_format($etfEmployee, 2) }}</td>
             </tr>
             <tr class="border-b border-gray-200">
                 <td class="py-2">Salary Advance</td>

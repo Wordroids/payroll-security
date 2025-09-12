@@ -18,24 +18,20 @@ class Employee extends Model
         'date_of_birth',
         'date_of_hire',
         'rank',
+        'basic_salary',
+        'attendance_bonus',
     ];
 
-    protected $appends = ['basic','special_ot_rate' , 'attendance_bonus'];
+    protected $appends = ['basic', 'attendance_bonus'];
 
     public function getBasicAttribute()
     {
-        return $this->attributes['basic'] ?? 27000;
-    }
-
-
-    public function getSpecialOtRateAttribute()
-    {
-        return $this->attributes['special_ot_rate'] ?? 200;
+        return $this->attributes['basic_salary'] ?? SalarySetting::getSettings()->default_basic_salary;
     }
 
     public function getAttendanceBonusAttribute()
     {
-        return $this->attributes['attendance_bonus'] ?? 5000;
+        return $this->attributes['attendance_bonus'] ?? SalarySetting::getSettings()->default_attendance_bonus;
     }
 
 

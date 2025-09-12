@@ -105,14 +105,34 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label for="site_shift_rate" class="block text-sm font-medium text-gray-700">Site Shift Rate</label>
+                    <input type="number" step="0.01" name="site_shift_rate" id="site_shift_rate"
+                        value="{{ old('site_shift_rate') }}"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    @error('site_shift_rate')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="guard_shift_rate" class="block text-sm font-medium text-gray-700">Guard Shift
+                        Rate</label>
+                    <input type="number" step="0.01" name="guard_shift_rate" id="guard_shift_rate"
+                        value="{{ old('guard_shift_rate') }}"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    @error('guard_shift_rate')
+                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
                 <div class="md:col-span-2">
                     <div class="form-check">
                         <input type="checkbox" name="has_special_ot_hours" id="has_special_ot_hours" value="1"
                             class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                            @if (old('has_special_ot_hours')) checked @endif onclick="toggleSpecialOtRate()">
+                            @if (old('has_special_ot_hours')) checked @endif>
                         <label for="has_special_ot_hours" class="ml-2 text-sm font-medium text-gray-700">
-                            Special Overtime Rate
+                            Special Overtime Hours (Hours beyond 12 will be considered as Special OT)
                         </label>
                     </div>
                     @error('has_special_ot_hours')
@@ -120,23 +140,9 @@
                     @enderror
                 </div>
 
-                <div class="md:col-span-2" id="special_ot_rate_container"
-                    style="display: {{ old('has_special_ot_hours') ? 'block' : 'none' }}">
-                    <label for="special_ot_rate" class="block text-sm font-medium text-gray-700">Special OT Rate (per
-                        hour)</label>
-                    <input type="number" step="0.01" name="special_ot_rate" id="special_ot_rate"
-                        value="{{ old('special_ot_rate', 200) }}"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
-                    @error('special_ot_rate')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 <div class="md:col-span-2">
                     <h3 class="text-lg font-medium text-gray-700 mb-2">Rank Rates</h3>
-                    <div id="rank-rates-container">
-
-                    </div>
+                    <div id="rank-rates-container"></div>
                     <button type="button" onclick="addRankRate()"
                         class="mt-2 inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Add Rank Rate
@@ -151,13 +157,8 @@
             </form>
         </div>
     </div>
-    <script>
-    function toggleSpecialOtRate() {
-        const container = document.getElementById('special_ot_rate_container');
-        const checkbox = document.getElementById('has_special_ot_hours');
-        container.style.display = checkbox.checked ? 'block' : 'none';
-    }
 
+    <script>
      //To add Rank Rates
         function addRankRate() {
         const container = document.getElementById('rank-rates-container');

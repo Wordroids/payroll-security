@@ -129,7 +129,29 @@
                             class="block px-2 py-1 rounded hover:bg-gray-100 transition">Uniforms</a></li>
                 </ul>
             </li>
-
+            {{-- Section: Salary Settings --}}
+            <li>
+                <button type="button"
+                    class="flex items-center w-full px-2 py-2 text-left rounded-lg hover:bg-gray-100 transition group"
+                    aria-controls="dropdown-users" data-collapse-toggle="dropdown-users">
+                    <svg class="w-5 h-5 text-gray-500 group-hover:text-indigo-600" fill="currentColor"
+                        viewBox="0 0 24 24">
+                        <path fill-rule="evenodd"
+                            d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-3 flex-1">Settings</span>
+                    <svg class="w-3 h-3 ml-auto text-gray-400 group-hover:text-indigo-600" fill="none"
+                        viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M1 1l4 4 4-4" />
+                    </svg>
+                </button>
+                <ul id="dropdown-users" class="hidden ml-7 mt-1 space-y-1">
+                    <li><a href="{{ route('salary-settings.index') }}"
+                            class="block px-2 py-1 rounded hover:bg-gray-100 transition">Salary Settings </a></li>
+                </ul>
+            </li>
             {{-- Section: Users --}}
             <li>
                 <button type="button"
@@ -153,6 +175,8 @@
                             class="block px-2 py-1 rounded hover:bg-gray-100 transition">All Users</a></li>
                 </ul>
             </li>
+
+
         </ul>
         <div class="absolute bottom-4 left-0 w-full px-4">
             <p class="text-xs text-gray-400 text-center">

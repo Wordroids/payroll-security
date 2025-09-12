@@ -40,6 +40,9 @@ class EmployeeController extends Controller
             'date_of_birth' => 'required|date',
             'date_of_hire' => 'required|date',
             'rank' => 'required|string|max:255',
+            'basic_salary' => 'nullable|numeric|min:0',
+            'attendance_bonus' => 'nullable|numeric|min:0',
+           
         ]);
 
         Employee::create($validated);
@@ -77,6 +80,9 @@ class EmployeeController extends Controller
             'date_of_birth' => 'required|date',
             'date_of_hire' => 'required|date',
             'rank' => 'required|string|max:255',
+            'basic_salary' => 'nullable|numeric|min:0',
+            'attendance_bonus' => 'nullable|numeric|min:0',
+
         ]);
 
         $employee->update($validated);

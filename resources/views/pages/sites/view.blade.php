@@ -72,11 +72,21 @@
                 </div>
 
                 <div>
-                    <h3 class="text-sm font-medium text-gray-500">Special OT Rate</h3>
+                    <h3 class="text-sm font-medium text-gray-500">Special OT Hours</h3>
                     <p class="mt-1 text-sm text-gray-900">
-                        {{ $site->has_special_ot_hours ? 'Rs. ' . number_format($site->special_ot_rate, 2) . '/hr' : 'No' }}
+                        {{ $site->has_special_ot_hours ? 'Enabled' : 'Disabled' }}
                     </p>
                 </div>
+
+                @if($site->has_special_ot_hours)
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500">Calculated Special OT Rate</h3>
+                    <p class="mt-1 text-sm text-gray-900">
+                        Rs. {{ number_format($site->calculated_special_ot_rate, 2) }}/hr
+                        <span class="text-xs text-gray-500">(Guard Rate/12 × 1.5)</span>
+                    </p>
+                </div>
+                @endif
             </div>
 
             <div class="mt-8">
