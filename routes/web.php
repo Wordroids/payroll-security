@@ -7,6 +7,7 @@ use App\Http\Controllers\MealsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalaryAdvanceController;
 use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\SalarySettingController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\UniformsController;
 use App\Http\Controllers\UserController;
@@ -28,19 +29,20 @@ Route::middleware('auth')->group(function () {
     Route::get('employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
     Route::put('employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
     Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
-
+    Route::get('/employees/print-gaurds', [EmployeeController::class, 'printGaurds'])->name('employees.printGaurds');
     // Sites Management Routes
     Route::get('sites', [SiteController::class, 'index'])->name('sites.index');
     Route::get('sites/create', [SiteController::class, 'create'])->name('sites.create');
     Route::post('sites', [SiteController::class, 'store'])->name('sites.store');
     Route::get('sites/{site}/edit', [SiteController::class, 'edit'])->name('sites.edit');
     Route::put('sites/{site}', [SiteController::class, 'update'])->name('sites.update');
+    Route::get('sites/{site}/view', [SiteController::class, 'view'])->name('sites.view');
     Route::delete('sites/{site}', [SiteController::class, 'destroy'])->name('sites.destroy');
     // Attendance Management Routes
     Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::get('/attendances/site-entry', [AttendanceController::class, 'siteEntryForm'])->name('attendances.site-entry');
     Route::post('/attendances/site-entry', [AttendanceController::class, 'storeSiteEntry'])->name('attendances.site-entry.store');
-
+    Route::get('/attendances/pdf', [AttendanceController::class, 'downloadPDF'])->name('attendances.pdf');
     Route::get('/sites/{site}/assign', [SiteController::class, 'assignGuards'])->name('sites.assign');
     Route::post('/sites/{site}/assign', [SiteController::class, 'storeAssignedGuards'])->name('sites.assign.store');
 
@@ -73,6 +75,10 @@ Route::middleware('auth')->group(function () {
         // Update advance
         Route::put('/{id}', [SalaryAdvanceController::class, 'update'])
             ->name('salary.advance.update');
+
+        Route::get('/salary/advances/export-pdf', [SalaryController::class, 'exportSalaryAdvancesPdf'])
+            ->name('salary.advance.export.pdf');
+
     });
 
     Route::prefix('meals')->group(function () {
@@ -120,7 +126,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/salaries/{employee}/slip-download/{month}', [SalaryController::class, 'downloadSlip'])->name('salaries.slip.download');
     Route::get('/salaries', [SalaryController::class, 'index'])->name('salaries');
     Route::get('/salaries/{employee}', [SalaryController::class, 'show'])->name('salaries.show');
-
+    Route::get('/salaries/overview/pdf', [SalaryController::class, 'exportSalaryOverviewPdf'])->name('salaries.overview.pdf');
     //User Resources
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
@@ -130,6 +136,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    //Salary Settings Routes
+    Route::get('/salary-settings', [SalarySettingController::class, 'index'])->name('salary-settings.index');
+    Route::put('/salary-settings', [SalarySettingController::class, 'update'])->name('salary-settings.update');
 });
 
 require __DIR__ . '/auth.php';

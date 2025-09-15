@@ -27,6 +27,11 @@
                         <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-white hover:bg-indigo-500 focus:outline-none">
                             Filter
                         </button>
+
+                        <a href="{{ route('salaries.overview.pdf', request()->query()) }}"
+                            class="ml-2 inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-white hover:bg-red-500 focus:outline-none">
+                            Download PDF
+                        </a>
                     </div>
                 </form>
             </div>
@@ -42,6 +47,7 @@
                                     <tr>
                                         <th class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6 sticky top-0 z-30 bg-gray-50">Emp No</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-30 bg-gray-50">Name</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-30 bg-gray-50">EPF/ETF</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -53,10 +59,13 @@
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap bg-white">
                                             {{ $data['employee']->name }}
                                         </td>
+                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap bg-white">
+                                            {{ $data['employee']->include_epf_etf ? 'Yes' : 'No' }}
+                                        </td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500 bg-white">
+                                            <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500 bg-white">
                                                 No salary data found.
                                             </td>
                                         </tr>
@@ -72,13 +81,15 @@
                                         <tr>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Shifts</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Basic</th>
-                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">BR Allow</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">OT Earnings</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Special OT Earnings</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Shift Earnings</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Att. Bonus</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Other Allow</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Sub Total</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Gross Pay</th>
-                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">EPF 8%</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">EPF 12%</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">ETF 3%</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Salary Adv</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Meals</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Uniform</th>
@@ -96,10 +107,13 @@
                                             {{ number_format($data['basic'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['br_allow'], 2) }}
+                                            {{ number_format($data['ot_earnings'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['ot_earnings'], 2) }}
+                                            {{ number_format($data['special_ot_earnings'], 2) }}
+                                        </td>
+                                        <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                            {{ number_format($data['totalShiftEarning'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                             {{ number_format($data['attendance_bonus'], 2) }}
@@ -114,7 +128,10 @@
                                             {{ number_format($data['gross_pay'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['epf_employee'], 2) }}
+                                            {{ $data['employee']->include_epf_etf ? number_format($data['epf_employee'], 2) : 'Excluded' }}
+                                        </td>
+                                        <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                            {{ $data['employee']->include_epf_etf ? number_format($data['etf_employee'], 2) : 'Excluded' }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                             {{ number_format($data['salary_advance'], 2) }}

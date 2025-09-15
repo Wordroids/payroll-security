@@ -18,18 +18,17 @@
         @endif
 
         <div class="overflow-x-auto bg-white rounded shadow">
+          <div style="height: calc(100vh - 250px); overflow: auto;">
             <table class="min-w-full text-sm text-left text-gray-600">
                 <thead class="bg-gray-100 text-gray-800 text-xs uppercase tracking-wider">
                     <tr>
-                        <th class="px-4 py-3">Name</th>
-                        <th class="px-4 py-3">Location</th>
-                        <th class="px-4 py-3">Contact Person</th>
-                        <th class="px-4 py-3">Phone</th>
-                        <th class="px-4 py-3">Start Date</th>
-                        <th class="px-4 py-3 ">No. Of Guards</th>
-                        <th class="px-4 py-3 ">Site Rate</th>
-                        <th class="px-4 py-3 ">Guard Rate</th>
-                        <th class="px-4 py-3 text-center">Actions</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Location</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Contact Person</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Phone</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Start Date</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">No. Of Guards</th>
+                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -41,15 +40,15 @@
                             <td class="px-4 py-3">{{ $site->contact_number }}</td>
                             <td class="px-4 py-3">{{ \Carbon\Carbon::parse($site->start_date)->format('Y-m-d') }}</td>
                             <td class="px-4 py-3">{{ $site->no_of_guards }}</td>
-                            <td class="px-4 py-3">Rs.{{ $site->site_shift_rate }}.00</td>
-                            <td class="px-4 py-3">Rs.{{ $site->guard_shift_rate }}.00</td>
+
                             <td class="px-4 py-3 text-right">
                                 <a href="{{ route('sites.assign', $site->id) }}"
                                    class="text-blue-600 hover:text-blue-900 mr-4">Assign Guards</a>
-                                   
+
                                 <a href="{{ route('sites.edit', $site->id) }}"
                                    class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-
+                                <a href="{{ route('sites.view', $site->id) }}"
+                                   class="text-indigo-600 hover:text-indigo-900 mr-4">View</a>
                                 <form action="{{ route('sites.destroy', $site->id) }}" method="POST" class="inline-block"
                                       onsubmit="return confirm('Are you sure you want to delete this site?');">
                                     @csrf
@@ -65,6 +64,7 @@
                     @endforelse
                 </tbody>
             </table>
+          </div>
         </div>
     </div>
 </x-app-layout>

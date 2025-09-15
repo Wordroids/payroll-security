@@ -47,11 +47,23 @@ class SiteController extends Controller
             'site_shift_rate' => 'nullable|numeric|min:0',
             'guard_shift_rate' => 'nullable|numeric|min:0',
             'has_special_ot_hours' => 'boolean',
-            'special_ot_rate' => 'nullable|numeric|min:0|required_if:has_special_ot_hours,true',
+            'ranks' => 'sometimes|array',
+            'ranks.*.rank' => 'required|string',
+            'ranks.*.site_shift_rate' => 'required|numeric|min:0',
+            'ranks.*.guard_shift_rate' => 'required|numeric|min:0',
         ]);
 
         try {
-        Site::create($validated);
+        $site =Site::create($validated);
+
+        if (isset($validated['ranks'])) {
+                foreach ($validated['ranks'] as $rankData) {
+                    $site->rankRates()->create([
+                        'rank' => $rankData['rank'],
+                        'site_shift_rate' => $rankData['site_shift_rate'],
+                        'guard_shift_rate' => $rankData['guard_shift_rate']
+                    ]);
+                }}
         return redirect()->route('sites.index')->with('success', 'Site created successfully.');
         } catch (\Exception $e) {
             \Log::error('Site creation failed: ' . $e->getMessage());
@@ -76,6 +88,12 @@ class SiteController extends Controller
         return view('pages.sites.edit', compact('site'));
     }
 
+    //To view site details
+    public function view(Site $site)
+    {
+        return view('pages.sites.view', compact('site'));
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -96,14 +114,31 @@ class SiteController extends Controller
             'site_shift_rate' => 'nullable|numeric|min:0',
             'guard_shift_rate' => 'nullable|numeric|min:0',
             'has_special_ot_hours' => 'boolean',
-            'special_ot_rate' => 'nullable|numeric|min:0|required_if:has_special_ot_hours,true',
+            'ranks' => 'sometimes|array',
+            'ranks.*.rank' => 'required|string',
+            'ranks.*.site_shift_rate' => 'required|numeric|min:0',
+            'ranks.*.guard_shift_rate' => 'required|numeric|min:0',
         ]);
 
         if (!isset($validated['has_special_ot_hours'])) {
             $validated['has_special_ot_hours'] = false;
-            $validated['special_ot_rate'] = null;
+           
         }
         $site->update($validated);
+           // Update rank rates
+        if (isset($validated['ranks'])) {
+            //  delete existing rates
+            $site->rankRates()->delete();
+
+            // Add new rates
+            foreach ($validated['ranks'] as $rankData) {
+                $site->rankRates()->create([
+                    'rank' => $rankData['rank'],
+                    'site_shift_rate' => $rankData['site_shift_rate'],
+                    'guard_shift_rate' => $rankData['guard_shift_rate']
+                ]);
+            }
+        }
 
         return redirect()->route('sites.index')->with('success', 'Site updated successfully.');
     }
@@ -112,7 +147,10 @@ class SiteController extends Controller
     {
         $employees = Employee::orderBy('name')->get();
         $assigned = $site->employees->pluck('id')->toArray();
-
+        // to get existing ranks for assigned employees
+        $assignedWithRanks = $site->employees->mapWithKeys(function ($employee) {
+        return [$employee->id => $employee->pivot->rank ?? 'CSO'];
+    });
         return view('pages.sites.assign', compact('site', 'employees', 'assigned'));
     }
 
@@ -121,9 +159,18 @@ class SiteController extends Controller
         $validated = $request->validate([
             'employee_ids' => 'nullable|array',
             'employee_ids.*' => 'exists:employees,id',
+            'ranks' => 'nullable|array',
+            'ranks.*' => 'in:CSO,JSO,LSO,OIC,SSO',
         ]);
+                $syncData = [];
+    if (!empty($validated['employee_ids'])) {
+        foreach ($validated['employee_ids'] as $employeeId) {
+            $syncData[$employeeId] = ['rank' => $validated['ranks'][$employeeId] ?? 'CSO'];
+        }
+    }
 
-        $site->employees()->sync($validated['employee_ids'] ?? []);
+    $site->employees()->sync($syncData);
+
 
         return redirect()->route('sites.index')->with('success', 'Guards assigned successfully.');
     }

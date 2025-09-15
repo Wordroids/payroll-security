@@ -38,13 +38,19 @@
                 <td class="py-2 text-right">{{ number_format($employee->basic, 2) }}</td>
             </tr>
             <tr class="border-b border-gray-200">
-                <td class="py-2">Budgetary Allowances</td>
-                <td class="py-2 text-right">{{ number_format($employee->br_allow, 2) }}</td>
+                <td class="py-2">Shift Earnings</td>
+                <td class="py-2 text-right">{{ number_format($totalShiftEarning, 2) }}</td>
             </tr>
             <tr class="border-b border-gray-200">
                 <td class="py-2">Over Time</td>
                 <td class="py-2 text-right">{{ number_format($otEarnings, 2) }}</td>
             </tr>
+            @if($specialOtEarnings > 0)
+            <tr class="border-b border-gray-200">
+                <td class="py-2">Special Overtime ({{ $specialOtHours }} hrs)</td>
+                <td class="py-2 text-right">{{ number_format($specialOtEarnings, 2) }}</td>
+            </tr>
+            @endif
             <tr class="border-b border-gray-200">
                 <td class="py-2">Attendance Allowance</td>
                 <td class="py-2 text-right">{{ number_format($employee->attendance_bonus, 2) }}</td>
@@ -71,10 +77,21 @@
             </tr>
         </thead>
         <tbody>
+             @if($employee->include_epf_etf)
             <tr class="border-b border-gray-200">
-                <td class="py-2 w-2/3">E.P.F 8%</td>
+                <td class="py-2 w-2/3">E.P.F 12%</td>
                 <td class="py-2 text-right">{{ number_format($epfEmployee, 2) }}</td>
             </tr>
+            <tr class="border-b border-gray-200">
+                <td class="py-2 w-2/3">E.T.F 3%</td>
+                <td class="py-2 text-right">{{ number_format($etfEmployee, 2) }}</td>
+            </tr>
+            @else
+            <tr class="border-b border-gray-200">
+                <td class="py-2 w-2/3">EPF/ETF</td>
+                <td class="py-2 text-right">Excluded</td>
+            </tr>
+            @endif
             <tr class="border-b border-gray-200">
                 <td class="py-2">Salary Advance</td>
                 <td class="py-2 text-right">{{ number_format($totalSalaryAdvance, 2) }}</td>
@@ -107,12 +124,8 @@
             <td class="py-2">Total Shifts Done</td>
             <td class="py-2 text-right">{{ number_format(array_sum(array_column($siteSummaries, 'shifts')), 2) }}</td>
         </tr>
-        <tr class="border-b border-gray-200">
-            <td class="py-2">Shift Rate</td>
-            <td class="py-2 text-right">{{ number_format($employee->sites->first()->guard_shift_rate ?? 0, 2) }}</td>
-        </tr>
     </table>
-
+    @if($employee->include_epf_etf)
     <table class="w-full border-collapse mb-8">
         <tr class="border-b border-gray-200">
             <td class="py-2 w-2/3">E.P.F 12%</td>
@@ -123,7 +136,7 @@
             <td class="py-2 text-right">{{ number_format(($employee->basic / 100) * 3, 2) }}</td>
         </tr>
     </table>
-
+    @endif
     <div class="border-t-2 border-gray-300 pt-4">
         <h3 class="text-center font-bold text-lg mb-4">RECEIPT</h3>
         <table class="w-full border-collapse">
@@ -134,6 +147,10 @@
             <tr>
                 <td class="py-2 font-semibold">E.P.F No</td>
                 <td class="py-2">{{ $employee->emp_no }}</td>
+            </tr>
+             <tr>
+                <td class="py-2 font-semibold">EPF/ETF Status</td>
+                <td class="py-2">{{ $employee->include_epf_etf ? 'Included' : 'Excluded' }}</td>
             </tr>
             <tr>
                 <td class="py-2 font-semibold">Signature</td>

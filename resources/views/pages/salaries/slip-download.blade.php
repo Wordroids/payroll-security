@@ -125,6 +125,10 @@
                 <td class="font-semibold">Rank</td>
                 <td>{{ $employee->rank }}</td>
             </tr>
+             <tr>
+                <td class="font-semibold">EPF/ETF</td>
+                <td>{{ $employee->include_epf_etf ? 'Included' : 'Excluded' }}</td>
+            </tr>
         </table>
 
         <table class="compact-row">
@@ -138,10 +142,6 @@
                 <tr>
                     <td>Basic Salary</td>
                     <td class="text-right">{{ number_format($employee->basic, 2) }}</td>
-                </tr>
-                <tr>
-                    <td>Budgetary Allowances</td>
-                    <td class="text-right">{{ number_format($employee->br_allow, 2) }}</td>
                 </tr>
                 <tr>
                     <td>Over Time</td>
@@ -169,10 +169,21 @@
                 </tr>
             </thead>
             <tbody>
+                 @if($employee->include_epf_etf)
                 <tr>
-                    <td class="w-2/3">E.P.F 8%</td>
+                    <td class="w-2/3">E.P.F 12%</td>
                     <td class="text-right">{{ number_format($epfEmployee, 2) }}</td>
                 </tr>
+                 <tr>
+                    <td class="w-2/3">E.T.F 3%</td>
+                    <td class="text-right">{{ number_format($etfEmployee, 2) }}</td>
+                </tr>
+                @else
+                <tr>
+                    <td class="w-2/3">EPF/ETF</td>
+                    <td class="text-right">Excluded</td>
+                </tr>
+                @endif
                 <tr>
                     <td>Salary Advance</td>
                     <td class="text-right">{{ number_format($totalSalaryAdvance, 2) }}</td>
@@ -207,7 +218,7 @@
                 <td class="text-right">{{ number_format($employee->sites->first()->guard_shift_rate ?? 0, 2) }}</td>
             </tr>
         </table>
-
+        @if($employee->include_epf_etf)
         <table class="compact-row">
             <tr>
                 <td class="w-2/3">E.P.F 12%</td>
@@ -218,7 +229,7 @@
                 <td class="text-right">{{ number_format(($employee->basic / 100) * 3, 2) }}</td>
             </tr>
         </table>
-
+        @endif
         <div class="border-t-1 border-gray-300 pt-1 mt-2">
             <h3 class="text-center font-bold" style="font-size: 9px; margin: 1mm 0;">RECEIPT</h3>
             <table class="compact-row">
@@ -229,6 +240,10 @@
                 <tr>
                     <td class="font-semibold">E.P.F No</td>
                     <td>{{ $employee->emp_no }}</td>
+                </tr>
+                 <tr>
+                    <td class="font-semibold">EPF/ETF Status</td>
+                    <td>{{ $employee->include_epf_etf ? 'Included' : 'Excluded' }}</td>
                 </tr>
                 <tr>
                     <td class="font-semibold">Signature</td>

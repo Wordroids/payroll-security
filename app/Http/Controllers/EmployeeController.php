@@ -6,6 +6,7 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EmployeeController extends Controller
 {
@@ -39,7 +40,12 @@ class EmployeeController extends Controller
             'date_of_birth' => 'required|date',
             'date_of_hire' => 'required|date',
             'rank' => 'required|string|max:255',
+            'basic_salary' => 'nullable|numeric|min:0',
+            'attendance_bonus' => 'nullable|numeric|min:0',
+            'include_epf_etf' => 'sometimes|boolean',
         ]);
+
+        $validated['include_epf_etf'] = $request->has('include_epf_etf');
 
         Employee::create($validated);
 
@@ -76,8 +82,12 @@ class EmployeeController extends Controller
             'date_of_birth' => 'required|date',
             'date_of_hire' => 'required|date',
             'rank' => 'required|string|max:255',
-        ]);
+            'basic_salary' => 'nullable|numeric|min:0',
+            'attendance_bonus' => 'nullable|numeric|min:0',
+            'include_epf_etf' => 'sometimes|boolean',
 
+        ]);
+        $validated['include_epf_etf'] = $request->has('include_epf_etf');
         $employee->update($validated);
 
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
@@ -92,5 +102,15 @@ class EmployeeController extends Controller
         $employee->delete();
 
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
+    }
+
+
+    //to print gaurds
+    public function printGaurds()
+    {
+        $employees = Employee::orderBy('emp_no')->get();
+        $pdf = PDF::loadView('pages.employees.print', compact('employees'))
+            ->setPaper('a4', 'landscape');
+        return $pdf->download('guards-list.pdf');
     }
 }

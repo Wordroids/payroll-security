@@ -14,10 +14,18 @@
                         @endif
                     </p>
                 </div>
-                <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+                <div class="sm:flex sm:items-center gap-2 ">
                     <a href="{{ route('salary.advance.create') }}"
                         class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                         Add Salary Advance
+                    </a>
+                    <a href="{{ route('salary.advance.export.pdf', [
+                        'month' => request()->has('month') ? request('month') : null,
+                        'date' => !request()->has('month') && request()->has('date') ? request('date') : null,
+                        'show_all' => request('show_all', false),
+                    ]) }}"
+                        class="block rounded-md bg-red-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                        Download PDF
                     </a>
                 </div>
             </div>
@@ -60,16 +68,17 @@
                             </div>
                         </form>
                         <div class="overflow-visible shadow-sm ring-1 ring-black/5 sm:rounded-lg">
+                          <div style="height: calc(100vh - 250px); overflow: auto;">
                             <table class="min-w-full divide-y divide-gray-300">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th
-                                            class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                            class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                                             Emp No</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Amount
+                                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
+                                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Amount
                                         </th>
-                                        <th class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Actions
+                                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Actions
                                         </th>
                                     </tr>
                                 </thead>
@@ -157,6 +166,7 @@
                                     </tr>
                                 </tbody>
                             </table>
+                          </div>
                         </div>
                         <!-- Pagination -->
                         <div class="mt-4">
