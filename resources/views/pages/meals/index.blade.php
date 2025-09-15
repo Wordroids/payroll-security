@@ -73,16 +73,17 @@
                         </form>
 
                         <div class="overflow-visible shadow-sm ring-1 ring-black/5 sm:rounded-lg">
+                           <div style="height: calc(100vh - 250px); overflow: auto;">
                             <table class="min-w-full divide-y divide-gray-300">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th
-                                            class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                            class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                                             Emp No</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
-                                        <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total
+                                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Name</th>
+                                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Total
                                             Amount</th>
-                                        <th class="px-3 py-3.5 text-center text-sm font-semibold text-gray-900">Actions
+                                        <th class="sticky top-0 z-10 bg-gray-50 py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">Actions
                                         </th>
                                     </tr>
                                 </thead>
@@ -164,6 +165,7 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
                         </div>
                         <!-- Pagination -->
                         <div class="mt-4">
