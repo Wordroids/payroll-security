@@ -1,4 +1,16 @@
 <x-app-layout>
+     <style>
+        /* hover effect to all table rows */
+        table tbody tr:hover {
+            background-color: #f3f4f6;
+            cursor: pointer;
+        }
+
+
+        table tbody tr:hover td {
+            color: #111827;
+        }
+    </style>
     <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="sm:flex sm:items-center">
@@ -44,11 +56,11 @@
                                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 {{ $user->email }}
                                             </td>
-                                           
+
                                             <td class="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
                                                 <a href="{{ route('users.edit', $user->id) }}"
                                                    class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                                            
+
                                                 <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline-block"
                                                       onsubmit="return confirm('Are you sure you want to delete this user?');">
                                                     @csrf

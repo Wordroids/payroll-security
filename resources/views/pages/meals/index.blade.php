@@ -1,4 +1,16 @@
 <x-app-layout>
+     <style>
+        /* hover effect to all table rows */
+        table tbody tr:hover {
+            background-color: #f3f4f6;
+            cursor: pointer;
+        }
+
+
+        table tbody tr:hover td {
+            color: #111827;
+        }
+    </style>
     <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="sm:flex sm:items-center">
