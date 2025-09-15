@@ -133,7 +133,7 @@
             <li>
                 <button type="button"
                     class="flex items-center w-full px-2 py-2 text-left rounded-lg hover:bg-gray-100 transition group"
-                    aria-controls="dropdown-users" data-collapse-toggle="dropdown-users">
+                    aria-controls="dropdown-salary-settings" data-collapse-toggle="dropdown-salary-settings">
                     <svg class="w-5 h-5 text-gray-500 group-hover:text-indigo-600" fill="currentColor"
                         viewBox="0 0 24 24">
                         <path fill-rule="evenodd"
@@ -147,7 +147,7 @@
                             d="M1 1l4 4 4-4" />
                     </svg>
                 </button>
-                <ul id="dropdown-users" class="hidden ml-7 mt-1 space-y-1">
+                <ul id="dropdown-salary-settings" class="hidden ml-7 mt-1 space-y-1">
                     <li><a href="{{ route('salary-settings.index') }}"
                             class="block px-2 py-1 rounded hover:bg-gray-100 transition">Salary Settings </a></li>
                 </ul>
