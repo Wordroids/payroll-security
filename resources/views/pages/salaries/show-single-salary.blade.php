@@ -196,9 +196,10 @@
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Earnings Summary</h2>
                 <div class="space-y-2 text-sm text-gray-700">
                     <div><strong>Total Shift Earnings:</strong> Rs. {{ number_format($totalShiftEarning, 2) }}</div>
-                    <div><strong>OT Hours:</strong> {{ $totalOTHours }} hrs</div>
+                    <div><strong>OT Hours:</strong> {{ $paidOtHours }} hrs</div>
                     <div><strong>OT Rate:</strong> Rs. {{ number_format($otRate, 2) }} / hr</div>
                     <div><strong>OT Earnings:</strong> Rs. {{ number_format($otEarnings, 2) }}</div>
+                    <div><strong>Performance Allowance:</strong> Rs. {{ number_format($performanceAllowance, 2) }}</div>
                     <div><strong>Special OT Earnings:</strong> Rs. {{ number_format($specialOtEarnings, 2) }}</div>
                     <div><strong>Sub Total:</strong> Rs. {{ number_format($subTotal, 2) }}</div>
                     <div><strong>Gross Pay:</strong> Rs. {{ number_format($grossPay, 2) }}</div>

@@ -97,6 +97,7 @@
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Special OT Earnings</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Shift Earnings</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Att. Bonus</th>
+                                            <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Perf. Allow</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Other Allow</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Sub Total</th>
                                             <th class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sticky top-0 z-10 bg-gray-50">Gross Pay</th>
@@ -129,6 +130,9 @@
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                             {{ number_format($data['attendance_bonus'], 2) }}
+                                        </td>
+                                        <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                            {{ number_format($data['performance_allowance'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                             {{ number_format($data['other_allowances'], 2) }}
