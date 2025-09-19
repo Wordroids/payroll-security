@@ -45,7 +45,13 @@
                 <td class="py-2">Over Time</td>
                 <td class="py-2 text-right">{{ number_format($otEarnings, 2) }}</td>
             </tr>
-            @if($specialOtEarnings > 0)
+            @if ($performanceAllowance > 0)
+                <tr class="border-b border-gray-200">
+                    <td class="py-2">Performance Allowance</td>
+                    <td class="py-2 text-right">{{ number_format($performanceAllowance, 2) }}</td>
+                </tr>
+            @endif
+            @if ($specialOtEarnings > 0)
             <tr class="border-b border-gray-200">
                 <td class="py-2">Special Overtime ({{ $specialOtHours }} hrs)</td>
                 <td class="py-2 text-right">{{ number_format($specialOtEarnings, 2) }}</td>
@@ -58,10 +64,6 @@
             <tr class="border-b border-gray-200">
                 <td class="py-2">Other Allowance</td>
                 <td class="py-2 text-right">{{ number_format($otherAllowances, 2) }}</td>
-            </tr>
-            <tr class="border-b border-gray-200">
-                <td class="py-2">Good Conduct Allowance</td>
-                <td class="py-2 text-right">-</td>
             </tr>
             <tr class="border-b-2 border-gray-300 font-semibold">
                 <td class="py-2">Gross Pay</td>

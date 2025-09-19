@@ -147,6 +147,12 @@
                     <td>Over Time</td>
                     <td class="text-right">{{ number_format($otEarnings, 2) }}</td>
                 </tr>
+                @if ($performanceAllowance > 0)
+                    <tr>
+                        <td>Performance Allowance</td>
+                        <td class="text-right">{{ number_format($performanceAllowance, 2) }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Attendance Allowance</td>
                     <td class="text-right">{{ number_format($employee->attendance_bonus, 2) }}</td>
