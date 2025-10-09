@@ -33,11 +33,11 @@
                                             <label for="rank_{{ $emp->id }}" class="block text-xs text-gray-500 mb-1">Rank</label>
                                             <select name="ranks[{{ $emp->id }}]" id="rank_{{ $emp->id }}"
                                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
-                                                <option value="CSO" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'CSO') ? 'selected' : '' }}>CSO</option>
-                                                <option value="JSO" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'JSO') ? 'selected' : '' }}>JSO</option>
-                                                <option value="LSO" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'LSO') ? 'selected' : '' }}>LSO</option>
-                                                <option value="OIC" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'OIC') ? 'selected' : '' }}>OIC</option>
-                                                <option value="SSO" {{ (isset($emp->pivot->rank) && $emp->pivot->rank == 'SSO') ? 'selected' : '' }}>SSO</option>
+                                                <option value="CSO" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'CSO') ? 'selected' : '' }}>CSO</option>
+                                                <option value="JSO" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'JSO') ? 'selected' : '' }}>JSO</option>
+                                                <option value="LSO" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'LSO') ? 'selected' : '' }}>LSO</option>
+                                                <option value="OIC" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'OIC') ? 'selected' : '' }}>OIC</option>
+                                                <option value="SSO" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'SSO') ? 'selected' : '' }}>SSO</option>
                                             </select>
                                         </div>
                                     </div>
