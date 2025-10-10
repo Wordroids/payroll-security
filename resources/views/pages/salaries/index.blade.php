@@ -14,6 +14,7 @@
             <div class="sm:flex sm:items-center">
                 <div class="sm:flex-auto">
                     <h1 class="text-base font-semibold text-gray-900">Salaries</h1>
+                    <h1 class="text-base font-semibold text-gray-900">To test</h1>
                 </div>
             </div>
 
