@@ -96,12 +96,6 @@
             margin: 0;
             padding: 0;
         }
-
-        .special-ot-table th,
-        .special-ot-table td {
-            font-size: 7px;
-            padding: 0.5mm;
-        }
     </style>
 </head>
 
@@ -150,10 +144,6 @@
                     <td class="text-right">{{ number_format($employee->basic, 2) }}</td>
                 </tr>
                 <tr>
-                    <td>Shift Earnings</td>
-                    <td class="text-right">{{ number_format($totalShiftEarning, 2) }}</td>
-                </tr>
-                <tr>
                     <td>Over Time</td>
                     <td class="text-right">{{ number_format($otEarnings, 2) }}</td>
                 </tr>
@@ -162,12 +152,6 @@
                         <td>Performance Allowance</td>
                         <td class="text-right">{{ number_format($performanceAllowance, 2) }}</td>
                     </tr>
-                @endif
-                @if ($specialOtEarnings > 0)
-                <tr>
-                    <td>Special Overtime</td>
-                    <td class="text-right">{{ number_format($specialOtEarnings, 2) }}</td>
-                </tr>
                 @endif
                 <tr>
                     <td>Attendance Allowance</td>
@@ -279,4 +263,5 @@
         </div>
     </div>
 </body>
+
 </html>
