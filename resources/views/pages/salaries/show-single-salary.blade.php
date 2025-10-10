@@ -130,45 +130,37 @@
             <tbody>
                 @php
                     $totalSpecialOtEarnings = 0;
+                    $totalSpecialOtDayHours = 0;
+                    $totalSpecialOtNightHours = 0;
                 @endphp
 
-                @foreach($employee->sites as $site)
-                  @if ($site->has_special_ot_hours)
-                    @php
-                        $siteSpecialOtDayHours = 0;
-                        $siteSpecialOtNightHours = 0;
-
-                            for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
-                                $siteSpecialOtDayHours += $attendances[$employee->id][$site->id][$d]['special_ot_day_hours'] ?? 0;
-                                $siteSpecialOtNightHours += $attendances[$employee->id][$site->id][$d]['special_ot_night_hours'] ?? 0;
-                            }
-
-                            $siteSpecialOtHours = $siteSpecialOtDayHours + $siteSpecialOtNightHours;
-                            $siteSpecialOtEarnings = $siteSpecialOtHours * $site->special_ot_rate;
-                            $totalSpecialOtEarnings += $siteSpecialOtEarnings;
+                        @if (!empty($specialOtData))
+                            @foreach ($specialOtData as $siteOt)
+                                @php
+                                    $totalSpecialOtEarnings += $siteOt['earnings'];
+                                    $totalSpecialOtDayHours += $siteOt['day_hours'];
+                                    $totalSpecialOtNightHours += $siteOt['night_hours'];
                     @endphp
-
-                    @if($siteSpecialOtHours > 0)
                         <tr class="border-b hover:bg-gray-50">
-                            <td class="px-4 py-2">{{ $site->name }}</td>
-                            <td class="px-4 py-2">{{ $siteSpecialOtDayHours }}</td>
-                            <td class="px-4 py-2">{{ $siteSpecialOtNightHours }}</td>
-                            <td class="px-4 py-2">{{ $siteSpecialOtHours }}</td>
-                            <td class="px-4 py-2">Rs. {{ number_format($site->special_ot_rate, 2) }}</td>
-                            <td class="px-4 py-2">Rs. {{ number_format($siteSpecialOtEarnings, 2) }}</td>
+                            <td class="px-4 py-2">
+                                        {{ $siteOt['site']->name }}
+                                        <br><span class="text-xs text-gray-500">Rank: {{ $siteOt['rank'] }}</span>
+                                    </td>
+                            <td class="px-4 py-2">{{ number_format($siteOt['day_hours'], 2) }}</td>
+                            <td class="px-4 py-2">{{ number_format($siteOt['night_hours'], 2) }}</td>
+                            <td class="px-4 py-2">{{ number_format($siteOt['total_hours'], 2) }}</td>
+                            <td class="px-4 py-2">Rs. {{ number_format($siteOt['rate'], 2) }}</td>
+                            <td class="px-4 py-2">Rs. {{ number_format($siteOt['earnings'], 2) }}</td>
                         </tr>
-                                @endif
-                    @endif
                 @endforeach
 
-                @if($totalSpecialOtEarnings > 0)
                     <tr class="border-t font-semibold">
                         <td class="px-4 py-2">Total</td>
-                        <td class="px-4 py-2">{{ $specialOtDayHours }}</td>
-                        <td class="px-4 py-2">{{ $specialOtNightHours }}</td>
-                        <td class="px-4 py-2">{{ $specialOtHours }}</td>
+                        <td class="px-4 py-2">{{ number_format($totalSpecialOtDayHours, 2) }}</td>
+                        <td class="px-4 py-2">{{ number_format($totalSpecialOtNightHours, 2) }}</td>
+                        <td class="px-4 py-2">{{ number_format($specialOtHours, 2) }}</td>
                         <td class="px-4 py-2"></td>
-                        <td class="px-4 py-2">Rs. {{ number_format($totalSpecialOtEarnings, 2) }}</td>
+                        <td class="px-4 py-2">Rs. {{ number_format($specialOtEarnings, 2) }}</td>
                     </tr>
                 @else
                     <tr>
@@ -253,7 +245,6 @@
                             <select id="downloadFormat"
                                 class="rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 <option value="pdf">PDF</option>
-
                             </select>
                             <button type="button" id="downloadSlipBtn"
                                 class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-500 focus:outline-none">
