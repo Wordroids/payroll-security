@@ -122,7 +122,7 @@ class SiteController extends Controller
 
         if (!isset($validated['has_special_ot_hours'])) {
             $validated['has_special_ot_hours'] = false;
-           
+
         }
         $site->update($validated);
            // Update rank rates
@@ -151,7 +151,7 @@ class SiteController extends Controller
         $assignedWithRanks = $site->employees->mapWithKeys(function ($employee) {
         return [$employee->id => $employee->pivot->rank ?? 'CSO'];
     });
-        return view('pages.sites.assign', compact('site', 'employees', 'assigned'));
+        return view('pages.sites.assign', compact('site', 'employees', 'assigned','assignedWithRanks'));
     }
 
     public function storeAssignedGuards(Request $request, Site $site)
