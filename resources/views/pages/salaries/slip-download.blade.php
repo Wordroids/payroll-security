@@ -177,12 +177,12 @@
             <tbody>
                  @if($employee->include_epf_etf)
                 <tr>
-                    <td class="w-2/3">E.P.F 12%</td>
-                    <td class="text-right">{{ number_format($epfEmployee, 2) }}</td>
+                    <td class="w-2/3 text-red-700">E.P.F 12%</td>
+                    <td class="text-right text-red-700">{{ number_format($epfEmployee, 2) }}</td>
                 </tr>
                  <tr>
-                    <td class="w-2/3">E.T.F 3%</td>
-                    <td class="text-right">{{ number_format($etfEmployee, 2) }}</td>
+                    <td class="w-2/3 text-red-700">E.T.F 3%</td>
+                    <td class="text-right text-red-700">{{ number_format($etfEmployee, 2) }}</td>
                 </tr>
                 @else
                 <tr>
@@ -227,12 +227,12 @@
         @if($employee->include_epf_etf)
         <table class="compact-row">
             <tr>
-                <td class="w-2/3">E.P.F 12%</td>
-                <td class="text-right">{{ number_format(($employee->basic / 100) * 12, 2) }}</td>
+                <td class="w-2/3 text-red-700">E.P.F 12%</td>
+                <td class="text-right text-red-700">{{ number_format(($employee->basic / 100) * 12, 2) }}</td>
             </tr>
             <tr>
-                <td>E.T.F 3%</td>
-                <td class="text-right">{{ number_format(($employee->basic / 100) * 3, 2) }}</td>
+                <td class="text-red-700">E.T.F 3%</td>
+                <td class="text-right text-red-700">{{ number_format(($employee->basic / 100) * 3, 2) }}</td>
             </tr>
         </table>
         @endif

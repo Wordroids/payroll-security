@@ -211,8 +211,9 @@ class SalaryController extends Controller
 
         $epfEmployee =  $employee->include_epf_etf ? ($employee->basic / 100) * 12 : 0;
         $etfEmployee =  $employee->include_epf_etf ? ($employee->basic / 100) * 3 : 0;
+        $epfDeductEmployee =  $employee->include_epf_etf ? ($employee->basic / 100) * 8 : 0;
         $epfEtfEmployer =  $employee->include_epf_etf ? ($employee->basic / 100) * 15 : 0;
-        $totalDeductions = $epfEmployee + $employee->totalSalaryAdvance + $mealDeductions + $uniformDeductions;
+        $totalDeductions = $epfDeductEmployee + $employee->totalSalaryAdvance + $mealDeductions + $uniformDeductions;
         $totalEarnings = $grossPay - $totalDeductions;
 
         return view('pages.salaries.show-single-salary', compact(
@@ -416,7 +417,8 @@ class SalaryController extends Controller
             $grossPay = $specialOtEarnings + $totalShiftEarning;
             $epfEmployee =  $employee->include_epf_etf ?($employee->basic / 100) * 12:0;
             $etfEmployee =  $employee->include_epf_etf ?($employee->basic / 100) * 3:0;
-            $totalDeductions = $epfEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
+            $epfDeductEmployee =  $employee->include_epf_etf ?($employee->basic / 100) * 8:0;
+            $totalDeductions = $epfDeductEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
             $salaryData[] = [
                 'employee' => $employee,
                 'total_shifts' => $totalShifts,
@@ -429,13 +431,14 @@ class SalaryController extends Controller
                 'other_allowances' => $otherAllowances,
                 'sub_total' => $subTotal,
                 'gross_pay' => $grossPay,
-                'epf_employee' => $epfEmployee,
-                'etf_employee' => $etfEmployee,
                 'salary_advance' => $totalSalaryAdvance,
                 'meal_deductions' => $mealDeductions,
                 'uniform_deductions' => $uniformDeductions,
+                 'epf_deduct_employee' => $epfDeductEmployee,
                 'total_deductions' => $totalDeductions,
                 'net_pay' => $grossPay - $totalDeductions,
+                'epf_employee' => $epfEmployee,
+                'etf_employee' => $etfEmployee,
                 'ot_days' => $otDays,
                 'paid_ot_hours' => $paidOtHours,
                 'performance_ot_hours' => $performanceOtHours,
@@ -522,6 +525,7 @@ class SalaryController extends Controller
                 'grossPay' => 0,
                 'epfEmployee' => 0,
                 'etfEmployee' => 0,
+                'epfDeductEmployee' => 0,
                 'totalDeductions' => 0,
                 'totalEarnings' => 0,
                 'siteSummaries' => [],
@@ -681,8 +685,9 @@ class SalaryController extends Controller
         // gross pay
         $data['grossPay'] = $data['specialOtEarnings'] + $data['totalShiftEarning'];
         $data['epfEmployee'] = $employee->include_epf_etf ? ($employee->basic / 100) * 12 : 0;
-            $data['etfEmployee'] = $employee->include_epf_etf ? ($employee->basic / 100) * 3 : 0;
-        $data['totalDeductions'] = $data['epfEmployee'] + $data['totalSalaryAdvance'] + $data['mealDeductions'] + $data['uniformDeductions'];
+        $data['etfEmployee'] = $employee->include_epf_etf ? ($employee->basic / 100) * 3 : 0;
+        $data['epfDeductEmployee'] = $employee->include_epf_etf ? ($employee->basic / 100) * 8 : 0;
+        $data['totalDeductions'] = $data['epfDeductEmployee'] + $data['totalSalaryAdvance'] + $data['mealDeductions'] + $data['uniformDeductions'];
             $data['totalEarnings'] = $data['grossPay'] - $data['totalDeductions'];
 
             return $data;
@@ -890,10 +895,10 @@ class SalaryController extends Controller
             $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
             $specialOtEarnings = $specialOtHours * $specialOtRate;
             $grossPay = $specialOtEarnings + $totalShiftEarning ;
+            $epfDeductEmployee =  $employee->include_epf_etf ? ($employee->basic / 100) * 8 : 0;
+            $totalDeductions = $epfDeductEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
             $epfEmployee =  $employee->include_epf_etf ? ($employee->basic / 100) * 12 : 0;
             $etfEmployee =  $employee->include_epf_etf ? ($employee->basic / 100) * 3 : 0;
-            $totalDeductions = $epfEmployee + $totalSalaryAdvance + $mealDeductions + $uniformDeductions;
-
             $salaryData[] = [
                 'employee' => $employee,
                 'total_shifts' => $totalShifts,
@@ -906,13 +911,14 @@ class SalaryController extends Controller
                 'other_allowances' => $otherAllowances,
                 'sub_total' => $subTotal,
                 'gross_pay' => $grossPay,
-                'epf_employee' => $epfEmployee,
-                'etf_employee' => $etfEmployee,
                 'salary_advance' => $totalSalaryAdvance,
                 'meal_deductions' => $mealDeductions,
                 'uniform_deductions' => $uniformDeductions,
+                'epf_deduct_employee' => $epfDeductEmployee,
                 'total_deductions' => $totalDeductions,
                 'net_pay' => $grossPay - $totalDeductions,
+                'epf_employee' => $epfEmployee,
+                'etf_employee' => $etfEmployee,
                 'ot_days' => $otDays,
                 'paid_ot_hours' => $paidOtHours,
                 'performance_ot_hours' => $performanceOtHours,

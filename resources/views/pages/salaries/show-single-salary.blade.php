@@ -229,7 +229,7 @@
         <div class="bg-white rounded-xl shadow p-6">
             <h2 class="text-xl font-semibold text-green-700 mb-4">Final Net Pay</h2>
             <div class="text-xl text-green-700 font-bold">Rs. {{ number_format($totalEarnings, 2) }}</div>
-            <div class="mt-2 text-blue-700 text-sm">
+            <div class="mt-2 text-red-700 text-sm">
                 <strong>Employer EPF/ETF (15%):</strong> Rs. {{ number_format($epfEtfEmployer, 2) }}
             </div>
         </div>

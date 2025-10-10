@@ -92,13 +92,14 @@
                 <th>Other Allow</th>
                 <th>Sub Total</th>
                 <th>Gross Pay</th>
-                <th>EPF 12%</th>
-                <th>ETF 3%</th>
                 <th>Salary Adv</th>
                 <th>Meals</th>
                 <th>Uniform</th>
+                <th>EPF</th>
                 <th>Total Deduct</th>
                 <th>Net Pay</th>
+                <th>EPF 12%</th>
+                <th>ETF 3%</th>
             </tr>
         </thead>
         <tbody>
@@ -116,13 +117,14 @@
                     <td class="text-right">{{ number_format($data['other_allowances'], 2) }}</td>
                     <td class="text-right text-bold">{{ number_format($data['sub_total'], 2) }}</td>
                     <td class="text-right text-bold">{{ number_format($data['gross_pay'], 2) }}</td>
-                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epf_employee'], 2) : 'Excluded' }}</td>
-                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['etf_employee'], 2) : 'Excluded' }}</td>
                     <td class="text-right">{{ number_format($data['salary_advance'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['meal_deductions'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['uniform_deductions'], 2) }}</td>
+                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epf_deduct_employee'], 2) : 'Excluded' }}</td>
                     <td class="text-right">{{ number_format($data['total_deductions'], 2) }}</td>
                     <td class="text-right text-bold text-green">{{ number_format($data['net_pay'], 2) }}</td>
+                      <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epf_employee'], 2) : 'Excluded' }}</td>
+                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['etf_employee'], 2) : 'Excluded' }}</td>
                 </tr>
             @endforeach
         </tbody>
