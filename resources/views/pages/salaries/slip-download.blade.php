@@ -102,6 +102,14 @@
             font-size: 7px;
             padding: 0.5mm;
         }
+        .text-red-700 {
+            color: #b91c1c;
+        }
+
+        .total-row {
+            font-weight: bold;
+            border-top: 1px solid #000;
+        }
     </style>
 </head>
 
@@ -187,18 +195,15 @@
         <table class="compact-row">
             <thead>
                 <tr class="border-b-1 border-gray-300">
-                    <th colspan="2">Deductions</th>
+                    <th class="w-2/3">Deductions</th>
+                    <th class="text-right">Amount (Rs.)</th>
                 </tr>
             </thead>
             <tbody>
                  @if($employee->include_epf_etf)
                 <tr>
-                    <td class="w-2/3 text-red-700">E.P.F 12%</td>
-                    <td class="text-right text-red-700">{{ number_format($epfEmployee, 2) }}</td>
-                </tr>
-                 <tr>
-                    <td class="w-2/3 text-red-700">E.T.F 3%</td>
-                    <td class="text-right text-red-700">{{ number_format($etfEmployee, 2) }}</td>
+                    <td class="text-red-700">E.P.F</td>
+                    <td class="text-right text-red-700">{{ number_format($epfDeductEmployee, 2) }}</td>
                 </tr>
                 @else
                 <tr>
@@ -207,21 +212,20 @@
                 </tr>
                 @endif
                 <tr>
-                    <td>Salary Advance</td>
-                    <td class="text-right">{{ number_format($totalSalaryAdvance, 2) }}</td>
+                    <td class="text-red-700">Salary Advance</td>
+                    <td class="text-right text-red-700">{{ number_format($totalSalaryAdvance, 2) }}</td>
                 </tr>
                 <tr>
-                    <td>Meals</td>
-                    <td class="text-right">{{ number_format($mealDeductions, 2) }}</td>
+                    <td class="text-red-700">Meals</td>
+                    <td class="text-right text-red-700">{{ number_format($mealDeductions, 2) }}</td>
                 </tr>
                 <tr>
-                    <td>Uniforms</td>
-                    <td class="text-right">{{ number_format($uniformDeductions, 2) }}</td>
+                    <td class="text-red-700">Uniforms</td>
+                    <td class="text-right text-red-700">{{ number_format($uniformDeductions, 2) }}</td>
                 </tr>
-
-                <tr class="border-b-1 border-gray-300 font-semibold">
-                    <td>Total Deduction</td>
-                    <td class="text-right">{{ number_format($totalDeductions, 2) }}</td>
+            <tr class="total-row">
+                    <td class="text-red-700">Total Deduction</td>
+                    <td class="text-right text-red-700">{{ number_format($totalDeductions, 2) }}</td>
                 </tr>
             </tbody>
         </table>
@@ -235,23 +239,7 @@
                 <td>Total Shifts Done</td>
                 <td class="text-right">{{ number_format(array_sum(array_column($siteSummaries, 'shifts')), 2) }}</td>
             </tr>
-            <tr>
-                <td>Shift Rate</td>
-                <td class="text-right">{{ number_format($employee->sites->first()->guard_shift_rate ?? 0, 2) }}</td>
-            </tr>
         </table>
-        @if($employee->include_epf_etf)
-        <table class="compact-row">
-            <tr>
-                <td class="w-2/3 text-red-700">E.P.F 12%</td>
-                <td class="text-right text-red-700">{{ number_format(($employee->basic / 100) * 12, 2) }}</td>
-            </tr>
-            <tr>
-                <td class="text-red-700">E.T.F 3%</td>
-                <td class="text-right text-red-700">{{ number_format(($employee->basic / 100) * 3, 2) }}</td>
-            </tr>
-        </table>
-        @endif
         <div class="border-t-1 border-gray-300 pt-1 mt-2">
             <h3 class="text-center font-bold" style="font-size: 9px; margin: 1mm 0;">RECEIPT</h3>
             <table class="compact-row">
