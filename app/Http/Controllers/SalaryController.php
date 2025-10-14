@@ -91,10 +91,11 @@ class SalaryController extends Controller
         // Process normal/OT hours and calculate special OT per site
         foreach ($attendances as $empId => $sites) {
             foreach ($sites as $siteId => $days) {
-                $site = Site::find($siteId);
+                $site = $employee->sites->find($siteId);
                 $siteSpecialOtDayHours = 0;
                 $siteSpecialOtNightHours = 0;
                 $siteSpecialOtEarnings = 0;
+
 
                 // to get the employee's rank for this site
                 $rank = $site->pivot->rank ?? 'CSO';
