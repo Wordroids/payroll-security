@@ -19,6 +19,7 @@ class SalarySettingController extends Controller
         $validated = $request->validate([
             'default_basic_salary' => 'required|numeric|min:0',
             'default_attendance_bonus' => 'required|numeric|min:0',
+            'special_ot_rate' => 'required|numeric|min:0',
 
         ]);
 
