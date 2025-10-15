@@ -50,6 +50,6 @@ class Site extends Model
 
         // special OT rate: guard_shift_rate/12*1.5
         $guardShiftRate = $this->guard_shift_rate ?? 0;
-        return round(($guardShiftRate / 12 * 1.5), 2);
+        return 200;
     }
 }
