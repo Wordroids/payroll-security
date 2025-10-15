@@ -118,7 +118,7 @@ class SalaryController extends Controller
 
                             // Calculate special OT earnings for this site
                             if ($guardShiftRate > 0) {
-                                $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+                                $specialOtRate = 200;
                                 $siteSpecialOtEarnings += $specialOtDay * $specialOtRate;
                                 $specialOtEarnings += $specialOtDay * $specialOtRate;
                             }
@@ -138,7 +138,7 @@ class SalaryController extends Controller
 
                             // Calculate special OT earnings for this site
                             if ($guardShiftRate > 0) {
-                                $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+                                $specialOtRate = 200;
                                 $siteSpecialOtEarnings += $specialOtNight * $specialOtRate;
                                 $specialOtEarnings += $specialOtNight * $specialOtRate;
                         }
@@ -148,7 +148,7 @@ class SalaryController extends Controller
 
                 // Store special OT data for this site
                 if ($site->has_special_ot_hours && ($siteSpecialOtDayHours > 0 || $siteSpecialOtNightHours > 0)) {
-                    $specialOtRate = $guardShiftRate > 0 ? round(($guardShiftRate / 12 * 1.5), 2) : 0;
+                    $specialOtRate = $guardShiftRate > 0 ? 200 : 0;
 
                     $specialOtData[$siteId] = [
                         'site' => $site,
@@ -349,7 +349,7 @@ class SalaryController extends Controller
                                 $specialOtDay = max($dayHours - 12, 0);
                                 $specialOtHours += $specialOtDay;
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+                                    $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
@@ -362,7 +362,7 @@ class SalaryController extends Controller
                                 $specialOtNight = max($nightHours - 12, 0);
                                 $specialOtHours += $specialOtNight;
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+                                    $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
                             }
@@ -656,7 +656,7 @@ class SalaryController extends Controller
 
                                 // Calculate special OT earnings for this site
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+                                    $specialOtRate = 200;
                                     $siteSpecialOtEarnings += $specialOtDay * $specialOtRate;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
@@ -676,7 +676,7 @@ class SalaryController extends Controller
 
                                 // Calculate special OT earnings for this site
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+                                    $specialOtRate = 200;
                                     $siteSpecialOtEarnings += $specialOtNight * $specialOtRate;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                             }
@@ -686,7 +686,7 @@ class SalaryController extends Controller
 
                     // Store special OT data for this site
                     if ($site->has_special_ot_hours && ($siteSpecialOtDayHours > 0 || $siteSpecialOtNightHours > 0)) {
-                        $specialOtRate = $guardShiftRate > 0 ? round(($guardShiftRate / 12 * 1.5), 2) : 0;
+                        $specialOtRate = $guardShiftRate > 0 ? 200 : 0;
 
                         $data['specialOtData'][$siteId] = [
                             'site' => $site,
@@ -890,7 +890,7 @@ class SalaryController extends Controller
                                 $specialOtHours += $specialOtDay;
                                 // Calculate earnings for this site's special OT
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+                                    $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
@@ -904,7 +904,7 @@ class SalaryController extends Controller
                                 $specialOtHours += $specialOtNight;
                                 // Calculate earnings for this site's special OT
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = round(($guardShiftRate / 12 * 1.5), 2);
+                                    $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                             }
                         }
