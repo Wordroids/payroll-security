@@ -1141,7 +1141,53 @@ class SalaryController extends Controller
         return $pdf->download($filename);
     }
 
+    /**
+     * Download all employees salary slips for a specific month
+     */
+    public function downloadAllSlips(Request $request)
+    {
+        $month = $request->input('month', now()->format('Y-m'));
+        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
 
+        // Get employees who have at least one shift in the specified month
+        $employeesWithShifts = Employee::whereHas('attendances', function ($query) use ($startDate, $endDate) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        })->get();
+
+        if ($employeesWithShifts->isEmpty()) {
+            return redirect()->back()->with('error', 'No employees found with shifts for the selected month.');
+        }
+
+        $slipsData = [];
+
+        foreach ($employeesWithShifts as $employee) {
+            try {
+                $salaryData = $this->getSalaryData($employee, $month);
+                $slipsData[] = $salaryData;
+            } catch (\Exception $e) {
+                \Log::error("Error generating slip for employee {$employee->id}: " . $e->getMessage());
+                continue;
+            }
+        }
+
+        if (empty($slipsData)) {
+            return redirect()->back()->with('error', 'Could not generate salary slips for any employees.');
+        }
+
+        $filename = 'all_salary_slips_' . $month . '.pdf';
+
+        $pdf = PDF::loadView('pages.salaries.all-slips-pdf', [
+            'slipsData' => $slipsData,
+            'month' => $month
+        ])->setPaper('a4', 'portrait')
+            ->setOption('margin-top', 5)
+            ->setOption('margin-bottom', 5)
+            ->setOption('margin-left', 5)
+            ->setOption('margin-right', 5);
+
+        return $pdf->download($filename);
+    }
     /**
      * Show the form for editing the specified resource.
      */

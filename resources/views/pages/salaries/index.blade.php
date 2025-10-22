@@ -16,8 +16,28 @@
                     <h1 class="text-base font-semibold text-gray-900">Salaries</h1>
                 </div>
             </div>
-
-            <div class="mt-8"  style="height: calc(100vh - 170px); display: flex; flex-direction: column;">
+            <div class="mt-4 sm:mt-0 sm:ml-4">
+                <form action="{{ route('salaries.download-all-slips') }}" method="GET"
+                    class="flex items-center space-x-2">
+                    <div>
+                        <label for="month" class="sr-only">Select Month</label>
+                        <input type="month" name="month" id="month" value="{{ now()->format('Y-m') }}"
+                            class="rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required>
+                    </div>
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Download All Slips
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="mt-8" style="height: calc(100vh - 170px); display: flex; flex-direction: column;">
                 <div class="flex-1 overflow-auto relative">
                     <div class="absolute top-0 left-0 right-0 bottom-0 overflow-auto">
                         <div class="inline-flex min-w-max">
