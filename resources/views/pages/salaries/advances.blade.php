@@ -10,7 +10,128 @@
         table tbody tr:hover td {
             color: #111827;
         }
+
+        /* Search bar styles */
+        .search-container {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-left: 2.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
     </style>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const tableRows = document.querySelectorAll('table tbody tr');
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+
+
+                if (searchTerm === '') {
+                    tableRows.forEach(row => {
+                        row.style.display = '';
+                    });
+                    // Hide no results message
+                    const noResultsMessage = document.getElementById('noResultsMessage');
+                    if (noResultsMessage) {
+                        noResultsMessage.style.display = 'none';
+                    }
+                    return;
+                }
+
+                // Filter rows based on search term
+                let hasResults = false;
+                let visibleRowCount = 0;
+
+                tableRows.forEach(row => {
+
+                    if (row.querySelector('td[colspan]') || row.textContent.includes('Total Salary Advances')) {
+                        return;
+                    }
+
+                    const cells = row.querySelectorAll('td');
+                    let rowText = '';
+
+
+                    cells.forEach((cell, index) => {
+                        if (index < cells.length - 1) {
+                            rowText += cell.textContent.toLowerCase() + ' ';
+                        }
+                    });
+
+
+                    if (rowText.includes(searchTerm)) {
+                        row.style.display = '';
+                        hasResults = true;
+                        visibleRowCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show/hide no results message
+                const noResultsMessage = document.getElementById('noResultsMessage');
+                if (noResultsMessage) {
+                    noResultsMessage.style.display = hasResults ? 'none' : 'block';
+                }
+
+               
+                const totalRow = document.querySelector('tr:has(td:contains("Total Salary Advances"))');
+                if (totalRow) {
+                    totalRow.style.display = visibleRowCount > 0 ? '' : 'none';
+                }
+            });
+
+            // Tooltip functionality
+            const tooltipTriggers = document.querySelectorAll('[data-tooltip-target]');
+            tooltipTriggers.forEach(trigger => {
+                const tooltipId = trigger.getAttribute('data-tooltip-target');
+                const tooltip = document.getElementById(tooltipId);
+
+                trigger.addEventListener('mouseenter', () => {
+                    tooltip.classList.remove('invisible', 'opacity-0');
+                    tooltip.classList.add('visible', 'opacity-100');
+                });
+
+                trigger.addEventListener('mouseleave', () => {
+                    tooltip.classList.add('invisible', 'opacity-0');
+                    tooltip.classList.remove('visible', 'opacity-100');
+                });
+            });
+        });
+    </script>
+
     <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="sm:flex sm:items-center">
@@ -79,6 +200,22 @@
 
                             </div>
                         </form>
+
+                         <!-- Search Bar -->
+                        <div class="search-container">
+                            <div class="relative">
+                                <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <input
+                                    type="text"
+                                    id="searchInput"
+                                    class="search-input"
+                                    placeholder="Search by Emp No, Name, or Amount..."
+                                >
+                            </div>
+                        </div>
+
                         <div class="overflow-visible shadow-sm ring-1 ring-black/5 sm:rounded-lg">
                           <div style="height: calc(100vh - 250px); overflow: auto;">
                             <table class="min-w-full divide-y divide-gray-300">

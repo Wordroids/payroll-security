@@ -8,9 +8,102 @@
 
 
         table tbody tr:hover td {
-            color: #111827; 
+            color: #111827;
         }
+
+           /* Search bar styles */
+        .search-container {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-left: 2.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
     </style>
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const tableRows = document.querySelectorAll('table tbody tr');
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+
+                // If search is empty, show all rows
+                if (searchTerm === '') {
+                    tableRows.forEach(row => {
+                        row.style.display = '';
+                    });
+                    // Hide no results message
+                    const noResultsMessage = document.getElementById('noResultsMessage');
+                    if (noResultsMessage) {
+                        noResultsMessage.style.display = 'none';
+                    }
+                    return;
+                }
+
+                // Filter rows based on search term
+                let hasResults = false;
+                tableRows.forEach(row => {
+                    // Skip the "no sites found" row
+                    if (row.querySelector('td[colspan]')) {
+                        return;
+                    }
+
+                    const cells = row.querySelectorAll('td');
+                    let rowText = '';
+
+                    // Collect text from all cells in the row
+                    cells.forEach((cell, index) => {
+                        if (index < cells.length - 1) { 
+                            rowText += cell.textContent.toLowerCase() + ' ';
+                        }
+                    });
+
+                    // Check if row contains the search term
+                    if (rowText.includes(searchTerm)) {
+                        row.style.display = '';
+                        hasResults = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Show/hide no results message
+                const noResultsMessage = document.getElementById('noResultsMessage');
+                if (noResultsMessage) {
+                    noResultsMessage.style.display = hasResults ? 'none' : 'block';
+                }
+            });
+        });
+    </script>
     <div class="p-4 sm:p-6 lg:p-8">
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -28,6 +121,21 @@
                 {{ session('success') }}
             </div>
         @endif
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="relative">
+                <svg class="search-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="search-input"
+                    placeholder="Search by Name, Location, Contact Person, Phone, Start Date, or No. Of Guards..."
+                >
+            </div>
+        </div>
 
         <div class="overflow-x-auto bg-white rounded shadow">
           <div style="height: calc(100vh - 250px); overflow: auto;">

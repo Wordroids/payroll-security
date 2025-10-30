@@ -69,6 +69,19 @@
                 </ul>
             </li>
 
+            <li>
+                <a href="{{ route('invoices.index') }}"
+                    class="flex items-center p-2 text-gray-700 rounded-lg hover:bg-gray-100">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 17v-2h6v2m-3 4a9 9 0 100-18 9 9 0 000 18z" />
+                    </svg>
+                    <span class="ml-3">Invoices</span>
+                </a>
+            </li>
+
+
             {{-- Section: Attendance --}}
             <li>
                 <button type="button"

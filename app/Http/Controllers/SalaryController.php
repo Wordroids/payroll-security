@@ -14,9 +14,18 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
+use App\Models\SalarySetting;
 
 class SalaryController extends Controller
 {
+
+    //to get salary setting special ot rate
+    private function getSpecialOtRate()
+    {
+        $settings = SalarySetting::getSettings();
+        return $settings->special_ot_rate;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -47,6 +56,7 @@ class SalaryController extends Controller
      */
     public function show(Employee $employee, Request $request)
     {
+        $specialOtRate = $this->getSpecialOtRate();
         $employee->load(['sites', 'salaryAdvances']);
         $month = $request->input('month', now()->format('Y-m'));
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
@@ -118,7 +128,7 @@ class SalaryController extends Controller
 
                             // Calculate special OT earnings for this site
                             if ($guardShiftRate > 0) {
-                                $specialOtRate = 200;
+                               // $specialOtRate = 200;
                                 $siteSpecialOtEarnings += $specialOtDay * $specialOtRate;
                                 $specialOtEarnings += $specialOtDay * $specialOtRate;
                             }
@@ -138,7 +148,7 @@ class SalaryController extends Controller
 
                             // Calculate special OT earnings for this site
                             if ($guardShiftRate > 0) {
-                                $specialOtRate = 200;
+                              //  $specialOtRate = 200;
                                 $siteSpecialOtEarnings += $specialOtNight * $specialOtRate;
                                 $specialOtEarnings += $specialOtNight * $specialOtRate;
                             }
@@ -148,7 +158,7 @@ class SalaryController extends Controller
 
                 // Store special OT data for this site
                 if ($site->has_special_ot_hours && ($siteSpecialOtDayHours > 0 || $siteSpecialOtNightHours > 0)) {
-                    $specialOtRate = $guardShiftRate > 0 ? 200 : 0;
+                  //  $specialOtRate = $guardShiftRate > 0 ? 200 : 0;
 
                     $specialOtData[$siteId] = [
                         'site' => $site,
@@ -281,7 +291,8 @@ class SalaryController extends Controller
             'paidOtHours',
             'performanceOtHours',
             'performanceAllowance',
-            'specialOtData'
+            'specialOtData',
+            'specialOtRate'
         ));
     }
 
@@ -290,6 +301,8 @@ class SalaryController extends Controller
      */
     public function overview(Request $request)
     {
+        // get salary setting special ot rate
+          $specialOtRate = $this->getSpecialOtRate();
         // Get filter values from request or use defaults
         $month = $request->input('month', now()->format('Y-m'));
         $employeeId = $request->input('employee_id');
@@ -349,7 +362,7 @@ class SalaryController extends Controller
                                 $specialOtDay = max($dayHours - 12, 0);
                                 $specialOtHours += $specialOtDay;
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = 200;
+                                   // $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
@@ -362,7 +375,7 @@ class SalaryController extends Controller
                                 $specialOtNight = max($nightHours - 12, 0);
                                 $specialOtHours += $specialOtNight;
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = 200;
+                                   // $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
                             }
@@ -548,6 +561,9 @@ class SalaryController extends Controller
     private function getSalaryData(Employee $employee, $month)
     {
         try {
+            //get special ot rate from salary settings
+              $specialOtRate = $this->getSpecialOtRate();
+
             $employee->load(['sites' => function ($query) {
                 $query->with('rankRates');
             }, 'salaryAdvances']);
@@ -585,6 +601,7 @@ class SalaryController extends Controller
                 'performanceOtHours' => 0,
                 'specialOtData' => [],
                 'siteSpecialOtSummaries' => [],
+                 'specialOtRate',
             ];
 
             // Meal deductions
@@ -656,7 +673,7 @@ class SalaryController extends Controller
 
                                 // Calculate special OT earnings for this site
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = 200;
+                                   // $specialOtRate = 200;
                                     $siteSpecialOtEarnings += $specialOtDay * $specialOtRate;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
@@ -676,7 +693,7 @@ class SalaryController extends Controller
 
                                 // Calculate special OT earnings for this site
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = 200;
+                                    //$specialOtRate = 200;
                                     $siteSpecialOtEarnings += $specialOtNight * $specialOtRate;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
@@ -838,6 +855,9 @@ class SalaryController extends Controller
     }
     private function getSalaryOverviewData($month, $employeeId)
     {
+          // get salary setting special ot rate
+          $specialOtRate = $this->getSpecialOtRate();
+
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
         $prevMonth = Carbon::createFromFormat('Y-m', $month)->subMonth()->format('Y-m');
@@ -890,7 +910,7 @@ class SalaryController extends Controller
                                 $specialOtHours += $specialOtDay;
                                 // Calculate earnings for this site's special OT
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = 200;
+                                 //   $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
@@ -904,7 +924,7 @@ class SalaryController extends Controller
                                 $specialOtHours += $specialOtNight;
                                 // Calculate earnings for this site's special OT
                                 if ($guardShiftRate > 0) {
-                                    $specialOtRate = 200;
+                                  //  $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
                             }
@@ -1121,7 +1141,53 @@ class SalaryController extends Controller
         return $pdf->download($filename);
     }
 
+    /**
+     * Download all employees salary slips for a specific month
+     */
+    public function downloadAllSlips(Request $request)
+    {
+        $month = $request->input('month', now()->format('Y-m'));
+        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
 
+        // Get employees who have at least one shift in the specified month
+        $employeesWithShifts = Employee::whereHas('attendances', function ($query) use ($startDate, $endDate) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        })->get();
+
+        if ($employeesWithShifts->isEmpty()) {
+            return redirect()->back()->with('error', 'No employees found with shifts for the selected month.');
+        }
+
+        $slipsData = [];
+
+        foreach ($employeesWithShifts as $employee) {
+            try {
+                $salaryData = $this->getSalaryData($employee, $month);
+                $slipsData[] = $salaryData;
+            } catch (\Exception $e) {
+                \Log::error("Error generating slip for employee {$employee->id}: " . $e->getMessage());
+                continue;
+            }
+        }
+
+        if (empty($slipsData)) {
+            return redirect()->back()->with('error', 'Could not generate salary slips for any employees.');
+        }
+
+        $filename = 'all_salary_slips_' . $month . '.pdf';
+
+        $pdf = PDF::loadView('pages.salaries.all-slips-pdf', [
+            'slipsData' => $slipsData,
+            'month' => $month
+        ])->setPaper('a4', 'portrait')
+            ->setOption('margin-top', 5)
+            ->setOption('margin-bottom', 5)
+            ->setOption('margin-left', 5)
+            ->setOption('margin-right', 5);
+
+        return $pdf->download($filename);
+    }
     /**
      * Show the form for editing the specified resource.
      */
