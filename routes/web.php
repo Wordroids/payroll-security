@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MealsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalaryAdvanceController;
@@ -46,6 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/sites/{site}/assign', [SiteController::class, 'assignGuards'])->name('sites.assign');
     Route::post('/sites/{site}/assign', [SiteController::class, 'storeAssignedGuards'])->name('sites.assign.store');
 
+    Route::resource('invoices', InvoiceController::class);
+    Route::get('invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoices.download');
+
 
 
     // Salary Advance Routes
@@ -78,7 +82,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/salary/advances/export-pdf', [SalaryController::class, 'exportSalaryAdvancesPdf'])
             ->name('salary.advance.export.pdf');
-
     });
 
     Route::prefix('meals')->group(function () {
