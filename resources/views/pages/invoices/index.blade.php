@@ -17,7 +17,7 @@
                         <th class="px-6 py-3">Invoice #</th>
                         <th class="px-6 py-3">Site</th>
                         <th class="px-6 py-3">Date</th>
-                        <th class="px-6 py-3">Total (£)</th>
+                        <th class="px-6 py-3">Total (Rs)</th>
                         <th class="px-6 py-3">Status</th>
                         <th class="px-6 py-3 text-right">Actions</th>
                     </tr>
@@ -28,7 +28,7 @@
                             <td class="px-6 py-3 font-medium text-gray-800">{{ $invoice->invoice_number }}</td>
                             <td class="px-6 py-3">{{ $invoice->site->name ?? 'N/A' }}</td>
                             <td class="px-6 py-3">{{ $invoice->invoice_date->format('Y-m-d') }}</td>
-                            <td class="px-6 py-3">£{{ number_format($invoice->total_amount, 2) }}</td>
+                            <td class="px-6 py-3">Rs{{ number_format($invoice->total_amount, 2) }}</td>
                             <td class="px-6 py-3">
                                 @php
                                     $colors = [

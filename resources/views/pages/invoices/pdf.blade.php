@@ -120,8 +120,8 @@
             <tr>
                 <th>Guard</th>
                 <th>Days</th>
-                <th>Rate (£)</th>
-                <th>Subtotal (£)</th>
+                <th>Rate (Rs)</th>
+                <th>Subtotal (Rs)</th>
             </tr>
         </thead>
         <tbody>
@@ -129,8 +129,8 @@
                 <tr>
                     <td>{{ $item->employee->name ?? 'N/A' }}</td>
                     <td>{{ $item->days }}</td>
-                    <td>£{{ number_format($item->rate, 2) }}</td>
-                    <td>£{{ number_format($item->subtotal, 2) }}</td>
+                    <td>Rs{{ number_format($item->rate, 2) }}</td>
+                    <td>Rs{{ number_format($item->subtotal, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -138,7 +138,7 @@
 
     {{-- TOTAL --}}
     <div class="total-section">
-        <h3>Total Amount: £{{ number_format($invoice->total_amount, 2) }}</h3>
+        <h3>Total Amount: Rs{{ number_format($invoice->total_amount, 2) }}</h3>
     </div>
 
     {{-- FOOTER --}}
