@@ -47,8 +47,8 @@
                             <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
                                 <th class="px-4 py-2 text-left">Guard</th>
                                 <th class="px-4 py-2 text-left">Days</th>
-                                <th class="px-4 py-2 text-left">Rate (£)</th>
-                                <th class="px-4 py-2 text-left">Subtotal (£)</th>
+                                <th class="px-4 py-2 text-left">Rate (Rs)</th>
+                                <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
                                 <th class="px-4 py-2"></th>
                             </tr>
                         </thead>
@@ -78,7 +78,7 @@
                                     </td>
 
                                     <td class="px-4 py-2 text-gray-700 font-medium">
-                                        £<span x-text="(item.days * item.rate).toFixed(2)"></span>
+                                        Rs<span x-text="(item.days * item.rate).toFixed(2)"></span>
                                     </td>
 
                                     <td class="px-4 py-2 text-right">
@@ -104,7 +104,7 @@
             <div class="flex justify-end mb-6">
                 <div class="text-right">
                     <p class="text-gray-600">Total Amount</p>
-                    <h2 class="text-2xl font-semibold text-gray-800">£<span x-text="total.toFixed(2)"></span></h2>
+                    <h2 class="text-2xl font-semibold text-gray-800">Rs<span x-text="total.toFixed(2)"></span></h2>
                 </div>
             </div>
 

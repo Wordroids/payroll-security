@@ -80,8 +80,10 @@ class InvoiceController extends Controller
 
         $invoice->update($validated);
 
-        return back()->with('success', 'Invoice status updated.');
+        return redirect()->route('invoices.show', $invoice)
+            ->with('success', 'Invoice status updated successfully.');
     }
+
 
     public function destroy(Invoice $invoice)
     {
