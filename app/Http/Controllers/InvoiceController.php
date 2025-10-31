@@ -109,7 +109,7 @@ class InvoiceController extends Controller
             // Load the rank rates relationship
             $site->load('rankRates');
 
-            $rankRates = $site->rankRates->pluck('guard_shift_rate', 'rank')->toArray();
+            $rankRates = $site->rankRates->pluck('site_shift_rate', 'rank')->toArray();
             $ranks = array_keys($rankRates);
 
             \Log::info('Rank rates for site ' . $site->id, [
