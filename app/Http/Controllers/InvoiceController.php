@@ -19,9 +19,8 @@ class InvoiceController extends Controller
 
     public function create()
     {
-        $sites = Site::all();
-        $employees = Employee::all();
-        return view('pages.invoices.create', compact('sites', 'employees'));
+        $sites = Site::with('rankRates')->get();
+        return view('pages.invoices.create', compact('sites'));
     }
 
     public function store(Request $request)
@@ -31,7 +30,8 @@ class InvoiceController extends Controller
             'invoice_date' => 'required|date',
             'description' => 'nullable|string',
             'items' => 'required|array|min:1',
-            'items.*.employee_id' => 'required|exists:employees,id',
+            'items.*.rank' => 'required|string',
+            'items.*.number_of_guards' => 'required|integer|min:1',
             'items.*.days' => 'required|integer|min:1',
             'items.*.rate' => 'required|numeric|min:0',
         ]);
@@ -40,7 +40,9 @@ class InvoiceController extends Controller
         $validated['invoice_number'] = 'INV/' . date('Y') . '/' . $nextNumber;
 
         // Calculate totals
-        $total = collect($validated['items'])->sum(fn($item) => $item['days'] * $item['rate']);
+        $total = collect($validated['items'])->sum(fn($item) =>
+            $item['number_of_guards'] * $item['days'] * $item['rate']
+        );
         $validated['total_amount'] = $total;
 
         $invoice = Invoice::create($validated);
@@ -48,10 +50,11 @@ class InvoiceController extends Controller
         foreach ($validated['items'] as $item) {
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
-                'employee_id' => $item['employee_id'],
+                'rank' => $item['rank'],
+                'number_of_guards' => $item['number_of_guards'],
                 'days' => $item['days'],
                 'rate' => $item['rate'],
-                'subtotal' => $item['days'] * $item['rate'],
+                'subtotal' => $item['number_of_guards'] * $item['days'] * $item['rate'],
             ]);
         }
 
@@ -60,16 +63,15 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['site', 'items.employee']);
+        $invoice->load(['site', 'items']);
         return view('pages.invoices.show', compact('invoice'));
     }
 
     public function edit(Invoice $invoice)
     {
         $sites = Site::all();
-        $employees = Employee::all();
         $invoice->load('items');
-        return view('pages.invoices.edit', compact('invoice', 'sites', 'employees'));
+        return view('pages.invoices.edit', compact('invoice', 'sites'));
     }
 
     public function update(Request $request, Invoice $invoice)
@@ -93,9 +95,38 @@ class InvoiceController extends Controller
 
     public function downloadPdf(Invoice $invoice)
     {
-        $invoice->load(['site', 'items.employee']);
+        $invoice->load(['site', 'items']);
         $pdf = Pdf::loadView('pages.invoices.pdf', compact('invoice'));
         $filename = str_replace(['/', '\\'], '-', $invoice->invoice_number) . '.pdf';
         return $pdf->download($filename);
+    }
+
+    // to fetch rank rates for a site
+
+    public function getRankRates(Site $site)
+    {
+        try {
+            // Load the rank rates relationship
+            $site->load('rankRates');
+
+            $rankRates = $site->rankRates->pluck('guard_shift_rate', 'rank')->toArray();
+            $ranks = array_keys($rankRates);
+
+            \Log::info('Rank rates for site ' . $site->id, [
+                'ranks' => $ranks,
+                'rates' => $rankRates
+            ]);
+
+            return response()->json([
+                'ranks' => $ranks,
+                'rates' => $rankRates
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching rank rates: ' . $e->getMessage());
+            return response()->json([
+                'ranks' => [],
+                'rates' => []
+            ], 500);
+        }
     }
 }

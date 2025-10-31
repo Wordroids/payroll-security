@@ -12,7 +12,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                     <label for="site_id" class="block text-sm font-medium text-gray-700 mb-1">Site</label>
-                    <select name="site_id" id="site_id" required
+                    <select name="site_id" id="site_id" required x-model="selectedSite" @change="fetchRankRates()"
                         class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
                         <option value="">-- Select Site --</option>
                         @foreach ($sites as $site)
@@ -39,13 +39,14 @@
 
             {{-- INVOICE ITEMS --}}
             <div class="bg-white shadow-md rounded-lg border border-gray-200 p-5 mb-6">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Guard Services</h2>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Rank Services</h2>
 
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm border-collapse">
                         <thead>
                             <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
-                                <th class="px-4 py-2 text-left">Guard</th>
+                                <th class="px-4 py-2 text-left">Rank</th>
+                                <th class="px-4 py-2 text-left">Number of Guards</th>
                                 <th class="px-4 py-2 text-left">Days</th>
                                 <th class="px-4 py-2 text-left">Rate (Rs)</th>
                                 <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
@@ -56,29 +57,36 @@
                             <template x-for="(item, index) in items" :key="index">
                                 <tr class="border-t">
                                     <td class="px-4 py-2">
-                                        <select x-model="item.employee_id" :name="`items[${index}][employee_id]`"
+                                        <select x-model="item.rank" :name="`items[${index}][rank]`"
+                                            @change="updateRate(index)"
                                             class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
-                                            <option value="">-- Select Guard --</option>
-                                            @foreach ($employees as $emp)
-                                                <option value="{{ $emp->id }}">{{ $emp->name }}</option>
-                                            @endforeach
+                                            <option value="">-- Select Rank --</option>
+                                            <template x-for="rank in availableRanks" :key="rank">
+                                                <option :value="rank" x-text="rank"></option>
+                                            </template>
                                         </select>
                                     </td>
 
                                     <td class="px-4 py-2">
-                                        <input type="number" min="1" x-model.number="item.days" :name="`items[${index}][days]`"
-                                            @input="calculateTotal"
+                                        <input type="number" min="1" x-model.number="item.number_of_guards"
+                                            :name="`items[${index}][number_of_guards]`" @input="calculateTotal"
                                             class="w-24 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
                                     </td>
 
                                     <td class="px-4 py-2">
-                                        <input type="number" step="0.01" min="0" x-model.number="item.rate" :name="`items[${index}][rate]`"
-                                            @input="calculateTotal"
+                                        <input type="number" min="1" x-model.number="item.days"
+                                            :name="`items[${index}][days]`" @input="calculateTotal"
+                                            class="w-24 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                    </td>
+
+                                    <td class="px-4 py-2">
+                                        <input type="number" step="0.01" min="0" x-model.number="item.rate"
+                                            :name="`items[${index}][rate]`" @input="calculateTotal"
                                             class="w-24 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
                                     </td>
 
                                     <td class="px-4 py-2 text-gray-700 font-medium">
-                                        Rs<span x-text="(item.days * item.rate).toFixed(2)"></span>
+                                        Rs<span x-text="(item.number_of_guards * item.days * item.rate).toFixed(2)"></span>
                                     </td>
 
                                     <td class="px-4 py-2 text-right">
@@ -95,7 +103,7 @@
                 <div class="mt-4 text-right">
                     <button type="button" @click="addItem"
                         class="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
-                        + Add Guard
+                        + Add Rank
                     </button>
                 </div>
             </div>
@@ -113,8 +121,7 @@
 
             {{-- SUBMIT --}}
             <div class="text-right">
-                <button type="submit"
-                    class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                     Save Invoice
                 </button>
             </div>
@@ -125,19 +132,70 @@
     <script>
         function invoiceForm() {
             return {
-                items: [{ employee_id: '', days: 1, rate: 0 }],
+                selectedSite: '',
+                availableRanks: [],
+                rankRates: {},
+                items: [{
+                    rank: '',
+                    number_of_guards: 1,
+                    days: 1,
+                    rate: 0
+ }],
                 total: 0,
-                addItem() {
-                    this.items.push({ employee_id: '', days: 1, rate: 0 });
-                    this.calculateTotal();
+
+                async fetchRankRates() {
+                    if (!this.selectedSite) {
+                        this.availableRanks = [];
+                        this.rankRates = {};
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/sites/${this.selectedSite}/rank-rates`);
+
+                        const data = await response.json();
+
+                        this.availableRanks = data.ranks || [];
+                        this.rankRates = data.rates || {};
+
+                        // Update rates for existing items
+                        this.items.forEach((item, index) => {
+                            if (item.rank && this.rankRates[item.rank]) {
+                                this.items[index].rate = this.rankRates[item.rank];
+                                this.calculateTotal();
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error fetching rank rates:', error);
+                        this.availableRanks = [];
+                        this.rankRates = {};
+                    }
                 },
+
+                updateRate(index) {
+                    const rank = this.items[index].rank;
+                    if (rank && this.rankRates[rank]) {
+                        this.items[index].rate = this.rankRates[rank];
+                        this.calculateTotal();
+                    }
+                },
+
+                addItem() {
+                    this.items.push({
+                        rank: '',
+                        number_of_guards: 1,
+                        days: 1,
+                        rate: 0
+                    });
+                },
+
                 removeItem(index) {
                     this.items.splice(index, 1);
                     this.calculateTotal();
                 },
                 calculateTotal() {
                     this.total = this.items.reduce((sum, item) => {
-                        const subtotal = (item.days * item.rate) || 0;
+                        const subtotal = (item.number_of_guards * item.days * item.rate) || 0;
                         return sum + subtotal;
                     }, 0);
                 }
