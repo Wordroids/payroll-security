@@ -49,8 +49,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('invoices', InvoiceController::class);
     Route::get('invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoices.download');
-
-
+    Route::get('/sites/{site}/rank-rates', [InvoiceController::class, 'getRankRates']);
 
     // Salary Advance Routes
     Route::prefix('salary-advance')->group(function () {

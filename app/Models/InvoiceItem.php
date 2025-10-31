@@ -10,10 +10,11 @@ class InvoiceItem extends Model
 
     protected $fillable = [
         'invoice_id',
-        'employee_id',
+        'rank',
+        'number_of_guards',
         'days',
         'rate',
-        'subtotal',
+        'subtotal'
     ];
 
     public function invoice()
@@ -21,8 +22,8 @@ class InvoiceItem extends Model
         return $this->belongsTo(Invoice::class);
     }
 
-    public function employee()
+  /*  public function employee()
     {
         return $this->belongsTo(Employee::class);
-    }
+    }*/
 }

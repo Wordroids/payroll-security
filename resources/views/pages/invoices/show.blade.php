@@ -69,14 +69,15 @@
             @endif
         </div>
 
-        {{-- Guards Table --}}
+        {{-- Ranks Table --}}
         <div class="bg-white rounded-lg shadow border border-gray-200 p-6 mb-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">Guard Services</h2>
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">Rank Services</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm border-collapse">
                     <thead>
                         <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
-                            <th class="px-4 py-2 text-left">Guard Name</th>
+                            <th class="px-4 py-2 text-left">Rank</th>
+                            <th class="px-4 py-2 text-left">Number of Guards</th>
                             <th class="px-4 py-2 text-left">Days</th>
                             <th class="px-4 py-2 text-left">Rate (Rs)</th>
                             <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
@@ -85,14 +86,15 @@
                     <tbody>
                         @forelse ($invoice->items as $item)
                             <tr class="border-t">
-                                <td class="px-4 py-2">{{ $item->employee->name ?? 'N/A' }}</td>
+                                <td class="px-4 py-2">{{ $item->rank }}</td>
+                                <td class="px-4 py-2">{{ $item->number_of_guards }}</td>
                                 <td class="px-4 py-2">{{ $item->days }}</td>
                                 <td class="px-4 py-2">Rs{{ number_format($item->rate, 2) }}</td>
                                 <td class="px-4 py-2 font-semibold">Rs{{ number_format($item->subtotal, 2) }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center py-4 text-gray-500">No guard records added.</td>
+                                <td colspan="5" class="text-center py-4 text-gray-500">No rank records added.</td>
                             </tr>
                         @endforelse
                     </tbody>

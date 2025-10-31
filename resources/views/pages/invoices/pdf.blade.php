@@ -118,7 +118,8 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Guard</th>
+                <th>Rank</th>
+                <th>No. of Guards</th>
                 <th>Days</th>
                 <th>Rate (Rs)</th>
                 <th>Subtotal (Rs)</th>
@@ -127,7 +128,8 @@
         <tbody>
             @foreach ($invoice->items as $item)
                 <tr>
-                    <td>{{ $item->employee->name ?? 'N/A' }}</td>
+                    <td>{{ $item->rank }}</td>
+                    <td>{{ $item->number_of_guards }}</td>
                     <td>{{ $item->days }}</td>
                     <td>Rs{{ number_format($item->rate, 2) }}</td>
                     <td>Rs{{ number_format($item->subtotal, 2) }}</td>
@@ -139,6 +141,30 @@
     {{-- TOTAL --}}
     <div class="total-section">
         <h3>Total Amount: Rs{{ number_format($invoice->total_amount, 2) }}</h3>
+    </div>
+
+    {{-- Account INFO --}}
+    <div class="bank-info">
+        <table>
+            <tr>
+                <td><strong>Bank Name:</strong> Seylan Bank</td>
+            </tr>
+            <tr>
+                <td><strong>Branch:</strong> Nugegoda Branch</td>
+            </tr>
+             <tr>
+                <td><strong>Account Name:</strong> Smart Syndicates (PVT) Ltd</td>
+            </tr>
+             <tr>
+                <td><strong>Account Number:</strong> 0120-13651103-00</td>
+            </tr>
+            <tr>
+                <td><strong>SWIFT Code:</strong> SEYBLKLX</td>
+            </tr>
+            <tr>
+                <td><strong>Payment Terms:</strong> Net 07 Days</td>
+            </tr>
+        </table>
     </div>
 
     {{-- FOOTER --}}
