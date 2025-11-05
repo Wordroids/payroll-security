@@ -31,8 +31,7 @@ class InvoiceController extends Controller
             'description' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.rank' => 'required|string',
-            'items.*.number_of_guards' => 'required|integer|min:1',
-            'items.*.days' => 'required|integer|min:1',
+            'items.*.number_of_shifts' => 'required|integer|min:1',
             'items.*.rate' => 'required|numeric|min:0',
         ]);
 
@@ -41,7 +40,7 @@ class InvoiceController extends Controller
 
         // Calculate totals
         $total = collect($validated['items'])->sum(fn($item) =>
-            $item['number_of_guards'] * $item['days'] * $item['rate']
+            $item['number_of_shifts'] * $item['rate']
         );
         $validated['total_amount'] = $total;
 
@@ -51,10 +50,9 @@ class InvoiceController extends Controller
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
                 'rank' => $item['rank'],
-                'number_of_guards' => $item['number_of_guards'],
-                'days' => $item['days'],
+                'number_of_shifts' => $item['number_of_shifts'],
                 'rate' => $item['rate'],
-                'subtotal' => $item['number_of_guards'] * $item['days'] * $item['rate'],
+                'subtotal' => $item['number_of_shifts'] * $item['rate'],
             ]);
         }
 
