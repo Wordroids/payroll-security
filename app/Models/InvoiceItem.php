@@ -11,8 +11,7 @@ class InvoiceItem extends Model
     protected $fillable = [
         'invoice_id',
         'rank',
-        'number_of_guards',
-        'days',
+        'number_of_shifts',
         'rate',
         'subtotal'
     ];
