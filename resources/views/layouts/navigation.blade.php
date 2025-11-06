@@ -19,7 +19,7 @@
 
             {{-- Logo + Brand --}}
             <a href="{{ route('dashboard') }}" class="flex items-center ms-3 space-x-2">
-                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-9 h-9">
+                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" class="w-12 h-15">
                 <span class="text-lg font-semibold text-gray-800 uppercase">Smart Syndicates</span>
             </a>
         </div>

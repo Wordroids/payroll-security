@@ -46,8 +46,7 @@
                         <thead>
                             <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
                                 <th class="px-4 py-2 text-left">Rank</th>
-                                <th class="px-4 py-2 text-left">Number of Guards</th>
-                                <th class="px-4 py-2 text-left">Days</th>
+                                <th class="px-4 py-2 text-left">Number of Shifts</th>
                                 <th class="px-4 py-2 text-left">Rate (Rs)</th>
                                 <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
                                 <th class="px-4 py-2"></th>
@@ -68,14 +67,8 @@
                                     </td>
 
                                     <td class="px-4 py-2">
-                                        <input type="number" min="1" x-model.number="item.number_of_guards"
-                                            :name="`items[${index}][number_of_guards]`" @input="calculateTotal"
-                                            class="w-24 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
-                                    </td>
-
-                                    <td class="px-4 py-2">
-                                        <input type="number" min="1" x-model.number="item.days"
-                                            :name="`items[${index}][days]`" @input="calculateTotal"
+                                        <input type="number" min="1" x-model.number="item.number_of_shifts"
+                                            :name="`items[${index}][number_of_shifts]`" @input="calculateTotal"
                                             class="w-24 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
                                     </td>
 
@@ -86,7 +79,7 @@
                                     </td>
 
                                     <td class="px-4 py-2 text-gray-700 font-medium">
-                                        Rs<span x-text="(item.number_of_guards * item.days * item.rate).toFixed(2)"></span>
+                                        Rs<span x-text="(item.number_of_shifts * item.rate).toFixed(2)"></span>
                                     </td>
 
                                     <td class="px-4 py-2 text-right">
@@ -137,8 +130,7 @@
                 rankRates: {},
                 items: [{
                     rank: '',
-                    number_of_guards: 1,
-                    days: 1,
+                    number_of_shifts: 1,
                     rate: 0
  }],
                 total: 0,
@@ -183,8 +175,7 @@
                 addItem() {
                     this.items.push({
                         rank: '',
-                        number_of_guards: 1,
-                        days: 1,
+                        number_of_shifts: 1,
                         rate: 0
                     });
                 },
@@ -195,7 +186,7 @@
                 },
                 calculateTotal() {
                     this.total = this.items.reduce((sum, item) => {
-                        const subtotal = (item.number_of_guards * item.days * item.rate) || 0;
+                        const subtotal = (item.number_of_shifts * item.rate) || 0;
                         return sum + subtotal;
                     }, 0);
                 }
