@@ -83,7 +83,7 @@ class AttendanceController extends Controller
             }
         }
 
-       
+
         return view('pages.attendances.index', [
             'month' => $month,
             'employeeId' => $employeeId,
@@ -138,27 +138,44 @@ class AttendanceController extends Controller
 
         foreach ($data as $employeeId => $days) {
             foreach ($days as $day => $shifts) {
-                $date = Carbon::createFromFormat('Y-m-d', "{$month}-" . str_pad($day, 2, '0', STR_PAD_LEFT));
+                $date = "$month-" . str_pad($day, 2, '0', STR_PAD_LEFT);
 
                 foreach (['day', 'night'] as $shift) {
                     $workedHours = $shifts[$shift] ?? null;
 
                     if ($workedHours !== null && $workedHours !== '') {
-                        Attendance::updateOrCreate(
-                            [
+
+                        $attendance = Attendance::where('employee_id', $employeeId)
+                            ->where('site_id', $siteId)
+                            ->where('date', $date)
+                            ->where('shift', $shift)
+                            ->first();
+
+                        if ($attendance) {
+                            $attendance->worked_hours = $workedHours;
+                            $attendance->save();
+                        } else {
+                            Attendance::create([
                                 'employee_id' => $employeeId,
                                 'site_id' => $siteId,
                                 'date' => $date,
                                 'shift' => $shift,
-                            ],
-                            ['worked_hours' => $workedHours]
-                        );
+                                'worked_hours' => $workedHours,
+                            ]);
+                        }
+                    } else {
+                        Attendance::where([
+                            'employee_id' => $employeeId,
+                            'site_id' => $siteId,
+                            'date' => $date,
+                            'shift' => $shift,
+                        ])->delete();
                     }
                 }
             }
         }
 
-        return redirect()->back()->with('success', 'Day & Night attendance successfully saved.');
+        return redirect()->back()->with('success', 'Attendance successfully updated.');
     }
 
 
