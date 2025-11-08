@@ -61,68 +61,78 @@
         .scrollable-columns {
             flex: 1;
         }
+
+
+        .empty-row {
+            display: none !important;
+        }
     </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
-            const tableRows = document.querySelectorAll('table tbody tr');
+            const noResultsMessage = document.getElementById('noResultsMessage');
 
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+
+                // Get all employee rows
+                const fixedRows = document.querySelectorAll('.fixed-columns tbody tr:not(.empty-row)');
+                const scrollableRows = document.querySelectorAll('.scrollable-columns tbody tr:not(.empty-row)');
 
                 // If search is empty, show all rows
                 if (searchTerm === '') {
-                    tableRows.forEach(row => {
-                        row.style.display = '';
-                    });
-                    // Hide no results message
-                    const noResultsMessage = document.getElementById('noResultsMessage');
+                    fixedRows.forEach(row => row.style.display = '');
+                    scrollableRows.forEach(row => row.style.display = '');
+
                     if (noResultsMessage) {
                         noResultsMessage.style.display = 'none';
                     }
                     return;
                 }
 
-                // Filter rows based on search term
                 let hasResults = false;
-                tableRows.forEach(row => {
-                    // Skip the "no employees found" row
-                    if (row.querySelector('td[colspan]')) {
-                        return;
-                    }
 
-                    const fixedCells = row.querySelectorAll('.fixed-columns td');
-                    const scrollableCells = row.querySelectorAll('.scrollable-columns td');
-                    let rowText = '';
+                // Check each row
+                fixedRows.forEach((fixedRow, index) => {
+                    if (index >= scrollableRows.length) return;
 
-                    // Collect text from fixed columns
-                    fixedCells.forEach(cell => {
-                        rowText += cell.textContent.toLowerCase() + ' ';
-                    });
+                    const scrollableRow = scrollableRows[index];
+                    const allCells = [
+                        ...fixedRow.querySelectorAll('td'),
+                        ...scrollableRow.querySelectorAll('td')
+                    ];
 
-                    // Collect text from scrollable columns
-                    scrollableCells.forEach((cell, index) => {
-                        if (index < scrollableCells.length - 1) {
-                            rowText += cell.textContent.toLowerCase() + ' ';
+                    let rowContainsMatch = false;
+
+                    // to check if any cell contains the search term
+                    allCells.forEach(cell => {
+                        const cellText = cell.textContent.toLowerCase();
+                        if (cellText.includes(searchTerm)) {
+                            rowContainsMatch = true;
                         }
                     });
 
-                    // Check if row contains the search term
-                    if (rowText.includes(searchTerm)) {
-                        row.style.display = '';
+                    // to show/hide both rows together
+                    if (rowContainsMatch) {
+                        fixedRow.style.display = '';
+                        scrollableRow.style.display = '';
                         hasResults = true;
                     } else {
-                        row.style.display = 'none';
+                        fixedRow.style.display = 'none';
+                        scrollableRow.style.display = 'none';
                     }
                 });
 
                 // Show/hide no results message
-                const noResultsMessage = document.getElementById('noResultsMessage');
                 if (noResultsMessage) {
                     noResultsMessage.style.display = hasResults ? 'none' : 'block';
                 }
-            });
+            }
+
+            searchInput.addEventListener('input', performSearch);
+
+            performSearch();
         });
     </script>
 
@@ -189,7 +199,7 @@
                                     </thead>
                                     <tbody class="divide-y divide-gray-200 bg-white">
                                         @forelse ($employees as $employee)
-                                            <tr>
+                                            <tr data-emp-id="{{ $employee->id }}">
                                                 <td class="py-4 pr-3 pl-4 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-6 bg-white">
                                                     {{ $employee->emp_no }}
                                                 </td>
@@ -198,7 +208,7 @@
                                                 </td>
                                             </tr>
                                         @empty
-                                            <tr>
+                                            <tr class="empty-row">
                                                 <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-500 bg-white">
                                                     No employees found.
                                                 </td>
@@ -225,7 +235,7 @@
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 bg-white">
                                     @forelse ($employees as $employee)
-                                        <tr>
+                                        <tr data-emp-id="{{ $employee->id }}">
                                             <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                 {{ $employee->rank }}
                                             </td>
@@ -247,7 +257,7 @@
                                             </td>
                                         </tr>
                                     @empty
-                                        <tr>
+                                        <tr class="empty-row">
                                             <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
                                                 No employees found.
                                             </td>
