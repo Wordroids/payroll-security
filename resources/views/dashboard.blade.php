@@ -15,13 +15,13 @@
             </div>
 
             <div class="bg-white shadow rounded-lg p-4">
-                <h2 class="text-sm text-gray-500">This Month's Attendances</h2>
-                <p class="text-2xl font-bold text-indigo-600 mt-1">{{ $monthlyAttendances }}</p>
+                <h2 class="text-sm text-gray-500">Total Salary Last Month</h2>
+                <p class="text-2xl font-bold text-indigo-600 mt-1">Rs.{{ number_format($lastMonthSalary, 2) }}</p>
             </div>
 
             <div class="bg-white shadow rounded-lg p-4">
-                <h2 class="text-sm text-gray-500">Salary Advances This Month</h2>
-                <p class="text-2xl font-bold text-indigo-600 mt-1">Rs. {{ number_format($monthlyAdvance, 2) }}</p>
+                <h2 class="text-sm text-gray-500">Salary Advances of Last Month</h2>
+                <p class="text-2xl font-bold text-indigo-600 mt-1">Rs. {{ number_format($lastMonthAdvance, 2) }}</p>
             </div>
         </div>
 
