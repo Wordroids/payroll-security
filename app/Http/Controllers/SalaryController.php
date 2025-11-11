@@ -128,7 +128,7 @@ class SalaryController extends Controller
 
                             // Calculate special OT earnings for this site
                             if ($guardShiftRate > 0) {
-                               // $specialOtRate = 200;
+                                // $specialOtRate = 200;
                                 $siteSpecialOtEarnings += $specialOtDay * $specialOtRate;
                                 $specialOtEarnings += $specialOtDay * $specialOtRate;
                             }
@@ -148,7 +148,7 @@ class SalaryController extends Controller
 
                             // Calculate special OT earnings for this site
                             if ($guardShiftRate > 0) {
-                              //  $specialOtRate = 200;
+                                //  $specialOtRate = 200;
                                 $siteSpecialOtEarnings += $specialOtNight * $specialOtRate;
                                 $specialOtEarnings += $specialOtNight * $specialOtRate;
                             }
@@ -158,7 +158,7 @@ class SalaryController extends Controller
 
                 // Store special OT data for this site
                 if ($site->has_special_ot_hours && ($siteSpecialOtDayHours > 0 || $siteSpecialOtNightHours > 0)) {
-                  //  $specialOtRate = $guardShiftRate > 0 ? 200 : 0;
+                    //  $specialOtRate = $guardShiftRate > 0 ? 200 : 0;
 
                     $specialOtData[$siteId] = [
                         'site' => $site,
@@ -302,7 +302,7 @@ class SalaryController extends Controller
     public function overview(Request $request)
     {
         // get salary setting special ot rate
-          $specialOtRate = $this->getSpecialOtRate();
+        $specialOtRate = $this->getSpecialOtRate();
         // Get filter values from request or use defaults
         $month = $request->input('month', now()->format('Y-m'));
         $employeeId = $request->input('employee_id');
@@ -344,11 +344,13 @@ class SalaryController extends Controller
             // Process normal/OT hours with per-site special OT calculation
             foreach ($attendances as $empId => $sites) {
                 foreach ($sites as $siteId => $days) {
-                    $site = Site::find($siteId);
+                    $site = $employee->sites->find($siteId);
                     // Get the employee's rank for this site
                     $rank = $site->pivot->rank ?? 'CSO';
                     $rankRate = $site->rankRates()->where('rank', $rank)->first();
 
+
+                   
                     // Use rank-specific rate if available, otherwise fallback to site rate
                     $guardShiftRate = $rankRate ? $rankRate->guard_shift_rate : ($site->guard_shift_rate ?? 0);
 
@@ -358,14 +360,18 @@ class SalaryController extends Controller
                             $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($dayHours, 9);
                             $attendances[$empId][$siteId][$day]['ot_day_hours'] = min(max($dayHours - 9, 0), 3);
 
+
+                           
                             if ($site->has_special_ot_hours) {
+
                                 $specialOtDay = max($dayHours - 12, 0);
                                 $specialOtHours += $specialOtDay;
                                 if ($guardShiftRate > 0) {
-                                   // $specialOtRate = 200;
+                                    // $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
+                            
                         }
                         if (isset($shifts['night'])) {
                             $nightHours = $shifts['night'];
@@ -375,7 +381,7 @@ class SalaryController extends Controller
                                 $specialOtNight = max($nightHours - 12, 0);
                                 $specialOtHours += $specialOtNight;
                                 if ($guardShiftRate > 0) {
-                                   // $specialOtRate = 200;
+                                    // $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
                             }
@@ -562,7 +568,7 @@ class SalaryController extends Controller
     {
         try {
             //get special ot rate from salary settings
-              $specialOtRate = $this->getSpecialOtRate();
+            $specialOtRate = $this->getSpecialOtRate();
 
             $employee->load(['sites' => function ($query) {
                 $query->with('rankRates');
@@ -601,7 +607,7 @@ class SalaryController extends Controller
                 'performanceOtHours' => 0,
                 'specialOtData' => [],
                 'siteSpecialOtSummaries' => [],
-                 'specialOtRate',
+                'specialOtRate',
             ];
 
             // Meal deductions
@@ -673,7 +679,7 @@ class SalaryController extends Controller
 
                                 // Calculate special OT earnings for this site
                                 if ($guardShiftRate > 0) {
-                                   // $specialOtRate = 200;
+                                    // $specialOtRate = 200;
                                     $siteSpecialOtEarnings += $specialOtDay * $specialOtRate;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
@@ -855,8 +861,8 @@ class SalaryController extends Controller
     }
     private function getSalaryOverviewData($month, $employeeId)
     {
-          // get salary setting special ot rate
-          $specialOtRate = $this->getSpecialOtRate();
+        // get salary setting special ot rate
+        $specialOtRate = $this->getSpecialOtRate();
 
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
@@ -910,7 +916,7 @@ class SalaryController extends Controller
                                 $specialOtHours += $specialOtDay;
                                 // Calculate earnings for this site's special OT
                                 if ($guardShiftRate > 0) {
-                                 //   $specialOtRate = 200;
+                                    //   $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
@@ -924,7 +930,7 @@ class SalaryController extends Controller
                                 $specialOtHours += $specialOtNight;
                                 // Calculate earnings for this site's special OT
                                 if ($guardShiftRate > 0) {
-                                  //  $specialOtRate = 200;
+                                    //  $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
                             }
