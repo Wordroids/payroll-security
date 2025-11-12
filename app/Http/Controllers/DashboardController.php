@@ -83,7 +83,8 @@ class DashboardController extends Controller
         // Process normal/OT hours
         foreach ($attendances as $empId => $sites) {
             foreach ($sites as $siteId => $days) {
-                $site = Site::find($siteId);
+              //  $site = Site::find($siteId);
+                $site = $employee->sites->find($siteId);
                 if (!$site) continue;
 
                 // Get the employee's rank for this site
