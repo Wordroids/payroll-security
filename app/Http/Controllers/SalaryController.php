@@ -350,7 +350,7 @@ class SalaryController extends Controller
                     $rankRate = $site->rankRates()->where('rank', $rank)->first();
 
 
-                   
+
                     // Use rank-specific rate if available, otherwise fallback to site rate
                     $guardShiftRate = $rankRate ? $rankRate->guard_shift_rate : ($site->guard_shift_rate ?? 0);
 
@@ -361,7 +361,7 @@ class SalaryController extends Controller
                             $attendances[$empId][$siteId][$day]['ot_day_hours'] = min(max($dayHours - 9, 0), 3);
 
 
-                           
+
                             if ($site->has_special_ot_hours) {
 
                                 $specialOtDay = max($dayHours - 12, 0);
@@ -897,8 +897,8 @@ class SalaryController extends Controller
             // Process normal/OT hours
             foreach ($attendances as $empId => $sites) {
                 foreach ($sites as $siteId => $days) {
-                    $site = Site::find($siteId);
-
+                  //  $site = Site::find($siteId);
+                    $site = $employee->sites->find($siteId);
                     // Get the employee's rank for this site
                     $rank = $site->pivot->rank ?? 'CSO';
                     $rankRate = $site->rankRates()->where('rank', $rank)->first();
