@@ -35,8 +35,10 @@ class InvoiceController extends Controller
             'items.*.rate' => 'required|numeric|min:0',
         ]);
 
-        $nextNumber = str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
-        $validated['invoice_number'] = 'INV/' . date('Y') . '/' . $nextNumber;
+        $year = date('Y');
+        $lastInvoice = Invoice::whereYear('invoice_date', $year)->orderBy('invoice_number', 'desc')->first();
+        $nextNumber = $lastInvoice ? intval(substr($lastInvoice->invoice_number, -4)) + 1 : 1;
+        $validated['invoice_number'] = 'INV/' . $year . '/' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
         // Calculate totals
         $total = collect($validated['items'])->sum(fn($item) =>
