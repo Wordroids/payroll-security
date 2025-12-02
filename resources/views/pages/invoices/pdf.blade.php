@@ -11,7 +11,7 @@
         }
         .header {
             border-bottom: 2px solid #2563eb;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             padding-bottom: 10px;
             display: flex;
             justify-content: space-between;
@@ -26,7 +26,7 @@
             color: #2563eb;
         }
         .invoice-info, .site-info {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .invoice-info table, .site-info table {
             width: 100%;
@@ -37,7 +37,7 @@
         .table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
         .table th, .table td {
             border: 1px solid #ddd;
@@ -50,7 +50,7 @@
         }
         .total-section {
             text-align: right;
-            margin-top: 20px;
+            margin-top: 8px;
         }
         .status {
             display: inline-block;
@@ -67,11 +67,28 @@
 
         footer {
             border-top: 1px solid #ddd;
-            margin-top: 30px;
-            padding-top: 10px;
+            margin-top: 20px;
+            padding-top: 8px;
             text-align: center;
             font-size: 11px;
             color: #6b7280;
+        }
+
+        .summary-table {
+            width: 50%;
+            float: right;
+            margin-top: 8px;
+            border-collapse: collapse;
+        }
+
+        .summary-table td {
+            padding: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .summary-table .label {
+            background-color: #f3f4f6;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -105,6 +122,7 @@
             </tr>
             <tr>
                 <td><strong>Generated On:</strong> {{ now()->format('Y-m-d H:i') }}</td>
+                <td><strong>Status:</strong> {{ ucfirst($invoice->status) }}</td>
             </tr>
         </table>
     </div>
@@ -121,7 +139,13 @@
         </table>
     </div>
 
-    {{-- INVOICE ITEMS --}}
+    {{-- RANK SERVICES --}}
+    @php
+        $rankServices = $invoice->items->where('type', 'rank_service');
+        $rankTotal = $rankServices->sum('subtotal');
+    @endphp
+    @if ($rankServices->count() > 0)
+        <h3 style="margin-top: 8px; margin-bottom: 10px; color: #2563eb;">Rank Services</h3>
     <table class="table">
         <thead>
             <tr>
@@ -132,7 +156,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($invoice->items as $item)
+            @foreach ($rankServices as $item)
                 <tr>
                     <td>{{ $item->rank }}</td>
                     <td>{{ $item->number_of_shifts }}</td>
@@ -140,16 +164,70 @@
                     <td>Rs{{ number_format($item->subtotal, 2) }}</td>
                 </tr>
             @endforeach
+                <tr style="font-weight: bold; background-color: #f3f4f6;">
+                    <td colspan="3" style="text-align: right;">Rank Services Total:</td>
+                    <td>Rs{{ number_format($rankTotal, 2) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    @endif
+
+    {{-- OTHER CHARGES --}}
+    @php
+        $otherCharges = $invoice->items->where('type', 'other_charge');
+        $otherTotal = $otherCharges->sum('subtotal');
+    @endphp
+    @if ($otherCharges->count() > 0)
+        <h3 style="margin-top: 8px; margin-bottom: 8px; color: #2563eb;">Other Charges</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Charge Item</th>
+                    <th>Description</th>
+                    <th>Price (Rs)</th>
+                    <th>Subtotal (Rs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($otherCharges as $charge)
+                    <tr>
+                        <td>{{ $charge->description ?? $charge->rank }}</td>
+                        <td>{{ $charge->description ?? '-' }}</td>
+                        <td>Rs{{ number_format($charge->rate, 2) }}</td>
+                        <td>Rs{{ number_format($charge->subtotal, 2) }}</td>
+                    </tr>
+                @endforeach
+                <tr style="font-weight: bold; background-color: #f3f4f6;">
+                    <td colspan="3" style="text-align: right;">Other Charges Total:</td>
+                    <td>Rs{{ number_format($otherTotal, 2) }}</td>
+                </tr>
         </tbody>
+        </table>
+    @endif
+
+    {{-- TOTAL SUMMARY --}}
+    <table class="summary-table">
+        <tr>
+            <td class="label">Rank Services Total:</td>
+            <td>Rs{{ number_format($rankTotal, 2) }}</td>
+        </tr>
+        @if ($otherCharges->count() > 0)
+            <tr>
+                <td class="label">Other Charges Total:</td>
+                <td>Rs{{ number_format($otherTotal, 2) }}</td>
+            </tr>
+        @endif
+        <tr style="font-weight: bold; font-size: 10px;">
+            <td class="label">Total Amount:</td>
+            <td>Rs{{ number_format($invoice->total_amount, 2) }}</td>
+        </tr>
     </table>
 
-    {{-- TOTAL --}}
-    <div class="total-section">
-        <h3>Total Amount: Rs{{ number_format($invoice->total_amount, 2) }}</h3>
-    </div>
+    {{-- Clear float --}}
+    <div style="clear: both;"></div>
 
     {{-- Account INFO --}}
-    <div class="bank-info">
+    <div class="bank-info" style="margin-top: 8px;">
         <table>
             <tr>
                 <td><strong>Bank Name:</strong> Seylan Bank</td>
@@ -172,7 +250,7 @@
         </table>
     </div>
     {{-- THANK YOU MESSAGE --}}
-    <div class="thank-you" style="margin-top: 40px; text-align: center;">
+    <div class="thank-you" style="margin-top: 10px; text-align: center;">
         <p>Thank you for choosing <strong>Smart Syndicates Security & Investigations.</strong></p>
         <p>For any queries regarding this invoice, please get in touch with us at
             <strong style="color: #2563eb;">kamanthap@smartsyndicates.lk</strong>
@@ -180,8 +258,8 @@
     </div>
 
     {{-- FOOTER --}}
-    <div class="footer" style="margin-top: 60px; text-align: center; font-size: 11px; color: #333; line-height: 1.5;">
-        <div style="font-weight: bold; font-size: 14px; margin-bottom: 5px;">SMART SYNDICATES</div>
+    <div class="footer" style="margin-top: 20px; text-align: center; font-size: 11px; color: #333; line-height: 1.5;">
+        <div style="font-weight: bold; font-size: 13px; margin-bottom: 5px;">SMART SYNDICATES</div>
         <div style="margin-bottom: 5px;">SERVICE &nbsp;&nbsp; INTEGRITY &nbsp;&nbsp; RELIABILITY</div>
 
         <div class="contact-info" style="margin-top: 5px;">
