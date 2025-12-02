@@ -96,6 +96,10 @@
                         <option value="LSO" {{ $employee->rank == 'LSO' ? 'selected' : '' }}>LSO</option>
                         <option value="JSO" {{ $employee->rank == 'JSO' ? 'selected' : '' }}>JSO</option>
                         <option value="CSO" {{ $employee->rank == 'CSO' ? 'selected' : '' }}>CSO</option>
+                        <option value="OM" {{$employee->rank == 'OM' ? 'selected' : '' }}>OM</option>
+                        <option value="VO" {{ $employee->rank== 'VO' ? 'selected' : '' }}>VO</option>
+                        <option value="AOM" {{ $employee->rank== 'AOM' ? 'selected' : '' }}>AOM</option>
+                        <option value="BDM" {{ $employee->rank == 'BDM' ? 'selected' : '' }}>BDM</option>
                     </select>
                 </div>
 

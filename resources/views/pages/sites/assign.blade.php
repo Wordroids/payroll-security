@@ -38,6 +38,10 @@
                                                 <option value="LSO" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'LSO') ? 'selected' : '' }}>LSO</option>
                                                 <option value="OIC" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'OIC') ? 'selected' : '' }}>OIC</option>
                                                 <option value="SSO" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'SSO') ? 'selected' : '' }}>SSO</option>
+                                                <option value="OM" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'OM') ? 'selected' : '' }}>OM</option>
+                                                <option value="VO" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'VO') ? 'selected' : '' }}>VO</option>
+                                                <option value="AOM" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'AOM') ? 'selected' : '' }}>AOM</option>
+                                                <option value="BDM" {{ (isset($assignedWithRanks[$emp->id]) && $assignedWithRanks[$emp->id] == 'BDM') ? 'selected' : '' }}>BDM</option>
                                             </select>
                                         </div>
                                     </div>
