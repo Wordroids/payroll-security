@@ -100,6 +100,59 @@
                     </button>
                 </div>
             </div>
+           {{-- OTHER CHARGES --}}
+<div class="bg-white shadow-md rounded-lg border border-gray-200 p-5 mb-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Other Charges (Optional)</h2>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm border-collapse">
+            <thead>
+                <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
+                    <th class="px-4 py-2 text-left">Charge Item</th>
+                    <th class="px-4 py-2 text-left">Description (optional)</th>
+                    <th class="px-4 py-2 text-left">Price (Rs)</th>
+                    <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
+                    <th class="px-4 py-2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="(charge, index) in otherCharges" :key="index">
+                    <tr class="border-t">
+                        <td class="px-4 py-2">
+                            <input type="text" x-model="charge.item"
+                                :name="`other_charges[${index}][item]`"
+                                class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        </td>
+                        <td class="px-4 py-2">
+                            <input type="text" x-model="charge.description"
+                                :name="`other_charges[${index}][description]`"
+                                class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        </td>
+                        <td class="px-4 py-2">
+                            <input type="number" step="0.01" min="0" x-model.number="charge.price"
+                                :name="`other_charges[${index}][price]`" @input="calculateTotal"
+                                class="w-24 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        </td>
+                        <td class="px-4 py-2 text-gray-700 font-medium">
+                            Rs<span x-text="charge.price.toFixed(2)"></span>
+                        </td>
+                        <td class="px-4 py-2 text-right">
+                            <button type="button" @click="removeOtherCharge(index)" class="text-red-600 hover:text-red-800">&times;</button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 text-right">
+        <button type="button" @click="addOtherCharge"
+            class="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+            + Add Other Charge
+        </button>
+    </div>
+</div>
+
 
             {{-- TOTAL --}}
             <div class="flex justify-end mb-6">
@@ -128,11 +181,16 @@
                 selectedSite: '',
                 availableRanks: [],
                 rankRates: {},
+          // Rank service items
                 items: [{
                     rank: '',
                     number_of_shifts: 1,
                     rate: 0
- }],
+                 }],
+
+            // Other charges items
+            otherCharges: [],
+
                 total: 0,
 
                 async fetchRankRates() {
@@ -154,9 +212,10 @@
                         this.items.forEach((item, index) => {
                             if (item.rank && this.rankRates[item.rank]) {
                                 this.items[index].rate = this.rankRates[item.rank];
-                                this.calculateTotal();
                             }
                         });
+
+                    this.calculateTotal();
                     } catch (error) {
                         console.error('Error fetching rank rates:', error);
                         this.availableRanks = [];
@@ -168,8 +227,8 @@
                     const rank = this.items[index].rank;
                     if (rank && this.rankRates[rank]) {
                         this.items[index].rate = this.rankRates[rank];
+                }
                         this.calculateTotal();
-                    }
                 },
 
                 addItem() {
@@ -184,11 +243,20 @@
                     this.items.splice(index, 1);
                     this.calculateTotal();
                 },
+            addOtherCharge() {
+                this.otherCharges.push({ item: '', description: '', price: 0 });
+            },
+
+            removeOtherCharge(index) {
+                this.otherCharges.splice(index, 1);
+                this.calculateTotal();
+            },
+
                 calculateTotal() {
-                    this.total = this.items.reduce((sum, item) => {
-                        const subtotal = (item.number_of_shifts * item.rate) || 0;
-                        return sum + subtotal;
-                    }, 0);
+                const rankTotal = this.items.reduce((sum, item) =>
+                sum + ((item.number_of_shifts * item.rate) || 0), 0);
+                const otherTotal = this.otherCharges.reduce((sum, charge) => sum + (charge.price || 0), 0);
+                this.total = rankTotal + otherTotal;
                 }
             }
         }

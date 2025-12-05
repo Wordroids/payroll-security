@@ -33,30 +33,57 @@ class InvoiceController extends Controller
             'items.*.rank' => 'required|string',
             'items.*.number_of_shifts' => 'required|integer|min:1',
             'items.*.rate' => 'required|numeric|min:0',
+            'other_charges' => 'nullable|array',
+            'other_charges.*.item' => 'required|string',
+            'other_charges.*.description' => 'nullable|string',
+            'other_charges.*.price' => 'required|numeric|min:0',
         ]);
 
-        $year = date('Y');
-        $lastInvoice = Invoice::whereYear('invoice_date', $year)->orderBy('invoice_number', 'desc')->first();
-        $nextNumber = $lastInvoice ? intval(substr($lastInvoice->invoice_number, -4)) + 1 : 1;
-        $validated['invoice_number'] = 'INV/' . $year . '/' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $nextNumber = str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
+        $invoiceNumber = 'INV/' . date('Y') . '/' . $nextNumber;
 
-        // Calculate totals
-        $total = collect($validated['items'])->sum(fn($item) =>
-            $item['number_of_shifts'] * $item['rate']
-        );
-        $validated['total_amount'] = $total;
+        $invoice = Invoice::create([
+            'invoice_number' => $invoiceNumber,
+            'site_id' => $validated['site_id'],
+            'invoice_date' => $validated['invoice_date'],
+            'description' => $validated['description'] ?? null,
+            'total_amount' => 0,
+        ]);
 
-        $invoice = Invoice::create($validated);
-
+        $rankTotal = 0;
         foreach ($validated['items'] as $item) {
+            $subtotal = $item['number_of_shifts'] * $item['rate'];
             InvoiceItem::create([
                 'invoice_id' => $invoice->id,
                 'rank' => $item['rank'],
                 'number_of_shifts' => $item['number_of_shifts'],
                 'rate' => $item['rate'],
-                'subtotal' => $item['number_of_shifts'] * $item['rate'],
+                'subtotal' => $subtotal,
+                'type' => 'rank_service',
             ]);
+            $rankTotal += $subtotal;
         }
+
+        $otherTotal = 0;
+        if (!empty($validated['other_charges'])) {
+            foreach ($validated['other_charges'] as $charge) {
+                InvoiceItem::create([
+                    'invoice_id' => $invoice->id,
+                    'rank' => 'N/A',
+                    'number_of_shifts' => 1, 
+                    'rate' => $charge['price'],
+                    'subtotal' => $charge['price'],
+                    'description' => $charge['description'] ?? $charge['item'],
+                    'type' => 'other_charge',
+                ]);
+                $otherTotal += $charge['price'];
+            }
+        }
+
+        // Update total
+        $invoice->update([
+            'total_amount' => $rankTotal + $otherTotal,
+        ]);
 
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
     }
