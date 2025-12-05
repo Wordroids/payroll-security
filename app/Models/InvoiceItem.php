@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,10 @@ class InvoiceItem extends Model
         'rank',
         'number_of_shifts',
         'rate',
-        'subtotal'
+        'subtotal',
+        'type',
+        'description',
+
     ];
 
     public function invoice()

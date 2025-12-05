@@ -77,30 +77,75 @@
                     <thead>
                         <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
                             <th class="px-4 py-2 text-left">Rank</th>
-                            <th class="px-4 py-2 text-left">Number of Guards</th>
-                            <th class="px-4 py-2 text-left">Days</th>
+                            <th class="px-4 py-2 text-left">Number of Shifts</th>
                             <th class="px-4 py-2 text-left">Rate (Rs)</th>
                             <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($invoice->items as $item)
+                        @php
+                            $rankServices = $invoice->items->where('type', 'rank_service');
+                            $rankTotal = $rankServices->sum('subtotal');
+                        @endphp
+                        @forelse ($rankServices as $item)
                             <tr class="border-t">
                                 <td class="px-4 py-2">{{ $item->rank }}</td>
-                                <td class="px-4 py-2">{{ $item->number_of_guards }}</td>
-                                <td class="px-4 py-2">{{ $item->days }}</td>
+                                <td class="px-4 py-2">{{ $item->number_of_shifts }}</td>
                                 <td class="px-4 py-2">Rs{{ number_format($item->rate, 2) }}</td>
                                 <td class="px-4 py-2 font-semibold">Rs{{ number_format($item->subtotal, 2) }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-gray-500">No rank records added.</td>
+                                <td colspan="5" class="text-center py-4 text-gray-500">No rank services added.</td>
                             </tr>
                         @endforelse
+                        @if($rankServices->count() > 0)
+                            <tr class="border-t font-semibold bg-gray-50">
+                                <td colspan="3" class="px-4 py-2 text-right">Rank Services Total:</td>
+                                <td class="px-4 py-2">Rs{{ number_format($rankTotal, 2) }}</td>
+                            </tr>
+                        @endif
                     </tbody>
                 </table>
             </div>
         </div>
+
+        {{-- Other Charges Table --}}
+        @php
+            $otherCharges = $invoice->items->where('type', 'other_charge');
+            $otherTotal = $otherCharges->sum('subtotal');
+        @endphp
+        @if($otherCharges->count() > 0)
+            <div class="bg-white rounded-lg shadow border border-gray-200 p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Other Charges</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
+                                <th class="px-4 py-2 text-left">Charge Item</th>
+                                <th class="px-4 py-2 text-left">Description</th>
+                                <th class="px-4 py-2 text-left">Price (Rs)</th>
+                                <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($otherCharges as $charge)
+                                <tr class="border-t">
+                                    <td class="px-4 py-2">{{ $charge->description ?? $charge->rank }}</td>
+                                    <td class="px-4 py-2">{{ $charge->description ?? '-' }}</td>
+                                    <td class="px-4 py-2">Rs{{ number_format($charge->rate, 2) }}</td>
+                                    <td class="px-4 py-2 font-semibold">Rs{{ number_format($charge->subtotal, 2) }}</td>
+                                </tr>
+                            @endforeach
+                            <tr class="border-t font-semibold bg-gray-50">
+                                <td colspan="3" class="px-4 py-2 text-right">Other Charges Total:</td>
+                                <td class="px-4 py-2">Rs{{ number_format($otherTotal, 2) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
 
         {{-- Totals --}}
         <div class="bg-white rounded-lg shadow border border-gray-200 p-6">
