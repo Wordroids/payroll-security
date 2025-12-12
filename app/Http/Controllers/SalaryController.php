@@ -350,7 +350,7 @@ class SalaryController extends Controller
                     $rankRate = $site->rankRates()->where('rank', $rank)->first();
 
 
-                   
+
                     // Use rank-specific rate if available, otherwise fallback to site rate
                     $guardShiftRate = $rankRate ? $rankRate->guard_shift_rate : ($site->guard_shift_rate ?? 0);
 
@@ -361,7 +361,7 @@ class SalaryController extends Controller
                             $attendances[$empId][$siteId][$day]['ot_day_hours'] = min(max($dayHours - 9, 0), 3);
 
 
-                           
+
                             if ($site->has_special_ot_hours) {
 
                                 $specialOtDay = max($dayHours - 12, 0);
@@ -371,7 +371,7 @@ class SalaryController extends Controller
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
-                            
+
                         }
                         if (isset($shifts['night'])) {
                             $nightHours = $shifts['night'];
@@ -831,14 +831,23 @@ class SalaryController extends Controller
 
     public function exportSalaryOverviewPdf(Request $request)
     {
-
         $month = $request->input('month', now()->format('Y-m'));
         $employeeId = $request->input('employee_id');
 
+    // Get salary data
+    $salaryData = $this->getSalaryOverviewData($month, $employeeId);
+
+    // Calculate total net pay
+    $totalNetPay = 0;
+    foreach ($salaryData as $data) {
+        $totalNetPay += $data['net_pay'];
+    }
+
         $data = [
-            'salaryData' => $this->getSalaryOverviewData($month, $employeeId),
+            'salaryData' => $salaryData,
             'month' => $month,
             'selectedEmployee' => $employeeId,
+            'totalNetPay' => $totalNetPay,
         ];
 
 
