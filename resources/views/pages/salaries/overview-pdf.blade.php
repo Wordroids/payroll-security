@@ -62,8 +62,26 @@
             color: #008000;
         }
 
+        .total-row {
+            background-color: #e8f4f8;
+            font-weight: bold;
+        }
+
+        .total-label {
+            text-align: left;
+            padding-left: 10px;
+        }
+
         .page-break {
             page-break-after: always;
+        }
+
+        .report-footer {
+            margin-top: 15px;
+            text-align: right;
+            font-size: 10px;
+            padding-top: 5px;
+            border-top: 1px solid #333;
         }
     </style>
 </head>
@@ -74,6 +92,8 @@
         <div class="report-subtitle">{{ Carbon\Carbon::createFromFormat('Y-m', $month)->format('F Y') }}</div>
         @if ($selectedEmployee)
             <div class="report-subtitle">Employee: {{ \App\Models\Employee::find($selectedEmployee)->name }}</div>
+        @else
+            <div class="report-subtitle">All Employees</div>
         @endif
     </div>
 
@@ -123,12 +143,27 @@
                     <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epf_deduct_employee'], 2) : 'Excluded' }}</td>
                     <td class="text-right">{{ number_format($data['total_deductions'], 2) }}</td>
                     <td class="text-right text-bold text-green">{{ number_format($data['net_pay'], 2) }}</td>
-                      <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epf_employee'], 2) : 'Excluded' }}</td>
+                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epf_employee'], 2) : 'Excluded' }}</td>
                     <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['etf_employee'], 2) : 'Excluded' }}</td>
                 </tr>
             @endforeach
+
+            <!-- Total Net Pay -->
+            @if(count($salaryData) > 0)
+                <tr class="total-row">
+                    <td colspan="17" class="total-label">Total Net Pay ({{ count($salaryData) }} employee{{ count($salaryData) > 1 ? 's' : '' }})</td>
+                    <td class="text-right text-bold text-green">{{ number_format($totalNetPay, 2) }}</td>
+                    <td colspan="2"></td>
+                </tr>
+            @endif
         </tbody>
     </table>
-</body>
 
+    <!-- Total salary -->
+    <div class="report-footer">
+        Generated on: {{ now()->format('Y-m-d') }} |
+        Total Employees: {{ count($salaryData) }} |
+        Total Net Pay: {{ number_format($totalNetPay, 2) }}
+    </div>
+</body>
 </html>

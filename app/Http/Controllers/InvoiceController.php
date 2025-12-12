@@ -37,6 +37,9 @@ class InvoiceController extends Controller
             'other_charges.*.item' => 'required|string',
             'other_charges.*.description' => 'nullable|string',
             'other_charges.*.price' => 'required|numeric|min:0',
+            'special_ot.hours' => 'nullable|numeric|min:0',
+            'special_ot.rate' => 'nullable|numeric|min:0',
+
         ]);
 
         $nextNumber = str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
@@ -70,7 +73,7 @@ class InvoiceController extends Controller
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'rank' => 'N/A',
-                    'number_of_shifts' => 1, 
+                    'number_of_shifts' => 1,
                     'rate' => $charge['price'],
                     'subtotal' => $charge['price'],
                     'description' => $charge['description'] ?? $charge['item'],
@@ -79,10 +82,28 @@ class InvoiceController extends Controller
                 $otherTotal += $charge['price'];
             }
         }
+        $specialOtHours = $validated['special_ot']['hours'] ?? 0;
+        $specialOtRate = $validated['special_ot']['rate'] ?? 0;
+        $specialOtSubtotal = $specialOtHours * $specialOtRate;
+
+
+        if ($specialOtSubtotal > 0) {
+            InvoiceItem::create([
+                'invoice_id' => $invoice->id,
+                'type' => 'special_ot',
+                'rank' => 'N/A',
+                'special_ot_hours' => $specialOtHours,
+                'special_ot_rate' => $specialOtRate,
+                'number_of_shifts' => $specialOtHours,
+                'rate' => $specialOtRate,
+                'subtotal' => $specialOtSubtotal,
+                'description' => 'Special OT',
+            ]);
+        }
 
         // Update total
         $invoice->update([
-            'total_amount' => $rankTotal + $otherTotal,
+            'total_amount' => $rankTotal + $otherTotal + $specialOtSubtotal,
         ]);
 
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
@@ -137,22 +158,21 @@ class InvoiceController extends Controller
             $site->load('rankRates');
 
             $rankRates = $site->rankRates->pluck('site_shift_rate', 'rank')->toArray();
-            $ranks = array_keys($rankRates);
 
-            \Log::info('Rank rates for site ' . $site->id, [
-                'ranks' => $ranks,
-                'rates' => $rankRates
-            ]);
+            // Load OT rate from SalarySetting
+            $settings = \App\Models\SalarySetting::getSettings();
+            $specialOtRate = $settings->special_ot_rate ?? 0;
 
             return response()->json([
-                'ranks' => $ranks,
-                'rates' => $rankRates
+                'ranks' => array_keys($rankRates),
+                'rates' => $rankRates,
+                'special_ot_rate' => $specialOtRate
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error fetching rank rates: ' . $e->getMessage());
             return response()->json([
                 'ranks' => [],
-                'rates' => []
+                'rates' => [],
+                'special_ot_rate' => 0
             ], 500);
         }
     }
