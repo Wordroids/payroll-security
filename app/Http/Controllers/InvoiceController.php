@@ -8,6 +8,7 @@ use App\Models\Site;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
 {
@@ -39,11 +40,25 @@ class InvoiceController extends Controller
             'other_charges.*.price' => 'required|numeric|min:0',
             'special_ot.hours' => 'nullable|numeric|min:0',
             'special_ot.rate' => 'nullable|numeric|min:0',
-
         ]);
 
-        $nextNumber = str_pad(Invoice::count() + 1, 4, '0', STR_PAD_LEFT);
-        $invoiceNumber = 'INV/' . date('Y') . '/' . $nextNumber;
+        return DB::transaction(function () use ($validated) {
+
+            $year = now()->year;
+
+            $lastInvoice = Invoice::where('invoice_number', 'like', "INV/{$year}/%")
+                ->orderByDesc('id')
+                ->first();
+
+            if ($lastInvoice) {
+
+                $lastNumber = (int) substr($lastInvoice->invoice_number, -4);
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+        $invoiceNumber = 'INV/' . $year . '/' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
         $invoice = Invoice::create([
             'invoice_number' => $invoiceNumber,
@@ -107,6 +122,7 @@ class InvoiceController extends Controller
         ]);
 
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
+        });
     }
 
     public function show(Invoice $invoice)
