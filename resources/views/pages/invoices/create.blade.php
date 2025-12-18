@@ -153,6 +153,37 @@
     </div>
 </div>
 
+            {{-- SPECIAL OT --}}
+            <div class="bg-white shadow-md rounded-lg border border-gray-200 p-5 mb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Special OT (Optional)</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Number of OT Hours</label>
+                        <input type="number" min="0" x-model.number="specialOt.hours"
+                            name="special_ot[hours]" @input="calculateTotal"
+                            class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-200">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Rate per Hour (Rs)</label>
+                        <input type="number" min="0" step="0.01" x-model.number="specialOt.rate"
+                            name="special_ot[rate]" @input="calculateTotal"
+                            class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-200">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Subtotal</label>
+                        <p class="text-gray-700 font-medium text-lg">
+                            Rs<span x-text="(specialOt.hours * specialOt.rate).toFixed(2)"></span>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+
 
             {{-- TOTAL --}}
             <div class="flex justify-end mb-6">
@@ -190,9 +221,13 @@
 
             // Other charges items
             otherCharges: [],
+            specialOt: {
+            hours: 0,
+            rate: 0
+                },
+
 
                 total: 0,
-
                 async fetchRankRates() {
                     if (!this.selectedSite) {
                         this.availableRanks = [];
@@ -207,7 +242,7 @@
 
                         this.availableRanks = data.ranks || [];
                         this.rankRates = data.rates || {};
-
+                        this.specialOt.rate = data.special_ot_rate ?? 0;
                         // Update rates for existing items
                         this.items.forEach((item, index) => {
                             if (item.rank && this.rankRates[item.rank]) {
@@ -256,7 +291,10 @@
                 const rankTotal = this.items.reduce((sum, item) =>
                 sum + ((item.number_of_shifts * item.rate) || 0), 0);
                 const otherTotal = this.otherCharges.reduce((sum, charge) => sum + (charge.price || 0), 0);
-                this.total = rankTotal + otherTotal;
+
+                const specialOtTotal = (this.specialOt.hours * this.specialOt.rate) || 0;
+
+                this.total = rankTotal + otherTotal + specialOtTotal;
                 }
             }
         }

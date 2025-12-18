@@ -16,6 +16,8 @@ class InvoiceItem extends Model
         'subtotal',
         'type',
         'description',
+        'special_ot_hours',
+        'special_ot_rate',
 
     ];
 
