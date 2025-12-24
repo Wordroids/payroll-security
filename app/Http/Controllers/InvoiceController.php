@@ -38,8 +38,10 @@ class InvoiceController extends Controller
             'other_charges.*.item' => 'required|string',
             'other_charges.*.description' => 'nullable|string',
             'other_charges.*.price' => 'required|numeric|min:0',
-            'special_ot.hours' => 'nullable|numeric|min:0',
-            'special_ot.rate' => 'nullable|numeric|min:0',
+            'special_ot' => 'nullable|array',
+            'special_ot.*.rank' => 'required|string',
+            'special_ot.*.hours' => 'required|numeric|min:0',
+            'special_ot.*.rate' => 'required|numeric|min:0',
         ]);
 
         return DB::transaction(function () use ($validated) {
@@ -58,70 +60,72 @@ class InvoiceController extends Controller
                 $nextNumber = 1;
             }
 
-        $invoiceNumber = 'INV/' . $year . '/' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+            $invoiceNumber = 'INV/' . $year . '/' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        $invoice = Invoice::create([
-            'invoice_number' => $invoiceNumber,
-            'site_id' => $validated['site_id'],
-            'invoice_date' => $validated['invoice_date'],
-            'description' => $validated['description'] ?? null,
-            'total_amount' => 0,
-        ]);
-
-        $rankTotal = 0;
-        foreach ($validated['items'] as $item) {
-            $subtotal = $item['number_of_shifts'] * $item['rate'];
-            InvoiceItem::create([
-                'invoice_id' => $invoice->id,
-                'rank' => $item['rank'],
-                'number_of_shifts' => $item['number_of_shifts'],
-                'rate' => $item['rate'],
-                'subtotal' => $subtotal,
-                'type' => 'rank_service',
+            $invoice = Invoice::create([
+                'invoice_number' => $invoiceNumber,
+                'site_id' => $validated['site_id'],
+                'invoice_date' => $validated['invoice_date'],
+                'description' => $validated['description'] ?? null,
+                'total_amount' => 0,
             ]);
-            $rankTotal += $subtotal;
-        }
 
-        $otherTotal = 0;
-        if (!empty($validated['other_charges'])) {
-            foreach ($validated['other_charges'] as $charge) {
+            $rankTotal = 0;
+            foreach ($validated['items'] as $item) {
+                $subtotal = $item['number_of_shifts'] * $item['rate'];
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
-                    'rank' => 'N/A',
-                    'number_of_shifts' => 1,
-                    'rate' => $charge['price'],
-                    'subtotal' => $charge['price'],
-                    'description' => $charge['description'] ?? $charge['item'],
-                    'type' => 'other_charge',
+                    'rank' => $item['rank'],
+                    'number_of_shifts' => $item['number_of_shifts'],
+                    'rate' => $item['rate'],
+                    'subtotal' => $subtotal,
+                    'type' => 'rank_service',
                 ]);
-                $otherTotal += $charge['price'];
+                $rankTotal += $subtotal;
             }
-        }
-        $specialOtHours = $validated['special_ot']['hours'] ?? 0;
-        $specialOtRate = $validated['special_ot']['rate'] ?? 0;
-        $specialOtSubtotal = $specialOtHours * $specialOtRate;
 
+            $otherTotal = 0;
+            if (!empty($validated['other_charges'])) {
+                foreach ($validated['other_charges'] as $charge) {
+                    InvoiceItem::create([
+                        'invoice_id' => $invoice->id,
+                        'rank' => 'N/A',
+                        'number_of_shifts' => 1,
+                        'rate' => $charge['price'],
+                        'subtotal' => $charge['price'],
+                        'description' => $charge['description'] ?? $charge['item'],
+                        'type' => 'other_charge',
+                    ]);
+                    $otherTotal += $charge['price'];
+                }
+            }
+            $specialOtTotal = 0;
+            if (!empty($validated['special_ot'])) {
+                foreach ($validated['special_ot'] as $otRecord) {
+                    $subtotal = $otRecord['hours'] * $otRecord['rate'];
+                    if ($subtotal > 0) {
+                        InvoiceItem::create([
+                            'invoice_id' => $invoice->id,
+                            'type' => 'special_ot',
+                            'rank' => $otRecord['rank'],
+                            'special_ot_hours' => $otRecord['hours'],
+                            'special_ot_rate' => $otRecord['rate'],
+                            'number_of_shifts' => $otRecord['hours'],
+                            'rate' => $otRecord['rate'],
+                            'subtotal' => $subtotal,
+                            'description' => 'Special OT - ' . $otRecord['rank'],
+                        ]);
+                        $specialOtTotal += $subtotal;
+                    }
+                }
+            }
 
-        if ($specialOtSubtotal > 0) {
-            InvoiceItem::create([
-                'invoice_id' => $invoice->id,
-                'type' => 'special_ot',
-                'rank' => 'N/A',
-                'special_ot_hours' => $specialOtHours,
-                'special_ot_rate' => $specialOtRate,
-                'number_of_shifts' => $specialOtHours,
-                'rate' => $specialOtRate,
-                'subtotal' => $specialOtSubtotal,
-                'description' => 'Special OT',
+            // Update total
+            $invoice->update([
+                'total_amount' => $rankTotal + $otherTotal + $specialOtTotal,
             ]);
-        }
 
-        // Update total
-        $invoice->update([
-            'total_amount' => $rankTotal + $otherTotal + $specialOtSubtotal,
-        ]);
-
-        return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
+            return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
         });
     }
 

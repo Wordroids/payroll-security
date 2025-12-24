@@ -16,7 +16,7 @@
                         class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
                         <option value="">-- Select Site --</option>
                         @foreach ($sites as $site)
-                            <option value="{{ $site->id }}">{{ $site->name }}</option>
+                        <option value="{{ $site->id }}">{{ $site->name }}</option>
                         @endforeach
                     </select>
                     @error('site_id') <p class="text-sm text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -100,86 +100,131 @@
                     </button>
                 </div>
             </div>
-           {{-- OTHER CHARGES --}}
-<div class="bg-white shadow-md rounded-lg border border-gray-200 p-5 mb-6">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4">Other Charges (Optional)</h2>
+            {{-- OTHER CHARGES --}}
+            <div class="bg-white shadow-md rounded-lg border border-gray-200 p-5 mb-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Other Charges (Optional)</h2>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full text-sm border-collapse">
-            <thead>
-                <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
-                    <th class="px-4 py-2 text-left">Charge Item</th>
-                    <th class="px-4 py-2 text-left">Description (optional)</th>
-                    <th class="px-4 py-2 text-left">Price (Rs)</th>
-                    <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
-                    <th class="px-4 py-2"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <template x-for="(charge, index) in otherCharges" :key="index">
-                    <tr class="border-t">
-                        <td class="px-4 py-2">
-                            <input type="text" x-model="charge.item"
-                                :name="`other_charges[${index}][item]`"
-                                class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
-                        </td>
-                        <td class="px-4 py-2">
-                            <input type="text" x-model="charge.description"
-                                :name="`other_charges[${index}][description]`"
-                                class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
-                        </td>
-                        <td class="px-4 py-2">
-                            <input type="number" step="0.01" min="0" x-model.number="charge.price"
-                                :name="`other_charges[${index}][price]`" @input="calculateTotal"
-                                class="w-24 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
-                        </td>
-                        <td class="px-4 py-2 text-gray-700 font-medium">
-                            Rs<span x-text="charge.price.toFixed(2)"></span>
-                        </td>
-                        <td class="px-4 py-2 text-right">
-                            <button type="button" @click="removeOtherCharge(index)" class="text-red-600 hover:text-red-800">&times;</button>
-                        </td>
-                    </tr>
-                </template>
-            </tbody>
-        </table>
-    </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
+                                <th class="px-4 py-2 text-left">Charge Item</th>
+                                <th class="px-4 py-2 text-left">Description (optional)</th>
+                                <th class="px-4 py-2 text-left">Price (Rs)</th>
+                                <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
+                                <th class="px-4 py-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(charge, index) in otherCharges" :key="index">
+                                <tr class="border-t">
+                                    <td class="px-4 py-2">
+                                        <input type="text" x-model="charge.item"
+                                            :name="`other_charges[${index}][item]`"
+                                            class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="text" x-model="charge.description"
+                                            :name="`other_charges[${index}][description]`"
+                                            class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="number" step="0.01" min="0" x-model.number="charge.price"
+                                            :name="`other_charges[${index}][price]`" @input="calculateTotal"
+                                            class="w-24 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-700 font-medium">
+                                        Rs<span x-text="charge.price.toFixed(2)"></span>
+                                    </td>
+                                    <td class="px-4 py-2 text-right">
+                                        <button type="button" @click="removeOtherCharge(index)" class="text-red-600 hover:text-red-800">&times;</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
 
-    <div class="mt-4 text-right">
-        <button type="button" @click="addOtherCharge"
-            class="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
-            + Add Other Charge
-        </button>
-    </div>
-</div>
+                <div class="mt-4 text-right">
+                    <button type="button" @click="addOtherCharge"
+                        class="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+                        + Add Other Charge
+                    </button>
+                </div>
+            </div>
 
             {{-- SPECIAL OT --}}
             <div class="bg-white shadow-md rounded-lg border border-gray-200 p-5 mb-6">
                 <h2 class="text-lg font-semibold text-gray-800 mb-4">Special OT (Optional)</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="overflow-x-auto mb-4">
+                    <table class="min-w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-700 uppercase text-xs">
+                                <th class="px-4 py-2 text-left">Rank</th>
+                                <th class="px-4 py-2 text-left">Number of OT Hours</th>
+                                <th class="px-4 py-2 text-left">Rate per Hour (Rs)</th>
+                                <th class="px-4 py-2 text-left">Subtotal (Rs)</th>
+                                <th class="px-4 py-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(ot, index) in specialOt" :key="index">
+                                <tr class="border-t">
+                                    <td class="px-4 py-2">
+                                        <select x-model="ot.rank"
+                                            :name="`special_ot[${index}][rank]`"
+                                            @change="updateOtRate(index)"
+                                            class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                            <option value="">-- Select Rank --</option>
+                                            <template x-for="rank in availableRanks" :key="rank">
+                                                <option :value="rank" x-text="rank"></option>
+                                            </template>
+                                        </select>
+                                    </td>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Number of OT Hours</label>
-                        <input type="number" min="0" x-model.number="specialOt.hours"
-                            name="special_ot[hours]" @input="calculateTotal"
-                            class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-200">
-                    </div>
+                                    <td class="px-4 py-2">
+                                        <input type="number" min="0" step="0.5" x-model.number="ot.hours"
+                                            :name="`special_ot[${index}][hours]`" @input="calculateTotal"
+                                            class="w-32 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                    </td>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Rate per Hour (Rs)</label>
-                        <input type="number" min="0" step="0.01" x-model.number="specialOt.rate"
-                            name="special_ot[rate]" @input="calculateTotal"
-                            class="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-blue-200">
-                    </div>
+                                    <td class="px-4 py-2">
+                                        <input type="number" step="0.01" min="0" x-model.number="ot.rate"
+                                            :name="`special_ot[${index}][rate]`" @input="calculateTotal"
+                                            class="w-32 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                    </td>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Subtotal</label>
-                        <p class="text-gray-700 font-medium text-lg">
-                            Rs<span x-text="(specialOt.hours * specialOt.rate).toFixed(2)"></span>
-                        </p>
-                    </div>
+                                    <td class="px-4 py-2 text-gray-700 font-medium">
+                                        Rs<span x-text="(ot.hours * ot.rate).toFixed(2)"></span>
+                                    </td>
 
+                                    <td class="px-4 py-2 text-right">
+                                        <button type="button" @click="removeSpecialOt(index)"
+                                            class="text-red-600 hover:text-red-800">
+                                            &times;
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                        <tfoot x-show="specialOt.length > 0">
+                            <tr class="border-t">
+                                <td colspan="3" class="px-4 py-2 text-right font-medium">Special OT Total:</td>
+                                <td class="px-4 py-2 text-gray-700 font-medium">
+                                    Rs<span x-text="specialOtTotal.toFixed(2)"></span>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="text-right">
+                    <button type="button" @click="addSpecialOt"
+                        class="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm">
+                        + Add OT Record
+                    </button>
                 </div>
             </div>
 
@@ -212,60 +257,45 @@
                 selectedSite: '',
                 availableRanks: [],
                 rankRates: {},
-          // Rank service items
+                defaultSpecialOtRate: 0,
+
                 items: [{
                     rank: '',
                     number_of_shifts: 1,
                     rate: 0
-                 }],
+                }],
 
-            // Other charges items
-            otherCharges: [],
-            specialOt: {
-            hours: 0,
-            rate: 0
-                },
+                otherCharges: [],
 
+                specialOt: [],
 
                 total: 0,
+
+                /* ---------------- FETCH RATES ---------------- */
                 async fetchRankRates() {
-                    if (!this.selectedSite) {
-                        this.availableRanks = [];
-                        this.rankRates = {};
-                        return;
-                    }
+                    if (!this.selectedSite) return;
 
                     try {
                         const response = await fetch(`/sites/${this.selectedSite}/rank-rates`);
-
                         const data = await response.json();
 
                         this.availableRanks = data.ranks || [];
                         this.rankRates = data.rates || {};
-                        this.specialOt.rate = data.special_ot_rate ?? 0;
-                        // Update rates for existing items
+                        this.defaultSpecialOtRate = Number(data.special_ot_rate) || 0;
+
+                        // Update rank service rates
                         this.items.forEach((item, index) => {
                             if (item.rank && this.rankRates[item.rank]) {
                                 this.items[index].rate = this.rankRates[item.rank];
                             }
                         });
 
-                    this.calculateTotal();
                     } catch (error) {
-                        console.error('Error fetching rank rates:', error);
-                        this.availableRanks = [];
-                        this.rankRates = {};
+                        console.error('Error fetching rank rates', error);
                     }
                 },
 
-                updateRate(index) {
-                    const rank = this.items[index].rank;
-                    if (rank && this.rankRates[rank]) {
-                        this.items[index].rate = this.rankRates[rank];
-                }
-                        this.calculateTotal();
-                },
-
+                /* ---------------- RANK SERVICES ---------------- */
                 addItem() {
                     this.items.push({
                         rank: '',
@@ -278,23 +308,72 @@
                     this.items.splice(index, 1);
                     this.calculateTotal();
                 },
-            addOtherCharge() {
-                this.otherCharges.push({ item: '', description: '', price: 0 });
-            },
 
-            removeOtherCharge(index) {
-                this.otherCharges.splice(index, 1);
-                this.calculateTotal();
-            },
+                updateRate(index) {
+                    const rank = this.items[index].rank;
+                    if (rank && this.rankRates[rank]) {
+                        this.items[index].rate = this.rankRates[rank];
+                    }
+                    this.calculateTotal();
+                },
 
+                /* ---------------- OTHER CHARGES ---------------- */
+                addOtherCharge() {
+                    this.otherCharges.push({
+                        item: '',
+                        description: '',
+                        price: 0
+                    });
+                },
+
+                removeOtherCharge(index) {
+                    this.otherCharges.splice(index, 1);
+                    this.calculateTotal();
+                },
+
+                /* ---------------- SPECIAL OT ---------------- */
+                addSpecialOt() {
+                    this.specialOt.push({
+                        rank: '',
+                        hours: 0,
+                        rate: this.defaultSpecialOtRate
+                    });
+                },
+
+                removeSpecialOt(index) {
+                    this.specialOt.splice(index, 1);
+                    this.calculateTotal();
+                },
+
+                updateOtRate(index) {
+                    // DO NOT override user-entered value
+                    if (!this.specialOt[index].rate) {
+                        this.specialOt[index].rate = this.defaultSpecialOtRate;
+                    }
+                    this.calculateTotal();
+                },
+
+                /* ---------------- TOTALS ---------------- */
                 calculateTotal() {
-                const rankTotal = this.items.reduce((sum, item) =>
-                sum + ((item.number_of_shifts * item.rate) || 0), 0);
-                const otherTotal = this.otherCharges.reduce((sum, charge) => sum + (charge.price || 0), 0);
+                    const rankTotal = this.items.reduce(
+                        (sum, item) => sum + (item.number_of_shifts * item.rate || 0), 0
+                    );
 
-                const specialOtTotal = (this.specialOt.hours * this.specialOt.rate) || 0;
+                    const otherTotal = this.otherCharges.reduce(
+                        (sum, charge) => sum + (charge.price || 0), 0
+                    );
 
-                this.total = rankTotal + otherTotal + specialOtTotal;
+                    const specialOtTotal = this.specialOt.reduce(
+                        (sum, ot) => sum + (ot.hours * ot.rate || 0), 0
+                    );
+
+                    this.total = rankTotal + otherTotal + specialOtTotal;
+                },
+
+                get specialOtTotal() {
+                    return this.specialOt.reduce(
+                        (sum, ot) => sum + (ot.hours * ot.rate || 0), 0
+                    );
                 }
             }
         }
