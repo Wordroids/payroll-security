@@ -52,6 +52,7 @@
             text-align: right;
             margin-top: 8px;
         }
+
         .status {
             display: inline-block;
             padding: 4px 10px;
@@ -100,15 +101,15 @@
             <h1 style="margin: 0; color: #2563eb;">Invoice</h1>
             <p style="margin: 0; font-size: 14px;">{{ config('app.name', 'Security System') }}</p>
         </div>
-            {{-- Update logo path if available --}}
+        {{-- Update logo path if available --}}
         <div class="logo-container" style="text-align: right; height: 90px; display: flex; align-items: center;">
             <img src="{{ public_path('images/invoiceImage.jpg') }}" alt="Company Logo"
                 style="height: 90px; display: block;" onerror="this.style.display='none'">
             @if (!file_exists(public_path('images/invoiceImage.jpg')))
-                <div
-                    style="height: 90px; width: 90px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; border-radius: 10px;">
-                    COMPANY<br>LOGO
-                </div>
+            <div
+                style="height: 90px; width: 90px; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; border-radius: 10px;">
+                COMPANY<br>LOGO
+            </div>
             @endif
         </div>
     </div>
@@ -141,11 +142,11 @@
 
     {{-- RANK SERVICES --}}
     @php
-        $rankServices = $invoice->items->where('type', 'rank_service');
-        $rankTotal = $rankServices->sum('subtotal');
+    $rankServices = $invoice->items->where('type', 'rank_service');
+    $rankTotal = $rankServices->sum('subtotal');
     @endphp
     @if ($rankServices->count() > 0)
-        <h3 style="margin-top: 8px; margin-bottom: 10px; color: #2563eb;">Rank Services</h3>
+    <h3 style="margin-top: 8px; margin-bottom: 10px; color: #2563eb;">Rank Services</h3>
     <table class="table">
         <thead>
             <tr>
@@ -157,52 +158,88 @@
         </thead>
         <tbody>
             @foreach ($rankServices as $item)
-                <tr>
-                    <td>{{ $item->rank }}</td>
-                    <td>{{ $item->number_of_shifts }}</td>
-                    <td>Rs{{ number_format($item->rate, 2) }}</td>
-                    <td>Rs{{ number_format($item->subtotal, 2) }}</td>
-                </tr>
+            <tr>
+                <td>{{ $item->rank }}</td>
+                <td>{{ $item->number_of_shifts }}</td>
+                <td>Rs{{ number_format($item->rate, 2) }}</td>
+                <td>Rs{{ number_format($item->subtotal, 2) }}</td>
+            </tr>
             @endforeach
-                <tr style="font-weight: bold; background-color: #f3f4f6;">
-                    <td colspan="3" style="text-align: right;">Rank Services Total:</td>
-                    <td>Rs{{ number_format($rankTotal, 2) }}</td>
-                </tr>
-            </tbody>
-        </table>
+            <tr style="font-weight: bold; background-color: #f3f4f6;">
+                <td colspan="3" style="text-align: right;">Rank Services Total:</td>
+                <td>Rs{{ number_format($rankTotal, 2) }}</td>
+            </tr>
+        </tbody>
+    </table>
     @endif
 
     {{-- OTHER CHARGES --}}
     @php
-        $otherCharges = $invoice->items->where('type', 'other_charge');
-        $otherTotal = $otherCharges->sum('subtotal');
+    $otherCharges = $invoice->items->where('type', 'other_charge');
+    $otherTotal = $otherCharges->sum('subtotal');
     @endphp
     @if ($otherCharges->count() > 0)
-        <h3 style="margin-top: 8px; margin-bottom: 8px; color: #2563eb;">Other Charges</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Charge Item</th>
-                    <th>Description</th>
-                    <th>Price (Rs)</th>
-                    <th>Subtotal (Rs)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($otherCharges as $charge)
-                    <tr>
-                        <td>{{ $charge->description ?? $charge->rank }}</td>
-                        <td>{{ $charge->description ?? '-' }}</td>
-                        <td>Rs{{ number_format($charge->rate, 2) }}</td>
-                        <td>Rs{{ number_format($charge->subtotal, 2) }}</td>
-                    </tr>
-                @endforeach
-                <tr style="font-weight: bold; background-color: #f3f4f6;">
-                    <td colspan="3" style="text-align: right;">Other Charges Total:</td>
-                    <td>Rs{{ number_format($otherTotal, 2) }}</td>
-                </tr>
+    <h3 style="margin-top: 8px; margin-bottom: 8px; color: #2563eb;">Other Charges</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Charge Item</th>
+                <th>Description</th>
+                <th>Price (Rs)</th>
+                <th>Subtotal (Rs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($otherCharges as $charge)
+            <tr>
+                <td>{{ $charge->description ?? $charge->rank }}</td>
+                <td>{{ $charge->description ?? '-' }}</td>
+                <td>Rs{{ number_format($charge->rate, 2) }}</td>
+                <td>Rs{{ number_format($charge->subtotal, 2) }}</td>
+            </tr>
+            @endforeach
+            <tr style="font-weight: bold; background-color: #f3f4f6;">
+                <td colspan="3" style="text-align: right;">Other Charges Total:</td>
+                <td>Rs{{ number_format($otherTotal, 2) }}</td>
+            </tr>
         </tbody>
-        </table>
+    </table>
+    @endif
+    {{-- SPECIAL OT --}}
+    @php
+    $specialOtItems = $invoice->items->where('type', 'special_ot');
+    $specialOtTotal = $specialOtItems->sum('subtotal');
+    @endphp
+
+    @if ($specialOtItems->count() > 0)
+    <h3 style="margin-top: 10px; margin-bottom: 8px; color: #2563eb;">
+        Special OT
+    </h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>OT Hours</th>
+                <th>Rate / Hour (Rs)</th>
+                <th>Subtotal (Rs)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($specialOtItems as $ot)
+            <tr>
+                <td>{{ $ot->rank }}</td>
+                <td>{{ $ot->special_ot_hours }}</td>
+                <td>Rs{{ number_format($ot->special_ot_rate, 2) }}</td>
+                <td>Rs{{ number_format($ot->subtotal, 2) }}</td>
+            </tr>
+            @endforeach
+            <tr style="font-weight: bold; background-color: #f3f4f6;">
+                <td colspan="3" style="text-align: right;">Special OT Total:</td>
+                <td>Rs{{ number_format($specialOtTotal, 2) }}</td>
+            </tr>
+        </tbody>
+    </table>
     @endif
 
     {{-- TOTAL SUMMARY --}}
@@ -212,10 +249,17 @@
             <td>Rs{{ number_format($rankTotal, 2) }}</td>
         </tr>
         @if ($otherCharges->count() > 0)
-            <tr>
-                <td class="label">Other Charges Total:</td>
-                <td>Rs{{ number_format($otherTotal, 2) }}</td>
-            </tr>
+        <tr>
+            <td class="label">Other Charges Total:</td>
+            <td>Rs{{ number_format($otherTotal, 2) }}</td>
+        </tr>
+        @endif
+
+        @if ($specialOtItems->count() > 0)
+        <tr>
+            <td class="label">Special OT Total:</td>
+            <td>Rs{{ number_format($specialOtTotal, 2) }}</td>
+        </tr>
         @endif
         <tr style="font-weight: bold; font-size: 10px;">
             <td class="label">Total Amount:</td>
@@ -235,11 +279,11 @@
             <tr>
                 <td><strong>Branch:</strong> Nugegoda Branch</td>
             </tr>
-             <tr>
+            <tr>
                 <td><strong>Account Name:</strong> Smart Syndicates (PVT) Ltd</td>
             </tr>
-             <tr>
-                <td><strong>Account Number:</strong> 0120-13651103-00</td>
+            <tr>
+                <td><strong>Account Number:</strong> 012013651103001</td>
             </tr>
             <tr>
                 <td><strong>SWIFT Code:</strong> SEYBLKLX</td>
