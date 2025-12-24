@@ -317,6 +317,11 @@ class SalaryController extends Controller
         // Filter by employee if selected
         if ($employeeId) {
             $query->where('id', $employeeId);
+        } else {
+            // Only include employees who have at least one shift in the selected month
+            $query->whereHas('attendances', function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('date', [$startDate, $endDate]);
+            });
         }
 
         $employees = $query->get();
@@ -325,12 +330,25 @@ class SalaryController extends Controller
         $salaryData = [];
 
         foreach ($employees as $employee) {
+            // to check if employee has any shifts in the current month
+            $hasShifts = Attendance::whereBetween('date', [$startDate, $endDate])
+                ->where('employee_id', $employee->id)
+                ->exists();
+
+            if (!$employeeId && !$hasShifts) {
+                continue;
+            }
+
             $employee->load(['sites', 'salaryAdvances']);
 
             // Get attendance
             $records = Attendance::whereBetween('date', [$startDate, $endDate])
                 ->where('employee_id', $employee->id)
                 ->get();
+
+            if (!$employeeId && $records->isEmpty()) {
+                continue;
+            }
 
             $attendances = [];
             $specialOtHours = 0;
@@ -834,14 +852,14 @@ class SalaryController extends Controller
         $month = $request->input('month', now()->format('Y-m'));
         $employeeId = $request->input('employee_id');
 
-    // Get salary data
-    $salaryData = $this->getSalaryOverviewData($month, $employeeId);
+        // Get salary data
+        $salaryData = $this->getSalaryOverviewData($month, $employeeId);
 
-    // Calculate total net pay
-    $totalNetPay = 0;
-    foreach ($salaryData as $data) {
-        $totalNetPay += $data['net_pay'];
-    }
+        // Calculate total net pay
+        $totalNetPay = 0;
+        foreach ($salaryData as $data) {
+            $totalNetPay += $data['net_pay'];
+        }
 
         $data = [
             'salaryData' => $salaryData,
@@ -881,19 +899,34 @@ class SalaryController extends Controller
 
         if ($employeeId) {
             $query->where('id', $employeeId);
+        } else {
+            // Only include employees with shifts in the selected month
+            $query->whereHas('attendances', function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('date', [$startDate, $endDate]);
+            });
         }
 
         $employees = $query->get();
         $salaryData = [];
 
         foreach ($employees as $employee) {
+            // to check if employee has any shifts in the current month
+            $hasShifts = Attendance::whereBetween('date', [$startDate, $endDate])
+                ->where('employee_id', $employee->id)
+                ->exists();
+
+            if (!$employeeId && !$hasShifts) {
+                continue;
+            }
             $employee->load(['sites', 'salaryAdvances']);
 
             // Get attendance
             $records = Attendance::whereBetween('date', [$startDate, $endDate])
                 ->where('employee_id', $employee->id)
                 ->get();
-
+            if (!$employeeId && $records->isEmpty()) {
+                continue;
+            }
             $attendances = [];
             $specialOtHours = 0;
             $specialOtEarnings = 0;
