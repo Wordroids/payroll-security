@@ -178,6 +178,10 @@
                         <option value="LSO">LSO</option>
                         <option value="JSO">JSO</option>
                         <option value="CSO">CSO</option>
+                        <option value="OM">OM</option>
+                        <option value="VO">VO</option>
+                        <option value="AOM">AOM</option>
+                        <option value="BDM">BDM</option>
                     </select>
                 </div>
                 <div>
