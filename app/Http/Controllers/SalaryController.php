@@ -101,18 +101,18 @@ class SalaryController extends Controller
         // Process normal/OT hours and calculate special OT per site
         foreach ($attendances as $empId => $sites) {
             foreach ($sites as $siteId => $days) {
-                $site = $employee->sites->find($siteId);
+                $resolved = $this->resolveRankAndRate($employee, $siteId);
+                $site = $resolved['site'];
+                $rank = $resolved['rank'];
+                $guardShiftRate = $resolved['rate'];
+
+                if (!$site) {
+                    continue; // site deleted completely
+                }
+
                 $siteSpecialOtDayHours = 0;
                 $siteSpecialOtNightHours = 0;
                 $siteSpecialOtEarnings = 0;
-
-
-                // to get the employee's rank for this site
-                $rank = $site->pivot->rank ?? 'CSO';
-                $rankRate = $site->rankRates()->where('rank', $rank)->first();
-
-
-                $guardShiftRate = $rankRate ? $rankRate->guard_shift_rate : ($site->guard_shift_rate ?? 0);
 
                 foreach ($days as $day => $shifts) {
                     // Day shift calculations
@@ -128,7 +128,6 @@ class SalaryController extends Controller
 
                             // Calculate special OT earnings for this site
                             if ($guardShiftRate > 0) {
-                                // $specialOtRate = 200;
                                 $siteSpecialOtEarnings += $specialOtDay * $specialOtRate;
                                 $specialOtEarnings += $specialOtDay * $specialOtRate;
                             }
@@ -148,7 +147,6 @@ class SalaryController extends Controller
 
                             // Calculate special OT earnings for this site
                             if ($guardShiftRate > 0) {
-                                //  $specialOtRate = 200;
                                 $siteSpecialOtEarnings += $specialOtNight * $specialOtRate;
                                 $specialOtEarnings += $specialOtNight * $specialOtRate;
                             }
@@ -158,8 +156,6 @@ class SalaryController extends Controller
 
                 // Store special OT data for this site
                 if ($site->has_special_ot_hours && ($siteSpecialOtDayHours > 0 || $siteSpecialOtNightHours > 0)) {
-                    //  $specialOtRate = $guardShiftRate > 0 ? 200 : 0;
-
                     $specialOtData[$siteId] = [
                         'site' => $site,
                         'day_hours' => $siteSpecialOtDayHours,
@@ -186,27 +182,37 @@ class SalaryController extends Controller
         $totalOTHours = 0;
         // Calculate per-site earnings
         $siteSummaries = [];
-        foreach ($employee->sites as $site) {
+        
+        // Get all unique site IDs from attendance records
+        $siteIds = [];
+        foreach ($attendances as $empId => $sites) {
+            foreach ($sites as $siteId => $days) {
+                if (!in_array($siteId, $siteIds)) {
+                    $siteIds[] = $siteId;
+                }
+            }
+        }
+        
+        foreach ($siteIds as $siteId) {
+            $resolved = $this->resolveRankAndRate($employee, $siteId);
+            $site = $resolved['site'];
+            $rank = $resolved['rank'];
+            $shiftRate = $resolved['rate'];
+
+            if (!$site) {
+                continue; // site deleted completely
+            }
+
             $normalDayHours = 0;
             $normalNightHours = 0;
             $otDayHours = 0;
             $otNightHours = 0;
-            // Get the employee's rank
-            $rank = $site->pivot->rank ?? 'CSO';
 
-            // Get the shift rate for the rank
-            $rankRate = $site->rankRates()->where('rank', $rank)->first();
-            $shiftRate = $rankRate ? $rankRate->guard_shift_rate : $site->guard_shift_rate;
-
-            if (!$shiftRate) {
-                \Log::warning("No shift rate found for site {$site->id} - using fallback");
-                $shiftRate = 0;
-            }
             for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
-                $normalDayHours += $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
-                $normalNightHours += $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
-                $otDayHours += $attendances[$employee->id][$site->id][$d]['ot_day_hours'] ?? 0;
-                $otNightHours += $attendances[$employee->id][$site->id][$d]['ot_night_hours'] ?? 0;
+                $normalDayHours += $attendances[$employee->id][$siteId][$d]['normal_day_hours'] ?? 0;
+                $normalNightHours += $attendances[$employee->id][$siteId][$d]['normal_night_hours'] ?? 0;
+                $otDayHours += $attendances[$employee->id][$siteId][$d]['ot_day_hours'] ?? 0;
+                $otNightHours += $attendances[$employee->id][$siteId][$d]['ot_night_hours'] ?? 0;
             }
             $totalSiteHours = $normalDayHours + $normalNightHours + $otDayHours + $otNightHours;
             $siteShifts = $totalSiteHours / 12;
@@ -362,15 +368,14 @@ class SalaryController extends Controller
             // Process normal/OT hours with per-site special OT calculation
             foreach ($attendances as $empId => $sites) {
                 foreach ($sites as $siteId => $days) {
-                    $site = $employee->sites->find($siteId);
-                    // Get the employee's rank for this site
-                    $rank = $site->pivot->rank ?? 'CSO';
-                    $rankRate = $site->rankRates()->where('rank', $rank)->first();
+                    $resolved = $this->resolveRankAndRate($employee, $siteId);
+                    $site = $resolved['site'];
+                    $rank = $resolved['rank'];
+                    $guardShiftRate = $resolved['rate'];
 
-
-
-                    // Use rank-specific rate if available, otherwise fallback to site rate
-                    $guardShiftRate = $rankRate ? $rankRate->guard_shift_rate : ($site->guard_shift_rate ?? 0);
+                    if (!$site) {
+                        continue;
+                    }
 
                     foreach ($days as $day => $shifts) {
                         if (isset($shifts['day'])) {
@@ -378,18 +383,13 @@ class SalaryController extends Controller
                             $attendances[$empId][$siteId][$day]['normal_day_hours'] = min($dayHours, 9);
                             $attendances[$empId][$siteId][$day]['ot_day_hours'] = min(max($dayHours - 9, 0), 3);
 
-
-
                             if ($site->has_special_ot_hours) {
-
                                 $specialOtDay = max($dayHours - 12, 0);
                                 $specialOtHours += $specialOtDay;
                                 if ($guardShiftRate > 0) {
-                                    // $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
-
                         }
                         if (isset($shifts['night'])) {
                             $nightHours = $shifts['night'];
@@ -399,7 +399,6 @@ class SalaryController extends Controller
                                 $specialOtNight = max($nightHours - 12, 0);
                                 $specialOtHours += $specialOtNight;
                                 if ($guardShiftRate > 0) {
-                                    // $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
                             }
@@ -460,28 +459,37 @@ class SalaryController extends Controller
             $totalOTHours = 0;
             $totalShifts = 0;
 
+            // to get all unique site IDs from attendance records
+            $siteIds = [];
+            foreach ($attendances as $empId => $sites) {
+                foreach ($sites as $siteId => $days) {
+                    if (!in_array($siteId, $siteIds)) {
+                        $siteIds[] = $siteId;
+                    }
+                }
+            }
+            
             // Calculate per-site earnings
-            foreach ($employee->sites as $site) {
+            foreach ($siteIds as $siteId) {
+                $resolved = $this->resolveRankAndRate($employee, $siteId);
+                $site = $resolved['site'];
+                $rank = $resolved['rank'];
+                $shiftRate = $resolved['rate'];
+
+                if (!$site) {
+                    continue;
+                }
+
                 $normalDayHours = 0;
                 $normalNightHours = 0;
                 $otDayHours = 0;
                 $otNightHours = 0;
 
-                // Get the employee's rank for this site
-                $rank = $site->pivot->rank ?? 'CSO';
-                $rankRate = $site->rankRates()->where('rank', $rank)->first();
-                $shiftRate = $rankRate ? $rankRate->guard_shift_rate : $site->guard_shift_rate;
-
-                if (!$shiftRate) {
-                    \Log::warning("No shift rate found for site {$site->id} - using fallback");
-                    $shiftRate = 0;
-                }
-
                 for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
-                    $normalDayHours += $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
-                    $normalNightHours += $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
-                    $otDayHours += $attendances[$employee->id][$site->id][$d]['ot_day_hours'] ?? 0;
-                    $otNightHours += $attendances[$employee->id][$site->id][$d]['ot_night_hours'] ?? 0;
+                    $normalDayHours += $attendances[$employee->id][$siteId][$d]['normal_day_hours'] ?? 0;
+                    $normalNightHours += $attendances[$employee->id][$siteId][$d]['normal_night_hours'] ?? 0;
+                    $otDayHours += $attendances[$employee->id][$siteId][$d]['ot_day_hours'] ?? 0;
+                    $otNightHours += $attendances[$employee->id][$siteId][$d]['ot_night_hours'] ?? 0;
                 }
 
                 $totalSiteHours = $normalDayHours + $normalNightHours + $otDayHours + $otNightHours;
@@ -625,7 +633,7 @@ class SalaryController extends Controller
                 'performanceOtHours' => 0,
                 'specialOtData' => [],
                 'siteSpecialOtSummaries' => [],
-                'specialOtRate',
+                'specialOtRate' => $specialOtRate,
             ];
 
             // Meal deductions
@@ -671,17 +679,18 @@ class SalaryController extends Controller
             // Process attendance data and calculate special OT per site
             foreach ($attendances as $empId => $sites) {
                 foreach ($sites as $siteId => $days) {
-                    $site = $employee->sites->find($siteId);
+                    $resolved = $this->resolveRankAndRate($employee, $siteId);
+                    $site = $resolved['site'];
+                    $rank = $resolved['rank'];
+                    $guardShiftRate = $resolved['rate'];
+
+                    if (!$site) {
+                        continue; // site deleted completely
+                    }
+
                     $siteSpecialOtDayHours = 0;
                     $siteSpecialOtNightHours = 0;
                     $siteSpecialOtEarnings = 0;
-
-                    // Get the employee's rank for this site
-                    $rank = $site->pivot->rank ?? 'CSO';
-                    $rankRate = $site->rankRates()->where('rank', $rank)->first();
-
-                    // Use rank-specific rate if available
-                    $guardShiftRate = $rankRate ? $rankRate->guard_shift_rate : ($site->guard_shift_rate ?? 0);
 
                     foreach ($days as $day => $shifts) {
                         if (isset($shifts['day'])) {
@@ -697,7 +706,6 @@ class SalaryController extends Controller
 
                                 // Calculate special OT earnings for this site
                                 if ($guardShiftRate > 0) {
-                                    // $specialOtRate = 200;
                                     $siteSpecialOtEarnings += $specialOtDay * $specialOtRate;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
@@ -717,7 +725,6 @@ class SalaryController extends Controller
 
                                 // Calculate special OT earnings for this site
                                 if ($guardShiftRate > 0) {
-                                    //$specialOtRate = 200;
                                     $siteSpecialOtEarnings += $specialOtNight * $specialOtRate;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
@@ -727,8 +734,6 @@ class SalaryController extends Controller
 
                     // Store special OT data for this site
                     if ($site->has_special_ot_hours && ($siteSpecialOtDayHours > 0 || $siteSpecialOtNightHours > 0)) {
-                        $specialOtRate = $guardShiftRate > 0 ? 200 : 0;
-
                         $data['specialOtData'][$siteId] = [
                             'site' => $site,
                             'day_hours' => $siteSpecialOtDayHours,
@@ -786,22 +791,37 @@ class SalaryController extends Controller
 
             // Calculate per-site earnings
             $siteSummaries = [];
-            foreach ($employee->sites as $site) {
+            
+            // to get all unique site IDs from attendance records
+            $siteIds = [];
+            foreach ($attendances as $empId => $sites) {
+                foreach ($sites as $siteId => $days) {
+                    if (!in_array($siteId, $siteIds)) {
+                        $siteIds[] = $siteId;
+                    }
+                }
+            }
+            
+            foreach ($siteIds as $siteId) {
+                $resolved = $this->resolveRankAndRate($employee, $siteId);
+                $site = $resolved['site'];
+                $rank = $resolved['rank'];
+                $shiftRate = $resolved['rate'];
+
+                if (!$site) {
+                    continue;
+                }
+
                 $normalDayHours = 0;
                 $normalNightHours = 0;
                 $otDayHours = 0;
                 $otNightHours = 0;
 
-                // Get the employee's rank for site
-                $rank = $site->pivot->rank ?? 'CSO';
-                $rankRate = $site->rankRates->firstWhere('rank', $rank);
-                $shiftRate = $rankRate ? $rankRate->guard_shift_rate : ($site->guard_shift_rate ?? 0);
-
                 for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
-                    $normalDayHours += $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
-                    $normalNightHours += $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
-                    $otDayHours += $attendances[$employee->id][$site->id][$d]['ot_day_hours'] ?? 0;
-                    $otNightHours += $attendances[$employee->id][$site->id][$d]['ot_night_hours'] ?? 0;
+                    $normalDayHours += $attendances[$employee->id][$siteId][$d]['normal_day_hours'] ?? 0;
+                    $normalNightHours += $attendances[$employee->id][$siteId][$d]['normal_night_hours'] ?? 0;
+                    $otDayHours += $attendances[$employee->id][$siteId][$d]['ot_day_hours'] ?? 0;
+                    $otNightHours += $attendances[$employee->id][$siteId][$d]['ot_night_hours'] ?? 0;
                 }
 
                 $totalSiteHours = $normalDayHours + $normalNightHours + $otDayHours + $otNightHours;
@@ -939,13 +959,14 @@ class SalaryController extends Controller
             // Process normal/OT hours
             foreach ($attendances as $empId => $sites) {
                 foreach ($sites as $siteId => $days) {
-                    $site = Site::find($siteId);
+                    $resolved = $this->resolveRankAndRate($employee, $siteId);
+                    $site = $resolved['site'];
+                    $rank = $resolved['rank'];
+                    $guardShiftRate = $resolved['rate'];
 
-                    // Get the employee's rank for this site
-                    $rank = $site->pivot->rank ?? 'CSO';
-                    $rankRate = $site->rankRates()->where('rank', $rank)->first();
-
-                    $guardShiftRate = $rankRate ? $rankRate->guard_shift_rate : ($site->guard_shift_rate ?? 0);
+                    if (!$site) {
+                        continue; // site deleted completely
+                    }
 
                     foreach ($days as $day => $shifts) {
                         if (isset($shifts['day'])) {
@@ -958,7 +979,6 @@ class SalaryController extends Controller
                                 $specialOtHours += $specialOtDay;
                                 // Calculate earnings for this site's special OT
                                 if ($guardShiftRate > 0) {
-                                    //   $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtDay * $specialOtRate;
                                 }
                             }
@@ -972,7 +992,6 @@ class SalaryController extends Controller
                                 $specialOtHours += $specialOtNight;
                                 // Calculate earnings for this site's special OT
                                 if ($guardShiftRate > 0) {
-                                    //  $specialOtRate = 200;
                                     $specialOtEarnings += $specialOtNight * $specialOtRate;
                                 }
                             }
@@ -1034,28 +1053,37 @@ class SalaryController extends Controller
             $totalOTHours = 0;
             $totalShifts = 0;
 
+            // to get all unique site IDs from attendance records
+            $siteIds = [];
+            foreach ($attendances as $empId => $sites) {
+                foreach ($sites as $siteId => $days) {
+                    if (!in_array($siteId, $siteIds)) {
+                        $siteIds[] = $siteId;
+                    }
+                }
+            }
+            
             // Calculate per-site earnings
-            foreach ($employee->sites as $site) {
+            foreach ($siteIds as $siteId) {
+                $resolved = $this->resolveRankAndRate($employee, $siteId);
+                $site = $resolved['site'];
+                $rank = $resolved['rank'];
+                $shiftRate = $resolved['rate'];
+
+                if (!$site) {
+                    continue; // site deleted completely
+                }
+
                 $normalDayHours = 0;
                 $normalNightHours = 0;
                 $otDayHours = 0;
                 $otNightHours = 0;
 
-                // Get the employee's rank for the site
-                $rank = $site->pivot->rank ?? 'CSO';
-                $rankRate = $site->rankRates()->where('rank', $rank)->first();
-                $shiftRate = $rankRate ? $rankRate->guard_shift_rate : $site->guard_shift_rate;
-
-                if (!$shiftRate) {
-                    \Log::warning("No shift rate found for site {$site->id} - using fallback");
-                    $shiftRate = 0;
-                }
-
                 for ($d = 1; $d <= $startDate->daysInMonth; $d++) {
-                    $normalDayHours += $attendances[$employee->id][$site->id][$d]['normal_day_hours'] ?? 0;
-                    $normalNightHours += $attendances[$employee->id][$site->id][$d]['normal_night_hours'] ?? 0;
-                    $otDayHours += $attendances[$employee->id][$site->id][$d]['ot_day_hours'] ?? 0;
-                    $otNightHours += $attendances[$employee->id][$site->id][$d]['ot_night_hours'] ?? 0;
+                    $normalDayHours += $attendances[$employee->id][$siteId][$d]['normal_day_hours'] ?? 0;
+                    $normalNightHours += $attendances[$employee->id][$siteId][$d]['normal_night_hours'] ?? 0;
+                    $otDayHours += $attendances[$employee->id][$siteId][$d]['ot_day_hours'] ?? 0;
+                    $otNightHours += $attendances[$employee->id][$siteId][$d]['ot_night_hours'] ?? 0;
                 }
 
                 $totalSiteHours = $normalDayHours + $normalNightHours + $otDayHours + $otNightHours;
@@ -1236,6 +1264,58 @@ class SalaryController extends Controller
 
         return $pdf->download($filename);
     }
+
+    private function resolveRankAndRate(Employee $employee, int $siteId)
+    {
+        //  to get the site from the employee's current sites
+        $site = $employee->sites->firstWhere('id', $siteId);
+        
+
+        if ($site) {
+            $rank = $site->pivot?->rank ?? $employee->rank ?? 'CSO';
+        } else {
+        
+            $rank = $employee->rank ?? 'CSO';
+            
+            $site = Site::with('rankRates')->find($siteId);
+            
+            
+            if (!$site) {
+                return [
+                    'site' => null,
+                    'rank' => $rank,
+                    'rate' => 0,
+                ];
+            }
+        }
+        
+        
+        if (!isset($site) || !$site->relationLoaded('rankRates')) {
+            $site = Site::with('rankRates')->find($siteId);
+            
+            if (!$site) {
+                return [
+                    'site' => null,
+                    'rank' => $rank,
+                    'rate' => 0,
+                ];
+            }
+        }
+        
+        // Get rank-specific rate
+        $rankRate = $site->rankRates->firstWhere('rank', $rank);
+        
+        $rate = $rankRate?->guard_shift_rate 
+            ?? $site->guard_shift_rate 
+            ?? 0;
+        
+        return [
+            'site' => $site,
+            'rank' => $rank,
+            'rate' => $rate,
+        ];
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
