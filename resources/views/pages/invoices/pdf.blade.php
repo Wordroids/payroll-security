@@ -119,10 +119,10 @@
         <table>
             <tr>
                 <td><strong>Invoice No:</strong> {{ $invoice->invoice_number }}</td>
-                <td><strong>Date:</strong> {{ $invoice->invoice_date->format('Y-m-d') }}</td>
+                <td><strong>Date:</strong> {{ $invoice->invoice_date->format('d-m-Y') }}</td>
             </tr>
             <tr>
-                <td><strong>Generated On:</strong> {{ now()->format('Y-m-d H:i') }}</td>
+                <td><strong>Generated On:</strong> {{ now()->format('d-m-Y H:i') }}</td>
                 <td><strong>Status:</strong> {{ ucfirst($invoice->status) }}</td>
             </tr>
         </table>
