@@ -7,7 +7,7 @@
                     Invoice Details
                 </h1>
                 <p class="text-sm text-gray-500">
-                    {{ $invoice->invoice_number }} • Created on {{ $invoice->invoice_date->format('Y-m-d') }}
+                    {{ $invoice->invoice_number }} • Created on {{ $invoice->invoice_date->format('d-m-Y' )}}
                 </p>
             </div>
             <div class="flex space-x-2">
@@ -37,7 +37,7 @@
                 </div>
                 <div>
                     <h2 class="text-sm font-semibold text-gray-600 mb-1">Date</h2>
-                    <p class="text-gray-800">{{ $invoice->invoice_date->format('Y-m-d') }}</p>
+                    <p class="text-gray-800">{{ $invoice->invoice_date->format('d-m-Y') }}</p>
                 </div>
 
                 <div>

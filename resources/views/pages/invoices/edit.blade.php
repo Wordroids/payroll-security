@@ -26,7 +26,7 @@
                 </div>
                 <div>
                     <h2 class="text-sm font-semibold text-gray-600 mb-1">Date</h2>
-                    <p class="text-gray-800">{{ $invoice->invoice_date->format('Y-m-d') }}</p>
+                    <p class="text-gray-800">{{ $invoice->invoice_date->format('d-m-Y') }}</p>
                 </div>
                 <div>
                     <h2 class="text-sm font-semibold text-gray-600 mb-1">Total Amount</h2>
