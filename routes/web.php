@@ -13,6 +13,7 @@ use App\Http\Controllers\SiteController;
 use App\Http\Controllers\UniformsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EPFController;
+use App\Http\Controllers\CFormController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -160,13 +161,21 @@ Route::middleware('auth')->group(function () {
     });
 
 
-
-    // Form C Routes
+    //form C routes
     Route::prefix('epf/form-c')->name('epf.form-c.')->group(function () {
-        Route::get('/', [EPFController::class, 'formC'])->name('index');
-        Route::get('/create', [EPFController::class, 'create'])->name('create');
-        Route::post('/store', [EPFController::class, 'storeEtf'])->name('store');
-        Route::get('/download-pdf/{month}/{year}', [EPFController::class, 'printFormC'])->name('pdf');
+
+        Route::get('/', [CFormController::class, 'index'])->name('index');
+        Route::get('/create', [CFormController::class, 'create'])->name('create');
+        Route::post('/store', [CFormController::class, 'store'])->name('store');
+        Route::get('/bank-details', [CFormController::class, 'bankDetails'])->name('bankDetails');
+        Route::get('/bank-details/create', [CFormController::class, 'createBankDetails'])->name('bankDetails.create');
+        Route::post('/bank-details/store', [CFormController::class, 'storeBankDetails'])->name('bankDetails.store');
+        Route::get('/bank-details/{month}/{year}/edit', [CFormController::class, 'editBankDetails'])->name('bankDetails.edit');
+        Route::delete('/bank-details/{month}/{year}', [CFormController::class, 'destroyBankDetails'])->name('bankDetails.destroy');
+        Route::get('/pdf/{month}/{year}', [CFormController::class, 'printPdf'])->name('pdf');
+        Route::get('/{id}/edit', [CFormController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [CFormController::class, 'update'])->name('update');
+        Route::delete('/{id}', [CFormController::class, 'destroyEtf'])->name('destroy');
     });
     //Salary Settings Routes
     Route::get('/salary-settings', [SalarySettingController::class, 'index'])->name('salary-settings.index');
