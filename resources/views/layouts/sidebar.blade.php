@@ -142,6 +142,33 @@
                             class="block px-2 py-1 rounded hover:bg-gray-100 transition">Uniforms</a></li>
                 </ul>
             </li>
+            {{-- Section: EPF --}}
+            <li>
+                <button type="button"
+                    class="flex items-center w-full px-2 py-2 text-left rounded-lg hover:bg-gray-100 transition group"
+                    aria-controls="dropdown-epf" data-collapse-toggle="dropdown-epf">
+                    <svg class="w-5 h-5 text-gray-500 group-hover:text-indigo-600" fill="currentColor"
+                        viewBox="0 0 24 24">
+                        <path fill-rule="evenodd"
+                            d="M6 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8.414a2 2 0 0 0-.586-1.414l-4.414-4.414A2 2 0 0 0 12.586 2H6Zm2 10a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm0 4a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-3 flex-1">EPF</span>
+                    <svg class="w-3 h-3 ml-auto text-gray-400 group-hover:text-indigo-600" fill="none"
+                        viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M1 1l4 4 4-4" />
+                    </svg>
+                </button>
+                <ul id="dropdown-epf" class="hidden ml-7 mt-1 space-y-1">
+                    <li><a href="{{ route('epf.form-c.index') }}"
+                            class="block px-2 py-1 rounded hover:bg-gray-100 transition">Form C</a></li>
+                    <li><a href="{{ route('epf.form-r.index') }}"
+                            class="block px-2 py-1 rounded hover:bg-gray-100 transition">Form R</a></li>
+
+                </ul>
+            </li>
+
             {{-- Section: Salary Settings --}}
             <li>
                 <button type="button"
