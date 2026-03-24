@@ -94,6 +94,10 @@
                         <option value="LSO" {{ old('rank') == 'LSO' ? 'selected' : '' }}>LSO</option>
                         <option value="JSO" {{ old('rank') == 'JSO' ? 'selected' : '' }}>JSO</option>
                         <option value="CSO" {{ old('rank') == 'CSO' ? 'selected' : '' }}>CSO</option>
+                        <option value="OM" {{ old('rank') == 'OM' ? 'selected' : '' }}>OM</option>
+                        <option value="VO" {{ old('rank') == 'VO' ? 'selected' : '' }}>VO</option>
+                        <option value="AOM" {{ old('rank') == 'AOM' ? 'selected' : '' }}>AOM</option>
+                        <option value="BDM" {{ old('rank') == 'BDM' ? 'selected' : '' }}>BDM</option>
                     </select>
                 </div>
 

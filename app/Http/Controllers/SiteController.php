@@ -160,7 +160,7 @@ class SiteController extends Controller
             'employee_ids' => 'nullable|array',
             'employee_ids.*' => 'exists:employees,id',
             'ranks' => 'nullable|array',
-            'ranks.*' => 'in:CSO,JSO,LSO,OIC,SSO',
+            'ranks.*' => 'in:CSO,JSO,LSO,OIC,SSO,OM,VO,AOM,BDM',
         ]);
                 $syncData = [];
     if (!empty($validated['employee_ids'])) {

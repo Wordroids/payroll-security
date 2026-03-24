@@ -119,6 +119,19 @@
                                             <option value="CSO"
                                                 {{ old('ranks.' . $index . '.rank', $rate->rank) == 'CSO' ? 'selected' : '' }}>
                                                 CSO</option>
+                                            <option value="OM"
+                                                {{ old('ranks.' . $index . '.rank', $rate->rank) == 'OM' ? 'selected' : '' }}>
+                                                OM</option>
+
+                                            <option value="VO"
+                                                {{ old('ranks.' . $index . '.rank', $rate->rank) == 'VO' ? 'selected' : '' }}>
+                                                VO</option>
+                                            <option value="AOM"
+                                                {{ old('ranks.' . $index . '.rank', $rate->rank) == 'AOM' ? 'selected' : '' }}>
+                                                AOM</option>
+                                            <option value="BDM"
+                                                {{ old('ranks.' . $index . '.rank', $rate->rank) == 'BDM' ? 'selected' : '' }}>
+                                                BDM</option>
                                         </select>
                                     </div>
                                     <div>
@@ -184,6 +197,10 @@
                         <option value="LSO">LSO</option>
                         <option value="JSO">JSO</option>
                         <option value="CSO">CSO</option>
+                        <option value="OM">OM</option>
+                        <option value="VO">VO</option>
+                        <option value="AOM">AOM</option>
+                        <option value="BDM">BDM</option>
                     </select>
                 </div>
                 <div>
