@@ -15,7 +15,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EPFController;
 use App\Http\Controllers\CFormController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\FixedSalaryController;
 
 
 
@@ -180,6 +180,9 @@ Route::middleware('auth')->group(function () {
     //Salary Settings Routes
     Route::get('/salary-settings', [SalarySettingController::class, 'index'])->name('salary-settings.index');
     Route::put('/salary-settings', [SalarySettingController::class, 'update'])->name('salary-settings.update');
-});
+
+    // Fixed Salaries Routes
+    Route::resource('fixed-salaries', FixedSalaryController::class);
+    });
 
 require __DIR__ . '/auth.php';
