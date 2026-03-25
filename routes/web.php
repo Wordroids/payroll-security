@@ -12,6 +12,7 @@ use App\Http\Controllers\SalarySettingController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\UniformsController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EPFController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -140,6 +141,33 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Form R4 Routes
+    Route::prefix('epf/form-r')->name('epf.form-r.')->group(function () {
+        Route::get('/', [EPFController::class, 'formR'])->name('index');
+        Route::get('/create', [EPFController::class, 'create'])->name('create');
+        Route::post('/store', [EPFController::class, 'storeEtf'])->name('store');
+        Route::get('/download-pdf/{month}/{year}', [EPFController::class, 'printFormR'])->name('pdf');
+
+        Route::get('/bank-details', [EPFController::class, 'bankDetails'])->name('bankDetails');
+        Route::get('/bank-details/create', [EPFController::class, 'createBankDetails'])->name('bankDetails.create');
+        Route::post('/bank-details/store', [EPFController::class, 'storeBankDetails'])->name('bankDetails.store');
+        Route::get('/bank-details/{month}/{year}/edit', [EPFController::class, 'editBankDetails'])->name('bankDetails.edit');
+        Route::delete('/bank-details/{month}/{year}', [EPFController::class, 'destroyBankDetails'])->name('bankDetails.destroy');
+
+        Route::get('/{id}/edit', [EPFController::class, 'editEtf'])->name('edit');
+        Route::put('/{id}', [EPFController::class, 'updateEtf'])->name('update');
+        Route::delete('/{id}', [EPFController::class, 'destroyEtf'])->name('destroy');
+    });
+
+
+
+    // Form C Routes
+    Route::prefix('epf/form-c')->name('epf.form-c.')->group(function () {
+        Route::get('/', [EPFController::class, 'formC'])->name('index');
+        Route::get('/create', [EPFController::class, 'create'])->name('create');
+        Route::post('/store', [EPFController::class, 'storeEtf'])->name('store');
+        Route::get('/download-pdf/{month}/{year}', [EPFController::class, 'printFormC'])->name('pdf');
+    });
     //Salary Settings Routes
     Route::get('/salary-settings', [SalarySettingController::class, 'index'])->name('salary-settings.index');
     Route::put('/salary-settings', [SalarySettingController::class, 'update'])->name('salary-settings.update');
