@@ -69,4 +69,9 @@ class Employee extends Model
     {
         return $this->hasMany(EtfRecord::class);
     }
-}
+
+    public function cFormRecords()
+    {
+        return $this->hasMany(CFormRecord::class);
+    }
+    }
