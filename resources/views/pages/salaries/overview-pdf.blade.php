@@ -130,21 +130,21 @@
                     <td class="epf-etf-status">{{ $data['employee']->include_epf_etf ? 'Yes' : 'No' }}</td>
                     <td>{{ number_format($data['total_shifts'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['basic'], 2) }}</td>
-                    <td class="text-right">{{ number_format($data['ot_earnings'], 2) }}</td>
-                    <td class="text-right">{{ number_format($data['special_ot_earnings'], 2) }}</td>
+                    <td class="text-right">{{ number_format($data['otEarnings'], 2) }}</td>
+                    <td class="text-right">{{ number_format($data['specialOtEarnings'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['totalShiftEarning'], 2) }}</td>
                     <td class="text-right">{{ number_format($data['attendance_bonus'], 2) }}</td>
-                    <td class="text-right">{{ number_format($data['other_allowances'], 2) }}</td>
-                    <td class="text-right text-bold">{{ number_format($data['sub_total'], 2) }}</td>
-                    <td class="text-right text-bold">{{ number_format($data['gross_pay'], 2) }}</td>
-                    <td class="text-right">{{ number_format($data['salary_advance'], 2) }}</td>
-                    <td class="text-right">{{ number_format($data['meal_deductions'], 2) }}</td>
-                    <td class="text-right">{{ number_format($data['uniform_deductions'], 2) }}</td>
-                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epf_deduct_employee'], 2) : 'Excluded' }}</td>
-                    <td class="text-right">{{ number_format($data['total_deductions'], 2) }}</td>
-                    <td class="text-right text-bold text-green">{{ number_format($data['net_pay'], 2) }}</td>
-                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epf_employee'], 2) : 'Excluded' }}</td>
-                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['etf_employee'], 2) : 'Excluded' }}</td>
+                    <td class="text-right">{{ number_format($data['otherAllowances'], 2) }}</td>
+                    <td class="text-right text-bold">{{ number_format($data['subTotal'], 2) }}</td>
+                    <td class="text-right text-bold">{{ number_format($data['grossPay'], 2) }}</td>
+                    <td class="text-right">{{ number_format($data['totalSalaryAdvance'], 2) }}</td>
+                    <td class="text-right">{{ number_format($data['mealDeductions'], 2) }}</td>
+                    <td class="text-right">{{ number_format($data['uniformDeductions'], 2) }}</td>
+                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epfDeductEmployee'], 2) : 'Excluded' }}</td>
+                    <td class="text-right">{{ number_format($data['totalDeductions'], 2) }}</td>
+                    <td class="text-right text-bold text-green">{{ number_format($data['totalEarnings'], 2) }}</td>
+                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['epfEmployee'], 2) : 'Excluded' }}</td>
+                    <td class="text-right">{{ $data['employee']->include_epf_etf ? number_format($data['etfEmployee'], 2) : 'Excluded' }}</td>
                 </tr>
             @endforeach
 

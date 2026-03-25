@@ -112,9 +112,9 @@
             @endif
         </div>
 
-            {{-- Special OT --}}
-            <div class="bg-white rounded-xl shadow p-6">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Special Overtime</h2>
+        {{-- Special OT --}}
+        <div class="bg-white rounded-xl shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Special Overtime</h2>
      <div class="overflow-x-auto mb-4">
         <table class="min-w-full text-sm text-left text-gray-700">
             <thead class="bg-gray-100 font-semibold text-gray-800 border-b">
@@ -176,9 +176,9 @@
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-semibold text-gray-700 mb-4">Basic Salary & Allowances</h2>
                 <div class="space-y-2 text-sm text-gray-700">
-                    <div><strong>Basic Salary:</strong> Rs. {{ number_format($employee->basic, 2) }}</div>
-                    <div><strong>Attendance Bonus:</strong> Rs. {{ number_format($employee->attendance_bonus, 2) }}
-                    </div>
+                    <div><strong>Basic Salary:</strong> Rs. {{ number_format($basic, 2) }}</div>
+                    <div><strong>Attendance Bonus:</strong> Rs. {{ number_format($attendance_bonus, 2) }}</div>
+
                     <div><strong>Other Allowances:</strong> Rs. {{ number_format($otherAllowances, 2) }}</div>
             </div>
         </div>
@@ -196,7 +196,6 @@
                     <div><strong>Sub Total:</strong> Rs. {{ number_format($subTotal, 2) }}</div>
                     <div><strong>Gross Pay:</strong> Rs. {{ number_format($grossPay, 2) }}</div>
                 </div>
-                </div>
             </div>
 
             {{-- Deductions --}}
@@ -209,7 +208,7 @@
                 @else
                     <div><strong>EPF/ETF:</strong> Excluded from calculations</div>
                 @endif
-                    <div><strong>Salary Advances:</strong> Rs. {{ number_format($employee->totalSalaryAdvance, 2) }}
+                    <div><strong>Salary Advances:</strong> Rs. {{ number_format($totalSalaryAdvance, 2) }}
                     </div>
                     <div><strong>Meal Deductions:</strong> Rs. {{ number_format($mealDeductions, 2) }}</div>
                     <div><strong>Uniform Deductions:</strong> Rs. {{ number_format($uniformDeductions, 2) }}</div>
