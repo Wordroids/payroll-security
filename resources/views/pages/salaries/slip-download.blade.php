@@ -155,7 +155,7 @@
             <tbody>
                 <tr>
                     <td>Basic Salary</td>
-                    <td class="text-right">{{ number_format($employee->basic, 2) }}</td>
+                    <td class="text-right">{{ number_format($basic, 2) }}</td>
                 </tr>
                 <tr>
                     <td>Shift Earnings</td>

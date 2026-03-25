@@ -35,7 +35,7 @@
         <tbody>
             <tr class="border-b border-gray-200">
                 <td class="py-2">Basic Salary</td>
-                <td class="py-2 text-right">{{ number_format($employee->basic, 2) }}</td>
+                <td class="py-2 text-right">{{ number_format($basic, 2) }}</td>
             </tr>
             <tr class="border-b border-gray-200">
                 <td class="py-2">Shift Earnings</td>
