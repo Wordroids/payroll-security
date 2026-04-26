@@ -267,10 +267,10 @@
                                             {{ number_format($data['basic'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['ot_earnings'], 2) }}
+                                            {{ number_format($data['otEarnings'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['special_ot_earnings'], 2) }}
+                                            {{ number_format($data['specialOtEarnings'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
                                             {{ number_format($data['totalShiftEarning'], 2) }}
@@ -279,42 +279,42 @@
                                             {{ number_format($data['attendance_bonus'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['performance_allowance'], 2) }}
+                                            {{ number_format($data['performanceAllowance'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['other_allowances'], 2) }}
+                                            {{ number_format($data['otherAllowances'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['sub_total'], 2) }}
+                                            {{ number_format($data['subTotal'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['gross_pay'], 2) }}
+                                            {{ number_format($data['grossPay'], 2) }}
                                         </td>
 
 
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['salary_advance'], 2) }}
+                                            {{ number_format($data['totalSalaryAdvance'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['meal_deductions'], 2) }}
+                                            {{ number_format($data['mealDeductions'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['uniform_deductions'], 2) }}
+                                            {{ number_format($data['uniformDeductions'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ $data['employee']->include_epf_etf ? number_format($data['epf_deduct_employee'], 2) : 'Excluded' }}
+                                            {{ $data['employee']->include_epf_etf ? number_format($data['epfDeductEmployee'], 2) : 'Excluded' }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ number_format($data['total_deductions'], 2) }}
+                                            {{ number_format($data['totalDeductions'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm font-medium text-green-600 whitespace-nowrap">
-                                            {{ number_format($data['net_pay'], 2) }}
+                                            {{ number_format($data['totalEarnings'], 2) }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ $data['employee']->include_epf_etf ? number_format($data['epf_employee'], 2) : 'Excluded' }}
+                                            {{ $data['employee']->include_epf_etf ? number_format($data['epfEmployee'], 2) : 'Excluded' }}
                                         </td>
                                         <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                            {{ $data['employee']->include_epf_etf ? number_format($data['etf_employee'], 2) : 'Excluded' }}
+                                            {{ $data['employee']->include_epf_etf ? number_format($data['etfEmployee'], 2) : 'Excluded' }}
                                         </td>
                                     </tr>
                                     @empty

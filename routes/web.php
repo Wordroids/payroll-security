@@ -12,8 +12,10 @@ use App\Http\Controllers\SalarySettingController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\UniformsController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\EPFController;
+use App\Http\Controllers\CFormController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\FixedSalaryController;
 
 
 
@@ -140,9 +142,47 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Form R4 Routes
+    Route::prefix('epf/form-r')->name('epf.form-r.')->group(function () {
+        Route::get('/', [EPFController::class, 'formR'])->name('index');
+        Route::get('/create', [EPFController::class, 'create'])->name('create');
+        Route::post('/store', [EPFController::class, 'storeEtf'])->name('store');
+        Route::get('/download-pdf/{month}/{year}', [EPFController::class, 'printFormR'])->name('pdf');
+
+        Route::get('/bank-details', [EPFController::class, 'bankDetails'])->name('bankDetails');
+        Route::get('/bank-details/create', [EPFController::class, 'createBankDetails'])->name('bankDetails.create');
+        Route::post('/bank-details/store', [EPFController::class, 'storeBankDetails'])->name('bankDetails.store');
+        Route::get('/bank-details/{month}/{year}/edit', [EPFController::class, 'editBankDetails'])->name('bankDetails.edit');
+        Route::delete('/bank-details/{month}/{year}', [EPFController::class, 'destroyBankDetails'])->name('bankDetails.destroy');
+
+        Route::get('/{id}/edit', [EPFController::class, 'editEtf'])->name('edit');
+        Route::put('/{id}', [EPFController::class, 'updateEtf'])->name('update');
+        Route::delete('/{id}', [EPFController::class, 'destroyEtf'])->name('destroy');
+    });
+
+
+    //form C routes
+    Route::prefix('epf/form-c')->name('epf.form-c.')->group(function () {
+
+        Route::get('/', [CFormController::class, 'index'])->name('index');
+        Route::get('/create', [CFormController::class, 'create'])->name('create');
+        Route::post('/store', [CFormController::class, 'store'])->name('store');
+        Route::get('/bank-details', [CFormController::class, 'bankDetails'])->name('bankDetails');
+        Route::get('/bank-details/create', [CFormController::class, 'createBankDetails'])->name('bankDetails.create');
+        Route::post('/bank-details/store', [CFormController::class, 'storeBankDetails'])->name('bankDetails.store');
+        Route::get('/bank-details/{month}/{year}/edit', [CFormController::class, 'editBankDetails'])->name('bankDetails.edit');
+        Route::delete('/bank-details/{month}/{year}', [CFormController::class, 'destroyBankDetails'])->name('bankDetails.destroy');
+        Route::get('/pdf/{month}/{year}', [CFormController::class, 'printPdf'])->name('pdf');
+        Route::get('/{id}/edit', [CFormController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [CFormController::class, 'update'])->name('update');
+        Route::delete('/{id}', [CFormController::class, 'destroyEtf'])->name('destroy');
+    });
     //Salary Settings Routes
     Route::get('/salary-settings', [SalarySettingController::class, 'index'])->name('salary-settings.index');
     Route::put('/salary-settings', [SalarySettingController::class, 'update'])->name('salary-settings.update');
-});
+
+    // Fixed Salaries Routes
+    Route::resource('fixed-salaries', FixedSalaryController::class);
+    });
 
 require __DIR__ . '/auth.php';

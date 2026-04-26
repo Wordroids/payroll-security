@@ -42,7 +42,7 @@ class Employee extends Model
 
     public function sites()
     {
-        return $this->belongsToMany(Site::class) ->withPivot('rank');
+        return $this->belongsToMany(Site::class)->withPivot('rank');
     }
 
     public function salaryAdvances()
@@ -63,4 +63,15 @@ class Employee extends Model
     {
         return $this->hasMany(Uniform::class);
     }
-}
+
+    // to get all ETF/EPF records for the employee.
+    public function etfRecords()
+    {
+        return $this->hasMany(EtfRecord::class);
+    }
+
+    public function cFormRecords()
+    {
+        return $this->hasMany(CFormRecord::class);
+    }
+    }
