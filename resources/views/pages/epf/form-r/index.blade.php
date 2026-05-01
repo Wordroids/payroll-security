@@ -25,14 +25,6 @@
                 <p class="text-xs text-indigo-600 font-bold uppercase">Total ETF (3%)</p>
                 <p class="text-xl font-semibold">Rs. {{ number_format($totals['total_contribution'], 2) }}</p>
             </div>
-            <div class="bg-green-50 p-4 rounded-lg border border-green-100">
-                <p class="text-xs text-green-600 font-bold uppercase">Total Employer EPF (12%)</p>
-                <p class="text-xl font-semibold">Rs. {{ number_format($totals['total_employer_epf'], 2) }}</p>
-            </div>
-            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                <p class="text-xs text-blue-600 font-bold uppercase">Total Employee EPF (8%)</p>
-                <p class="text-xl font-semibold">Rs. {{ number_format($totals['total_employee_epf'], 2) }}</p>
-            </div>
         </div>
 
         <div class="flex gap-2 mb-4">
