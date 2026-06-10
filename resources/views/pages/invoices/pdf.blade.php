@@ -297,7 +297,7 @@
     <div class="thank-you" style="margin-top: 10px; text-align: center;">
         <p>Thank you for choosing <strong>Smart Syndicates Security & Investigations.</strong></p>
         <p>For any queries regarding this invoice, please get in touch with us at
-            <strong style="color: #2563eb;">kamanthap@smartsyndicates.lk</strong>
+            <strong style="color: #2563eb;">info@smartsyndicates.lk</strong>
         </p>
     </div>
 
