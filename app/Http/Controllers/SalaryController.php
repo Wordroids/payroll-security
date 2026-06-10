@@ -240,7 +240,7 @@ class SalaryController extends Controller
             $data['epfEtfEmployer'] = $employee->include_epf_etf ? round($activeBasic * 0.15, 2) : 0;
 
             $currentUniform = Uniform::where('employee_id', $employee->id)->whereMonth('date', $date->month)->whereYear('date', $date->year)->sum('total_amount');
-            $data['uniformDeductions'] = $currentUniform / 2;
+            $data['uniformDeductions'] = $currentUniform ;
 
             $data['totalDeductions'] = $data['epfDeductEmployee'] + $data['totalSalaryAdvance'] + $data['mealDeductions'] + $data['uniformDeductions'];
             $data['totalEarnings'] = $data['grossPay'] - $data['totalDeductions'];
